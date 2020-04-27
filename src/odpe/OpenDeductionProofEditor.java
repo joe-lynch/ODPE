@@ -22,50 +22,15 @@ import odpe.frontend.view.dialogs.RuleChooser;
 import odpe.frontend.view.dialogs.SystemChooser;
 import odpe.util.Pair;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 
 
 public class OpenDeductionProofEditor implements ActionListener, PropertyChangeListener, MouseListener, KeyListener{
@@ -365,7 +330,15 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 		derivation = d;
 		display_proof();
 	}
-	
+
+	private void proofSearch() throws ProverException, IOException, MaudeException {
+		status(SEARCHING);
+		Node d = system.getBackend().proofSearch(derivation);
+		status(PROVING);
+		d.print();
+		derivation = d;
+		display_proof();
+	}
 
 private synchronized void undo() {
 	if (undo_stack.empty())
@@ -384,9 +357,7 @@ private synchronized void undo() {
 		else {
 			try {
 				parent.replaceChild(last_change, last_change.getChild(0));
-			}catch(ArrayIndexOutOfBoundsException e) {
-				
-			}
+			}catch(ArrayIndexOutOfBoundsException ignored) {}
 			Node p;
 			Node n = parent;
 			while((p = n.getParent()) != null)
@@ -429,6 +400,7 @@ private synchronized void undo() {
 	private JButton newButton;
 	private JButton subatomiseButton;
 	private JButton interpretButton;
+	private JButton proofSearchButton;
 	private JButton undoButton;
 	private JButton stopButton;
 	private JPanel contentPanel;
@@ -482,8 +454,6 @@ private synchronized void undo() {
 		frame.getContentPane().setPreferredSize(new Dimension(600, 600));
 		frame.pack();
 		display_proof();
-		
-		
 
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.getContentPane().add(scrollPane, BorderLayout.CENTER);
@@ -492,20 +462,25 @@ private synchronized void undo() {
 		statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
 		frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
 
-		JToolBar toolBar = new JToolBar("GraPE Toolbar");
+		JToolBar toolBar = new JToolBar("ODPE Toolbar");
 		toolBar.setFloatable(false);
 		toolBar.setRollover(true);
 		newButton = new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/New16.gif")));
 		newButton.addActionListener(this);
 		toolBar.add(newButton);
 		
-		subatomiseButton = new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/New16.gif")));
+		subatomiseButton = new JButton("Subatomise "); //new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/New16.gif")));
 		subatomiseButton.addActionListener(this);
 		toolBar.add(subatomiseButton);
 		
-		interpretButton = new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/New16.gif")));
+		interpretButton = new JButton("Interpret "); //new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/New16.gif")));
 		interpretButton.addActionListener(this);
 		toolBar.add(interpretButton);
+		//interpretButton.setVisible(false);
+
+		proofSearchButton = new JButton(" Proof Search "); //new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/New16.gif")));
+		proofSearchButton.addActionListener(this);
+		toolBar.add(proofSearchButton);
 		
 		undoButton = new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/Undo16.gif")));
 		undoButton.addActionListener(this);
@@ -550,10 +525,22 @@ private synchronized void undo() {
 			c.gridy = 1;
 			c.weighty = 0;		
 			proofPanel.add(widget, c);
+
+			int frame_w = 600;
+			int frame_h = 600;
+
+            int widget_w = (int)widget.getPreferredSize().getWidth() + 200;
+            int widget_h = (int)widget.getPreferredSize().getHeight() + 200;
+
+            if (widget_w > frame_w || widget_h > frame_h) {
+				if (widget_w > frame_w)
+					frame_w = widget_w;
+				if (widget_h > frame_h)
+					frame_h = widget_h;
+				frame.setSize(new Dimension(frame_w, frame_h));
+			}
 		}
-		
 		frame.validate();
-		
 	}
 	
 	private Rewrite get_choice(Pair<Vector<Rewrite>, Vector<Rewrite>> choices) {
@@ -626,7 +613,9 @@ private synchronized void undo() {
 			
 			if (f == null) {
 				status(NO_ACTIVE_PROOF);
-				break;
+				new_proof();
+				//status(NO_ACTIVE_PROOF);
+				//break;
 			}
 			// initialize the backend and set everything up
 			try {
@@ -637,17 +626,20 @@ private synchronized void undo() {
 				if(ctxt != null)
 					f = ctxt.replace("#1", f);
 				//gets the derivation
-				derivation = system.getBackend().normalize( system.getParser().parse(f.trim(),system.getLexer()));
+				//derivation = system.getBackend().normalize( system.getParser().parse(f.trim(),system.getLexer()));
+
+				derivation = system.getBackend().test(f.trim());
+
 				derivation.prettyprint();
 				current_selection = new Selection(derivation);
 				undo_stack.push(derivation);
 				status(PROVING);
 				done = true;
-			} catch(ParseError e) {
-				ExceptionDialog.showWarningDialog(frame, e);
 			} catch(ProverException e) {
 				ExceptionDialog.showExceptionDialog(frame, e);
 				status(NO_ACTIVE_PROOF);
+			} catch (IOException | MaudeException parseError) {
+				parseError.printStackTrace();
 			}
 		}
 	}
@@ -658,12 +650,13 @@ private synchronized void undo() {
 	private static final int PROVING = 2;
 	private static final int READING_CHOICES = 3;
 	private static final int STOPPING_BACKEND = 4;
-	private static final int maxStatus = 4;
+	private static final int SEARCHING = 5;
+	private static final int maxStatus = 5;
 
 	
 	/**
 	 * This method provides the status of the open deduction proof editor
-	 * @author Max Schaefer
+	 * @author Joe Lynch, adapted from Max Schaefer's version
 	 * 
 	 * @param newStatus     the current status of the system
 	 */
@@ -724,11 +717,9 @@ private synchronized void undo() {
 			canStep(false);
 			canUndo(false);
 			canStop(true);
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					statusBar.setText("Reading Choices");
-					setCursor(BUSY);
-				}
+			SwingUtilities.invokeLater(() -> {
+				statusBar.setText("Reading Choices");
+				setCursor(BUSY);
 			});
 			break;
 		case STOPPING_BACKEND:
@@ -736,11 +727,19 @@ private synchronized void undo() {
 			canStep(false);
 			canUndo(false);
 			canStop(false);
-			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
-					statusBar.setText("Stopping Backend");
-					setCursor(BUSY);
-				}
+			SwingUtilities.invokeLater(() -> {
+				statusBar.setText("Stopping Backend");
+				setCursor(BUSY);
+			});
+			break;
+		case SEARCHING:
+			canNew(false);
+			canStep(false);
+			canUndo(false);
+			canStop(true);
+			SwingUtilities.invokeLater(() -> {
+				statusBar.setText("Searching");
+				setCursor(BUSY);
 			});
 			break;
 		}
@@ -837,7 +836,6 @@ private synchronized void undo() {
 					if(!subatomised)
 						subatomise();
 				} catch (ProverException | MaudeException | IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
             } else if((src == interpretButton)) {
@@ -845,10 +843,15 @@ private synchronized void undo() {
 					if(subatomised)
 						interpret();
 				} catch (ProverException | MaudeException | IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-            } else if (src == exitItem) {
+            } else if((src == proofSearchButton)) {
+				try {
+					proofSearch();
+				} catch (ProverException | MaudeException | IOException e) {
+					e.printStackTrace();
+				}
+			} else if (src == exitItem) {
 				System.exit(0);
 			} //else if ((src == undoItem1) || (src == undoItem2) || (src == undoButton)) {
 				//undo();
@@ -959,7 +962,7 @@ private synchronized void undo() {
 	private synchronized void multipleDerivationProcess() {
 		redexNode = null;
 		derivation.refresh();
-		
+
 		Vector<Node> selectedNodes = curr_pair.values().stream().map(Selection::getSurroundingNode).collect(Collectors.toCollection(Vector<Node>::new));
 		selectedNodes.forEach(item -> item.setSpecial(false));
 		
@@ -985,7 +988,7 @@ private synchronized void undo() {
 		curr_connective = connective;
 		multiple_derivations = true;
 	}
-	
+
 	/**
 	 * This method finds the lowest common ancestor node
 	 * it recursively goes through the list to find the lca node
@@ -1140,7 +1143,7 @@ private synchronized void undo() {
 				}
 				else
 					continue;
-			}		
+			}
 		return parents;
 	}
 	
@@ -1294,10 +1297,10 @@ private synchronized void undo() {
 	 * @param reverse       whether it should order in reverse
 	 */
 	private void orderByDepth(Vector<Node> nodes, Boolean reverse) {
-		Vector<Integer> orderedByDepth = new Vector<Integer>();
+		Vector<Integer> orderedByDepth = new Vector<>();
 		nodes.forEach(item -> orderedByDepth.add(item.getDepth(0)));
 		if(reverse)
-			Collections.sort(orderedByDepth, Collections.reverseOrder());
+			orderedByDepth.sort(Collections.reverseOrder());
 		else
 			Collections.sort(orderedByDepth);
 		nodes.sort(Comparator.comparing(item -> orderedByDepth.indexOf(item.getDepth(0))));

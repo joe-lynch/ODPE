@@ -94,19 +94,18 @@ fmod Util is
     var N K : Nat .
     var V V1 V2 : Variable .
     var C : Constant .
-    var TL : TermList .
-    var Rewr op op1 ss : Qid .
+    var Rewr op op1 ss cnst : Qid .
     var QL RewrList : QidList .
     var Reing : Rewriting .
     var ReingList : RewritingSet .
     var Ctxt Ctxt1 : Context .
-    vars TL1 TL2 : TermList .
+    vars TL TL1 TL2 : TermList .
     var Subst : Substitution .
     var Mod : Module .
     var Rls : RuleSet .
     var Rle : Rule  .
     var rp : ResultPair .
-    var cnst cnst1 cnst2 cnst3 : Constant .
+    var cnst1 cnst2 cnst3 : Constant .
     var sub : Substitution .
     var con : Context .
     var nct : NeCTermList .
@@ -183,7 +182,8 @@ fmod Util is
 
 
     op extractSubstitution : Substitution -> Term .
-    eq extractSubstitution ( V <- Trm ) = Trm .
+    eq extractSubstitution( V <- Trm ) = Trm .
+    eq extractSubstitution( none ) = empty .
 
     op manyMatches : Term Context Nat -> Nat .
     eq manyMatches( Trm , con , N ) =
@@ -412,10 +412,6 @@ fmod Util is
     eq getTopFormula( (Trm , empty ) ) = Trm .
     eq getTopFormula( (Trm, TL) ) = getTopFormula(Trm) , getTopFormula( TL ) .
     eq getTopFormula( empty ) = empty .
-
-    op getTopFormula : TermSet -> TermSet .
-    eq getTopFormula( emptyTermSet ) = emptyTermSet .
-    eq getTopFormula( (Trm | TSet) ) = getTopFormula(Trm) | getTopFormula(TSet) .
   
 
 *** find the rewrites of a term with a list of rules
@@ -528,7 +524,7 @@ fmod Util is
     
     eq matchbt(Trm, Trm1,  N, K) = empty .
 
-
+***(
     op rew : TermSet Qid QidList Term -> TermSet .
     eq rew( emptyTermSet, M, RewrList, Trm1 ) = emptyTermSet . 
     eq rew( (Trm | TSet), M, RewrList, Trm1 ) = fr( Trm, M, RewrList, Trm1 ) | rew( TSet, M, RewrList, Trm1 ) .
@@ -565,11 +561,11 @@ fmod Util is
     eq fr-manage( (Trm | TSet), Trm1 ) = fr(Trm, 'SAM-Meta, 'uuu 'unu 'ubu 'nun 'nnn 'nbn 'nuu 'nnu 'nbu 'uun 'ubn 'auu 'anu 'abu 'aun 'ann 'll1 'll2 'll3 'll4, Trm1)
                                         | fr-manage( TSet, Trm1 ) .   
     eq fr-manage( emptyTermSet, Trm1 ) = emptyTermSet .
-
+*)
     op formDeriv : Term Qid Term -> Term .
     eq formDeriv( Trm, Q, Trm1 ) =  '_>`[_`]>_[ Trm, Q, Trm1 ] .
 
-
+***(
     op ap : Qid Result4Tuple Qid Term -> Term .
     ceq ap ( M, {Trm, Tp, Subst, Ctxt}, Rewr, OrigTrm ) = follow-trace(metaSearchPath(['SAM-Meta], OrigTrm, Trm, nil, '+, 3, 0),Trm)
        if follow-trace(metaSearchPath(['SAM-Meta], OrigTrm, Trm, nil, '+, 3, 0),Trm) =/= empty /\
@@ -619,13 +615,7 @@ fmod Util is
     op manage1 : TermSet QidList Nat -> TermSet .
     eq manage1( TSet, RewrList, 0 ) = emptyTermSet .
     eq manage1( TSet, RewrList, N ) = master1(TSet, RewrList) . *** | master1(master1(TSet,RewrList), RewrList) .
-
-*** get value at index of term set
-    op get : TermSet Nat Nat -> Term .
-    eq get(emptyTermSet, N, K) = empty .
-    ceq get((Trm | TSet),N,K) = Trm
-        if N == K .
-    eq get((Trm | TSet), N, K) = get(TSet, N, K + 1) .
+*)
 
 *** get values at index of term list
     op get : TermList Nat Nat -> Term .
@@ -637,90 +627,59 @@ fmod Util is
     op size : TermList -> Nat .
     eq size( TL ) = $size( TL, 0 ) .
 
-    op size : TermSet -> Nat .
-    eq size( TSet ) = $size( TSet, 0 ) .
-    
     op $size : TermList Nat -> Nat .
     eq $size( empty , N ) = N .
     eq $size( (Trm,TL), N ) = $size(TL, N + 1) .
 
-    op $size : TermSet Nat -> Nat .
-    eq $size( empty , N ) = N .
-    eq $size( (Trm | TSet), N ) = $size(TSet, N + 1) .
+    op s : Trace -> Term .
 
-
-    op loop-ext : Term TermSet Term Nat -> Term .
-    eq loop-ext( '_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N ) =
-        if get(TSet,N,0) =/= empty then
-            if path(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0) =/= empty then
+    op loop-ext : Term TermList Term Nat -> TermList .
+    eq loop-ext( '_>`[_`]>_[ Trm, Q, Trm1 ], TL, Trm2, N ) = 
+        if get(TL,N,0) =/= empty then
+            if path(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TL,N,0), nil, 0)),0) =/= empty then
                 loopl(
                     Trm2,
-                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)),
-                    path(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0)
-                ) , loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1)
+                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TL,N,0), nil, '+, 3, 0), get(TL,N,0)),
+                    path(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TL,N,0), nil, 0)),0)
+                ) , loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], TL, Trm2, N + 1)
             else
-                loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1)
+                loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], TL, Trm2, N + 1)
             fi
         else
             empty
-        fi .
-
-    op loop-ext1 : Term TermSet Term Nat -> Term .
-    eq loop-ext1( '_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N ) = 
-        if get(TSet,N,0) =/= empty then
-            if path1(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0) =/= empty then
-                follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0))
-                ***( follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)) ***
-                loopl(
-                    Trm2,
-                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)),
-                    path1(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0)
-                )  *) ***(
-                loopl(
-                    Trm2,
-                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)),
-                    path1(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0)
-                ) , loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1) *)
-            else
-                loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1)
-            fi 
-        else
-            empty
-        fi .
-
-
+        fi . 
+        
 	op in : Term TermList -> Bool .
 	eq in ( T1, empty ) = false . 
 	ceq in( T1 , ( Trm , TL ) ) = true 
 		if flatten(T1) == flatten(Trm) .
 	eq in( T1, ( Trm , TL ) ) = in( T1, TL ) .
-	
 
-    op crazy : Term -> TermList .
-    eq crazy( op [ Trm , Trm1 ] ) = crazy1(unpack-structure( op , TermList(proofSearch( Trm, 'S:Structure )), TermList(proofSearch(Trm1, 'T:Structure)), 0 ), 0, 0) .
-	
-	op crazy1 : TermList Nat Nat -> TermList .
-	eq crazy1( empty , N, K ) = empty [print "N: " N ] .
-	eq crazy1( (Trm,TL) , N, K ) = TermList($crazy1(Trm, N, K)) , crazy1( TL, size(TL), K) [print "N: " N ] .
+	op StratResult : Nat Term Term -> ResultPair  .
+	eq StratResult( N, Trm1, Trm2 ) =
+		metaSrewrite(['SamStr],Trm1,
+					 	 'app[[empty]] ; test('gtf1[[empty]] ; 'unRewrite1[[empty]] ; match Trm2 s.t. nil),
+					breadthFirst,N) .
 
-	op $crazy1 : Term Nat Nat -> TermSet .
-    eq $crazy1( Trm, N, K ) = proofSearch(Trm,'S:Structure) .
-
-***reduce in SAM-Meta : in(upTerm([{0,0},{1,B}] a [{0,0},{1,C}]), crazy(upTerm([{B,1 a 0},{( 0 a 1 ), C}]))) .
+	op ps : Term Term Nat -> TermList .
+	eq ps( Trm1, Trm2, N ) = 
+			if StratResult(N,Trm1,Trm2) =/= failure then
+				getTerm(StratResult(N,Trm1,Trm2)), ps(Trm1, Trm2, N + 1)
+			else
+				empty
+			fi . 
 
 *** loop through each derivation
     op loop : Term TermList -> TermList .
     eq loop( '_>`[_`]>_[ Trm, Q, Trm1 ], empty) = empty . 
-    eq loop( '_>`[_`]>_[ Trm, Q, Trm1 ], (Trm2,TL)  ) =
-        loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], proofSearch(getTopFormula(Trm2), getFormula(Trm1)), Trm2, 0) ,
-        loop('_>`[_`]>_[ Trm, Q, Trm1 ], TL) . 
+    eq loop( '_>`[_`]>_[ Trm, Q, Trm1 ], (Trm2,TL)  ) = ps(getTopFormula(Trm2), getFormula(Trm1),0), loop('_>`[_`]>_[ Trm, Q, Trm1 ], TL) . ***(
+        loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], ps(getTopFormula(Trm2), getFormula(Trm1), 0), Trm2, 0),
+        loop('_>`[_`]>_[ Trm, Q, Trm1 ], TL) . *)
 
-
-    op loop1 : Term TermList -> TermList .
-    eq loop1( '_>`[_`]>_[ Trm, Q, Trm1 ], empty) = empty . 
-    eq loop1( '_>`[_`]>_[ Trm, Q, Trm1 ], (Trm2,TL)  ) = loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], proofSearch1(getTopFormula(get((Trm2,TL),450,0)), getFormula(Trm1)), get((Trm2,TL),450,0), 0) . ***(
-        loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], proofSearch1(getTopFormula(Trm2), getFormula(Trm1)), Trm2, 0) ,
-        loop1('_>`[_`]>_[ Trm, Q, Trm1 ], TL) . )
+	op loop1 : Term TermList Nat -> TermList .
+    eq loop1( '_>`[_`]>_[ Trm, Q, Trm1 ], empty, N) = empty . 
+    eq loop1( '_>`[_`]>_[ Trm, Q, Trm1 ], (Trm2,TL), N  ) = ps(getTopFormula(Trm2), getFormula(Trm1),0), loop1('_>`[_`]>_[ Trm, Q, Trm1 ], TL, size(TL))
+    	[print N] .
 
 *** loop through the conclusion
     op loopl : Term Term TermList -> Term .
@@ -728,20 +687,26 @@ fmod Util is
     eq loopl( Trm, Trm1, empty) = empty .
     eq loopl( Trm, Trm1, (Trm2, TL) ) = align(Trm,Trm1,Trm2), loopl(Trm, Trm1, TL) .
 
-*** find the path for the incomplete derivation - I somehow increased the speed by using op [ TL ] ???
+  	op path1 : Term Nat -> Term .
+    eq path1( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) = loop1('_>`[_`]>_[ Trm, Q, Trm1 ], path(Trm,0), size(path(Trm,0)) ) .
+
+*** red in SAM-Meta : path1( upTerm( ((rewr({[a,c],[e,g]}) >['n]> S:Structure ) a (rewr({[b,d],[f,h]}) >['n]> T:Structure)) >['n]> rewr([{a,S1:Structure} a {b,S2:Structure}, {c,S3:Structure} a {d,S4:Structure}]) ),0) .
     op path : Term Nat -> Term .
     eq path( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) = loop('_>`[_`]>_[ Trm, Q, Trm1 ], path(Trm,0) ) .
 
-    op path1 : Term Nat -> Term .
-    eq path1( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) = loop('_>`[_`]>_[ Trm, Q, Trm1 ], path1(Trm,0) ) .
-
-    ceq path( '___[ Trm, cnst, Trm1 ], N ) = unpack-subatom(path(Trm,N), cnst, path(Trm1, N), N)
+    ceq path( '___[ Trm, cnst, Trm1 ], N ) = comb-l('___[ path(Trm,N), cnst, path(Trm1,N) ])
         if path(Trm, N) =/= empty /\ path(Trm1, N) =/= empty .
     eq path( '___[ Trm, cnst, Trm1 ], N ) = empty .
 
-    ***reduce in SAM-Meta : path( upTerm( ( ({[a,c],[e,g]} >['n]> S:Structure) a ({[b,d],[f,h]} >['n]> T:Structure) ) >['n]> [({a,S1:Structure} a {b,S2:Structure}) >['n]> {a a b,[e,g] a [f,h]}, ({c,S3:Structure} a {d,S3:Structure}) >['n]> {c a d,[e,g] a [f,h]}] ), 0) .
+    op comb-l : Term -> TermList .	
+    eq comb-l( '___[ TL1, cnst, (Trm2,TL2) ] ) = comb-r( '___[ TL1 , cnst, Trm2 ] ) , comb-l( '___[ TL1 , cnst, TL2 ] ) .
+    eq comb-l( '___[ TL1, cnst, empty ] ) = empty .
+
+    op comb-r : Term -> TermList .
+    eq comb-r( '___[ (Trm1,TL1), cnst, Trm2 ] ) = '___[ Trm1, cnst, Trm2 ], comb-r('___[ TL1, cnst, Trm2 ]) .
+    eq comb-r( '___[ empty, cnst, Trm2 ] ) = empty .
+***reduce in SAM-Meta : path( upTerm( ( ({[a,c],[e,g]} >['n]> S:Structure) a ({[b,d],[f,h]} >['n]> T:Structure) ) >['n]> [({a,S1:Structure} a {b,S2:Structure}) >['n]> {a a b,[e,g] a [f,h]}, ({c,S3:Structure} a {d,S3:Structure}) >['n]> {c a d,[e,g] a [f,h]}] ), 0) .
     
-    *** sort this out
     ceq path( op [ Trm, Trm1 ], N ) = flatten(unpack-structure(op, path(Trm,N), path(Trm1 ,N), N))
         if Trm1 =/= empty /\  path(Trm, N) =/= empty /\ path(Trm1, N) =/= empty .
     ceq path( op [ Trm, TL ], N ) = flatten(unpack-structure(op, path(Trm,N), path( op [ TL ] ,N), N))
@@ -752,24 +717,6 @@ fmod Util is
     ceq path( (Trm, TL), N ) = path(Trm, N), path(TL, N)
         if TL =/= empty .
     eq path( Trm, N ) = Trm .
-
-
-
-    ceq path1( '___[ Trm, cnst, Trm1 ], N ) = unpack-subatom(path1(Trm,N), cnst, path1(Trm1, N), N)
-        if path1(Trm, N) =/= empty /\ path1(Trm1, N) =/= empty .
-    eq path1( '___[ Trm, cnst, Trm1 ], N ) = empty .
-    
-    *** sort this out
-    ceq path1( op [ Trm, Trm1 ], N ) = flatten(unpack-structure(op, path1(Trm,N), path1(Trm1 ,N), N))
-        if Trm1 =/= empty /\  path1(Trm, N) =/= empty /\ path1(Trm1, N) =/= empty .
-    ceq path1( op [ Trm, TL ], N ) = flatten(unpack-structure(op, path1(Trm,N), path1( op [ TL ] ,N), N))
-        if TL =/= empty /\  path1(Trm, N) =/= empty /\ path1(TL, N) =/= empty .
-    ceq path1( op[ Trm, TL ], N ) = empty
-        if TL =/= empty .
-    
-    ceq path1( (Trm, TL), N ) = path1(Trm, N), path1(TL, N)
-        if TL =/= empty .
-    eq path1( Trm, N ) = Trm .
 
 *** unpack structures made up of term lists
     op unpack-structure : Qid TermList TermList Nat -> TermList .
@@ -790,6 +737,15 @@ fmod Util is
     eq unpack-subatom( (Trm,TL), cnst, empty, N, (Trm2,TL2)) = empty .
     eq unpack-subatom( empty, cnst, (Trm1,TL1), N, (Trm2,TL2) ) = unpack-subatom((Trm2,TL2), cnst, TL1, N, (Trm2,TL2)) .
     eq unpack-subatom( empty, cnst, empty, N, (Trm2,TL2) ) = empty .
+
+    op unpack-deriv : TermList Qid TermList Nat -> TermList .
+    eq unpack-deriv( TL, Q, TL1, N ) = unpack-deriv(TL, Q, TL1, N, TL) .
+
+    op unpack-deriv : TermList Term TermList Nat TermList -> TermList .
+    eq unpack-deriv( (Trm,TL), Q, (Trm1,TL1), N, (Trm2,TL2)) = getTerm(metaReduce(['SamStr],'_>`[_`]>_[Trm, Q, Trm1])) , unpack-deriv( TL, Q, (Trm1, TL1), N, (Trm2,TL2)) .
+    eq unpack-deriv( (Trm,TL), Q, empty, N, (Trm2,TL2)) = empty .
+    eq unpack-deriv( empty, Q, (Trm1,TL1), N, (Trm2,TL2) ) = unpack-deriv((Trm2,TL2), Q, TL1, N, (Trm2,TL2)) .
+    eq unpack-deriv( empty, Q, empty, N, (Trm2,TL2) ) = empty .
     
 
 *** follow the traces and construct a derivation
@@ -806,7 +762,7 @@ fmod Util is
     eq follow-trace( nil, finalTrm ) = finalTrm .
     eq follow-trace( nil, Trm, finalTrm ) = Trm .
 
-    op mp : MatchPair -> Term .
+    op mp : Substitution -> Term .
 
     eq follow-trace( TrSt Tr , Trm1, Rle, Trm2, N, finalTrm , K) =
         if metaXmatch(['SAM-Meta], getPr(Rle) , getTopFormula(Trm1), nil , 0, unbounded, N) =/= noMatch then 
@@ -841,7 +797,7 @@ fmod Util is
             
         else
             empty
-        fi . 
+        fi .  
 
 *** get the premise of a rule                                                 
     op getPr : Rule -> Term .
@@ -866,6 +822,8 @@ fmod Util is
 
 *** replace variables with substitutions
     op substitute : Term Substitution -> Term .
+    eq substitute( 'rewu[ Trm ], Subst ) = 'rewu[ substitute( Trm , Subst ) ] .
+    eq substitute( 'rewr[ Trm ], Subst ) = 'rewr[ substitute( Trm , Subst ) ] .
     ceq substitute( op [ Trm , TL ], Subst ) = op [ substitute( Trm, Subst ) , substitute( TL, Subst ) ]
         if TL =/= empty .
     ceq substitute( (Trm, TL), Subst ) = substitute( Trm, Subst ), substitute( TL, Subst )
@@ -940,7 +898,7 @@ fmod Util is
    *** you try index 0, doesn't work so try index 1 - it works!
    *** there is something here... maybe use a list, if it's already in list then do next
 
-
+***(
   op over : Term -> Term .
   eq over ( '_>`[_`]>_[ Trm, Q, Trm1 ]  ) =
     if metaSearch(['SAM-Meta], getTopFormula(overcome(Trm,0)), Trm1, nil, '+, 1, 0) =/= failure then
@@ -971,7 +929,7 @@ fmod Util is
     else
         empty
     fi .
-
+*)
         ***(
 
         else if metaSearch(['SAM-Meta], getTopFormula(overcome1(Trm,1)), Trm1, nil, '+, 1, 0) =/= failure then
@@ -986,8 +944,8 @@ fmod Util is
         fi fi
     else
         empty
-    fi . )
-
+    fi . *)
+***(
  op t : Trace -> Term .
   op overcome1 : Term Nat -> Term .
   eq overcome1( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) =
@@ -997,7 +955,7 @@ fmod Util is
     else
         empty
     fi .
-
+*)
 
 *** reduce in SAM-Meta : overcome( upTerm( { a , a } >['n]> S:Structure >['n]> [ a , a ] ) ) .
 
@@ -1006,7 +964,7 @@ fmod Util is
 
 
 
-
+***(
 op strat : Nat TermList Qid  -> TermList .
 eq strat( N, empty, M ) = empty .
 eq strat( N, (Trm,TL), M) = strat( Trm , M, 0 ), strat(size(TL), TL, M) [ print "N: " N ] . 
@@ -1025,11 +983,11 @@ eq strat( Trm, M, N ) =
 
 op type : Term -> Type . 
 eq type( Trm ) = getType(Trm) .
-
+***)
 endfm
 
 
-fmod HELPER is 
+smod HELPER is 
     protecting Util .
 
 
@@ -1062,29 +1020,62 @@ fmod HELPER is
     eq replaceRules( mod H:Header is I:ImportList sorts SS:SortSet . SSD:SubsortDeclSet OD:OpDeclSet MAS:MembAxSet ES:EquationSet RS:RuleSet endm ) = 
          mod H:Header is I:ImportList sorts SS:SortSet . SSD:SubsortDeclSet OD:OpDeclSet MAS:MembAxSet ES:EquationSet redefineRules(RS:RuleSet) endm .
 
+    op tes : Module -> Module .
+    eq tes(
+        smod H:Header is 
+            I:ImportList
+            sorts SS:SortSet . 
+            SSD:SubsortDeclSet 
+            OD:OpDeclSet 
+            MAS:MembAxSet 
+            ES:EquationSet 
+            RS:RuleSet 
+            SDcS:StratDeclSet 
+            SDfS:StratDefSet 
+        endsm ) =
+                smod H:Header is 
+                    I:ImportList
+                    sorts SS:SortSet . 
+                    SSD:SubsortDeclSet 
+                    OD:OpDeclSet 
+                    MAS:MembAxSet 
+                    ES:EquationSet 
+                    redefineRules(RS:RuleSet)
+                    SDcS:StratDeclSet 
+                    SDfS:StratDefSet 
+                endsm .
+
     op redefineRules : RuleSet -> RuleSet .
     eq redefineRules( none ) = none .
     eq redefineRules( Rle RS:RuleSet ) = redefineRule(Rle) redefineRules(RS:RuleSet) .
 
     op redefineRule : Rule -> RuleSet .
     eq redefineRule( rl Trm => Trm2 [Attrs]. ) =
-       (rl Trm =>
-                constructRuleApplication(Trm,rulename(Attrs),Trm2) [Attrs].
+       rl Trm =>
+                constructRuleApplication(Trm,rulename(Attrs),Trm2) [Attrs] .
+
+       ***(
+
         rl extend(Trm) =>
                 extend( constructRuleApplication(Trm,rulename(Attrs),Trm2) ) [Attrs].
-        rl '`[_`,_`][ Trm , 'T:DerivStructure ] => 
-                '`[_`,_`] [ constructRuleApplication(Trm,rulename(Attrs),Trm2)  , 'T:DerivStructure ] [Attrs].
-        rl '`[_`,_`] [ extend( Trm ) , 'T:DerivStructure] =>
-                '`[_`,_`] [ extend( constructRuleApplication(Trm,rulename(Attrs),Trm2)) , 'T:DerivStructure ] [Attrs].
-        rl '`{_`,_`}[ Trm , 'T:DerivStructure ] => 
-                '`{_`,_`} [ constructRuleApplication(Trm,rulename(Attrs),Trm2)  , 'T:DerivStructure ] [Attrs].
-        rl '`{_`,_`} [ extend( Trm ) , 'T:DerivStructure] =>
-                '`{_`,_`} [ extend( constructRuleApplication(Trm,rulename(Attrs),Trm2)) , 'T:DerivStructure ] [Attrs]. ) .
+        rl '`[_`,_`][ Trm , 'T:NeqRewritable ] => 
+                '`[_`,_`] [ constructRuleApplication(Trm,rulename(Attrs),Trm2)  , 'T:NeqRewritable ] [Attrs].
+        rl '`[_`,_`] [ extend( Trm ) , 'T:NeqRewritable] =>
+                '`[_`,_`] [ extend( constructRuleApplication(Trm,rulename(Attrs),Trm2)) , 'T:NeqRewritable ] [Attrs].
+        rl '`{_`,_`}[ Trm , 'T:NeqRewritable] => 
+                '`{_`,_`} [ constructRuleApplication(Trm,rulename(Attrs),Trm2)  , 'T:NeqRewritable ] [Attrs].
+        rl '`{_`,_`} [ extend( Trm ) , 'T:NeqRewritable] =>
+                '`{_`,_`} [ extend( constructRuleApplication(Trm,rulename(Attrs),Trm2)) , 'T:NeqRewritable ] [Attrs]. ) .
+            ***)
 
     op extend : Term -> Term .
-    eq extend( Trm ) = '_>`[_`]>_[ 'S:DerivStructure, 'Q:Qid, Trm ] .
+    eq extend( Trm ) = 
+        getTerm(metaSrewrite(['HELPER], Trm, 're[[empty]], breadthFirst, 0)) .
+
+    strat re @ Term .
+    sd re := idle .
 
     op constructRuleApplication : Term Qid Term -> Term .
-    eq constructRuleApplication( Trm, Q, Trm1 ) = '_>`[_`]>_[ Trm, upTerm(Q), Trm1 ] .
+    eq constructRuleApplication( Trm, Q, Trm1 ) = '_>`[_`]>_[ 'unwrite[Trm], upTerm(Q), Trm1 ] .
 
-endfm
+endsm

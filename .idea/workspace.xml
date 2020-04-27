@@ -1,46 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="1fd10572-fe40-4b19-aadc-50d6ea319c77" name="Default Changelist" comment="" />
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <list default="true" id="7d326095-daf3-49aa-9f4a-3fffcfc0a9de" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="Class" />
-      </list>
-    </option>
+  <component name="ProjectId" id="1b0GDQUf0rprk6p9R7GOxmWPRMf" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
-  <component name="ProjectId" id="1Ta9RquVAzC2lX0TdxLSWXxxjmY" />
   <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.postfix.templates" />
+    <property name="settings.editor.selected.configurable" value="preferences.updates" />
   </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\joerd\Linux\joe\Documents\IdeaProjects\odpe_window\src" />
+      <recent name="C:\Users\joerd\Linux\joe\Documents\IdeaProjects\odpe_window" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\joerd\Linux\joe\Documents\IdeaProjects\odpe_window\src" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="OpenDeductionProofEditor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="odpe.OpenDeductionProofEditor" />
-      <module name="ODPE" />
+      <module name="odpe_window" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="odpe.*" />
@@ -62,55 +61,95 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="1fd10572-fe40-4b19-aadc-50d6ea319c77" name="Default Changelist" comment="" />
-      <created>1573687333516</created>
+      <changelist id="7d326095-daf3-49aa-9f4a-3fffcfc0a9de" name="Default Changelist" comment="" />
+      <created>1587761477886</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1573687333516</updated>
-      <workItem from="1573687338473" duration="11673000" />
-      <workItem from="1573747805066" duration="40246000" />
-      <workItem from="1573835810643" duration="19025000" />
-      <workItem from="1576515399029" duration="166000" />
-      <workItem from="1580052732743" duration="2056000" />
-      <workItem from="1580157575242" duration="4381000" />
-      <workItem from="1580232799922" duration="2300000" />
-      <workItem from="1580237582068" duration="1064000" />
-      <workItem from="1580315530760" duration="5306000" />
-      <workItem from="1580423307487" duration="2688000" />
-      <workItem from="1580587760762" duration="4745000" />
-      <workItem from="1580653234394" duration="623000" />
-      <workItem from="1580673292412" duration="5178000" />
-      <workItem from="1580760219743" duration="4535000" />
-      <workItem from="1580831191780" duration="11838000" />
-      <workItem from="1580908119598" duration="1749000" />
-      <workItem from="1580938336519" duration="719000" />
-      <workItem from="1581270290975" duration="3737000" />
-      <workItem from="1581335588777" duration="7207000" />
-      <workItem from="1581443159927" duration="5052000" />
-      <workItem from="1581459623966" duration="2367000" />
-      <workItem from="1581527684191" duration="2975000" />
+      <updated>1587761477886</updated>
+      <workItem from="1587761480786" duration="15905000" />
+      <workItem from="1587823623584" duration="106000" />
+      <workItem from="1587823877953" duration="1027000" />
+      <workItem from="1587825283193" duration="13475000" />
     </task>
     <servers />
   </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="361" y="71" key="#Servers" timestamp="1587778361578">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="361" y="71" key="#Servers/0.0.1536.824@0.0.1536.824" timestamp="1587778361578" />
+    <state x="599" y="267" key="#com.intellij.debugger.actions.ViewTextAction" timestamp="1587779198783">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="599" y="267" key="#com.intellij.debugger.actions.ViewTextAction/0.0.1536.824@0.0.1536.824" timestamp="1587779198783" />
+    <state x="574" y="128" key="#com.intellij.ide.util.MemberChooser" timestamp="1587842646846">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="574" y="128" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1587842646846" />
+    <state width="1493" height="261" key="GridCell.Tab.0.bottom" timestamp="1587958071916">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587958071916" />
+    <state width="1493" height="261" key="GridCell.Tab.0.center" timestamp="1587958071911">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1587958071911" />
+    <state width="1493" height="261" key="GridCell.Tab.0.left" timestamp="1587958071908">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1587958071908" />
+    <state width="1493" height="261" key="GridCell.Tab.0.right" timestamp="1587958071915">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1587958071915" />
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom" timestamp="1587958071924">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.bottom/0.0.1536.824@0.0.1536.824" timestamp="1587958071924" />
+    <state width="1493" height="261" key="GridCell.Tab.1.center" timestamp="1587958071923">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.center/0.0.1536.824@0.0.1536.824" timestamp="1587958071923" />
+    <state width="1493" height="261" key="GridCell.Tab.1.left" timestamp="1587958071921">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.left/0.0.1536.824@0.0.1536.824" timestamp="1587958071921" />
+    <state width="1493" height="261" key="GridCell.Tab.1.right" timestamp="1587958071923">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1493" height="261" key="GridCell.Tab.1.right/0.0.1536.824@0.0.1536.824" timestamp="1587958071923" />
+    <state x="277" y="55" key="SettingsEditor" timestamp="1587823736159">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="277" y="55" key="SettingsEditor/0.0.1536.824@0.0.1536.824" timestamp="1587823736159" />
+    <state width="775" height="419" key="XDebugger.FullValuePopup" timestamp="1587780622382">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="775" height="419" key="XDebugger.FullValuePopup/0.0.1536.824@0.0.1536.824" timestamp="1587780622382" />
+    <state x="400" y="162" key="com.intellij.ide.util.TipDialog" timestamp="1587825276112">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="400" y="162" key="com.intellij.ide.util.TipDialog/0.0.1536.824@0.0.1536.824" timestamp="1587825276112" />
+    <state x="330" y="148" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1587779372148">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="330" y="148" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2/0.0.1536.824@0.0.1536.824" timestamp="1587779372148" />
+    <state x="499" y="178" key="extract.method.dialog" timestamp="1587843384691">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="499" y="178" key="extract.method.dialog/0.0.1536.824@0.0.1536.824" timestamp="1587843384691" />
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup" timestamp="1587839826253">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="431" y="145" width="672" height="678" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1587839826253" />
+  </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/odpe/backend/odpe2maude/ODPE2Maude.java</url>
-          <line>523</line>
-          <option name="timeStamp" value="163" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/odpe/OpenDeductionProofEditor.java</url>
-          <line>130</line>
-          <option name="timeStamp" value="169" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <watches-manager>
       <configuration name="Application">
-        <watch expression="maude_names" language="JAVA" />
-        <watch expression="entry" />
+        <watch expression="formulae.get(0)" />
       </configuration>
     </watches-manager>
   </component>

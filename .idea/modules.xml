@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ODPE.iml" filepath="$PROJECT_DIR$/ODPE.iml" />
+      <module fileurl="file://$PROJECT_DIR$/odpe_window.iml" filepath="$PROJECT_DIR$/odpe_window.iml" />
     </modules>
   </component>
 </project>

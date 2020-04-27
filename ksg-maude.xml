@@ -14,6 +14,25 @@
 			<constant      symbol="ff"/>
 			<constant      symbol="t"/>
 			<constants     symbols="a b c d e f g h i j"/>
+			<constant      symbol="a&one;"   input="a1"/>
+			<constant symbol="&phi;&one;" input="phi1"/>
+			<constant symbol="&phi;&two;" input="phi2"/>
+			<constant symbol="&phi;&three;" input="phi3"/>
+			<constant symbol="&phi;&four;" input="phi4"/>
+			<constant symbol="&phi;&five;" input="phi5"/>
+			<constant symbol="&phi;&six;" input="phi6"/>
+			<constant symbol="&phi;&seven;" input="phi7"/>
+			<constant symbol="&phi;&eight;" input="phi8"/>
+			<constant symbol="&phi;&nine;" input="phi9"/>
+			<constant symbol="&phi;&one;&zero;" input="phi10"/>
+			<constant symbol="&phi;&one;&one;" input="phi11"/>
+			<constant symbol="&phi;&one;&two;" input="phi12"/>
+			<constant symbol="&phi;&one;&three;" input="phi13"/>
+			<constant symbol="&phi;&one;&four;" input="phi14"/>
+			<constant symbol="&phi;&one;&five;" input="phi15"/>
+			<constant symbol="&phi;&one;&six;" input="phi16"/>
+
+
 		</syntax>
 		  
 		<rules>
@@ -26,6 +45,7 @@
 			<inference-rule 			 name="ff-con"/>
 			<inference-rule 			 name="tt-elim"/>
 			<inference-rule id="equality" name="="/>
+			<inference-rule id="nowt" name=" "/>
 
 			<reverse-inference-rule id="i-up-r"	 name="i&uparrow;"/>
 			<reverse-inference-rule id="s-r"	 name="s"/>
@@ -68,7 +88,6 @@
 	</subatomic>
   
 	<backend class="odpe.backend.odpe2maude.ODPE2Maude">
-		<load name="nnf_KS.maude"/>
 		<load name="sam.maude"/>
 		<load name="s.maude"/>
 		<load name="ksg.maude"/>

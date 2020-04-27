@@ -7,6 +7,7 @@
  */
 package odpe.frontend.syntax;
 
+import odpe.backend.odpe2maude.ODPE2Maude;
 import odpe.frontend.ast.Node;
 
 /**
@@ -106,7 +107,7 @@ public class Parser {
 	public Node parse(String str, Lexer l) throws ParseError {
 		l.start(str);
 		Node res = parse(l, MAX_PRECEDENCE);
-		if(!l.current().equals(""))
+		if(!l.current().equals("") && !l.current().equals(">"))
 			throw new ParseError("unexpected token: `"+l.current()+"'");
 		return res;
 	}

@@ -7,31 +7,25 @@
  */
 package odpe.backend.odpe2maude;
 
-import java.awt.AWTException;
-import java.awt.Robot;
-import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
+import java.nio.Buffer;
 import java.util.Collection;
+import java.util.Scanner;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import odpe.util.Automate;
 
 public class Maude {
     private Process maude;
     private File dir;
     private Collection<String> ignore_patterns;
     private String[] maudecmd;
-    private InputStream maudeout;
-    private BufferedWriter maudein;
+	private InputStream maudeout;
+	private BufferedWriter maudein;
+	private Boolean start = false;
 
     public Maude(File dir, Collection<String> ignore_patterns,
-    		String... files) 
+    		String... files)
     			throws IOException, MaudeException {
     	this.dir = dir;
     	this.ignore_patterns = ignore_patterns;
@@ -44,32 +38,38 @@ public class Maude {
     	for(int i = 0; i < files.length; ++i) {
     		maudecmd[5+i] = files[i];
     	}
-    	
     	start_maude(dir, maudecmd);
     	readAnswer();
     }
- 
-    
+
     private void start_maude(File dir, String[] maudecmd) throws IOException {
-    	ProcessBuilder pb = new ProcessBuilder(maudecmd);
+		String cmd = "\"".concat(String.join(" ",maudecmd)).concat("\"");
+		ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
     	if(dir != null)
     		pb.directory(dir);
     	pb.redirectErrorStream(true);
     	maude = pb.start();
-    	maudeout = maude.getInputStream();
-    	maudein = new BufferedWriter(new OutputStreamWriter(maude.getOutputStream()));
+		maudeout = maude.getInputStream();
+		maudein = new BufferedWriter(new OutputStreamWriter(maude.getOutputStream()));
+        start = true;
     }
+
+    // (({[a,c],[e,g]} >[Q1]> phi1) a ({[b,d],[f,h]} >[Q2]> phi2))>[Q3]>[{a,[e,g]} a {b,[f,h]},{c,[e,g]} a {d,[f,h]}]
 
 	private String readline() throws IOException, MaudeException {
 		StringBuffer buf = new StringBuffer();
 		String prompt = "Maude>";
 		int l = prompt.length();
 		int c = -1, i;
+
+		long startTime = System.currentTimeMillis(); //fetch starting time
+		while(maudeout.available() == 0){};
+
 		for(i = 0; i < l; ++i) {
-			c = maudeout.read();
-			if(c == '\n' || c == '\r' || c == -1)
-				break;
-			buf.append((char)c);
+            c = maudeout.read();
+            if (c == '\n' || c == '\r' || c == -1)
+                break;
+            buf.append((char) c);
 		}
 		if(i == l && buf.toString().equals("Maude>"))
 			return null;
@@ -81,16 +81,32 @@ public class Maude {
 			throw new MaudeException(res);
 		return res;
 	}
-	
+
+
+
     private Vector<String> readAnswer() throws IOException, MaudeException {
     	Vector<String> answer = new Vector<String>();
     	String str;
-    	while((str = readline()) != null)
-    		if(addLine(str))
-    			answer.add(str);
+
+    	if (start) {
+            start = false;
+            return answer;
+        }
+
+    	while( maudeout.available() == 0 );
+
+    	while((str = readline()) != null) {
+			if (addLine(str)) {
+				answer.add(str);
+			}
+
+			if (answer.size() > 2 && answer.get(2).startsWith("result ")){
+				break;
+			}
+		}
     	return answer;
     }
-    
+
     private boolean addLine(String str) {
     	if(str.contains("Advisory: "))
     		return false;
@@ -108,9 +124,9 @@ public class Maude {
     	maudein.write(question, 0, question.length());
     	maudein.newLine();
     	maudein.flush();
-    	return readAnswer();
+		return readAnswer();
     }
-
+ // (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h]) })
 	public void stop() throws IOException, MaudeException  {
 		maude.destroy();
 		start_maude(dir, maudecmd);
@@ -118,8 +134,7 @@ public class Maude {
 	}
 
 	public String reduce(String module, String term) throws IOException, MaudeException {
- 		Vector<String> v = ask("reduce in " + module + " : " + term + " .");
-	
+		Vector<String> v = ask("reduce in " + module + " : " + term + " .");
 		if (!v.get(0).startsWith("reduce "))
 			throw new MaudeException("expected `reduce', found "+v.get(0));
 		if (!v.get(1).startsWith("rewrites: "))

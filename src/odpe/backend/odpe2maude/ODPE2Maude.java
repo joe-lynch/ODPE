@@ -53,6 +53,8 @@ public class ODPE2Maude implements Prover {
 	private String result_sort;
 	private File dir;
 	private Maude maude;
+	private Boolean interpret = false;
+	private Boolean proofSearch = false;
 
 	
 	public ODPE2Maude(InferenceSystem sys) throws ProverException {
@@ -185,8 +187,7 @@ public class ODPE2Maude implements Prover {
 			return "'"+quotemeta(n.getName());
 		} else if(elt instanceof Constant && tree.getChildren().isEmpty()) {
 			return getMaudeName((Constant)elt);
-		} else if(elt instanceof ListOperandPosition &&
-				tree.getNumChildren() == 1) {
+		} else if(elt instanceof ListOperandPosition && tree.getNumChildren() == 1) {
 			return maudify(tree.getChild(0));
 		} else {
 			String maudename = getMaudeName((Operator)elt);
@@ -195,7 +196,6 @@ public class ODPE2Maude implements Prover {
 			int n = tree.getNumChildren();
 			StringBuffer res;
 			if(elt instanceof BinaryOperator || elt instanceof ListOperandPosition) {
-
 				res = new StringBuffer();
 				for(int i = 0; i < n - 1; ++i) {
 					res.append(maudename).append("(");
@@ -205,7 +205,18 @@ public class ODPE2Maude implements Prover {
 				res.append(maudify(tree.getChild(n-1)));
 				res.append(fill(n-1, ')'));
 			} else if (elt instanceof  Constant && !tree.getChildren().isEmpty()) {
-				return maude_interpretise(tree);
+				if (interpret)
+					return maude_interpretise(tree);
+
+				res = new StringBuffer();
+				res.append(quotemeta("___"));
+				res.append("(");
+				res.append(maudify(tree.getChild(0)));
+				res.append(",");
+				res.append(maudename);
+				res.append(",");
+				res.append(maudify(tree.getChild(1)));
+				res.append(")");
 			}
 			else {
 				res = new StringBuffer(maudename);
@@ -261,6 +272,36 @@ public class ODPE2Maude implements Prover {
 		return !(str.equals("") || magic.contains(str));
 	}
 
+	private String normalizeString(String str) throws ProverException, IOException, MaudeException {
+	    return str.replaceAll("-(.*?)", "- $1")
+                   .replaceAll("Q\\d+", "'nowt").replaceAll("Q","'nowt")
+                   .replaceAll("phi(\\d+)","phi$1:Structure");
+    }
+
+	public Node test(String str) throws ProverException, IOException, MaudeException {
+		String reducedString = maude.reduce(normalizer, maude.reduce(subatomiser, normalizeString(str)));
+		String odpeReadable = reducedString.replaceAll("phi(\\d+):Structure","phi$1");
+		return parse(odpeReadable, inferencer);
+	}
+
+	private String proofSearchableString(String str) throws ProverException, IOException, MaudeException {
+        String proofSearchable = str.replaceAll("phi(\\d+)", "phi$1:Structure");
+        int i = 0;
+        while (proofSearchable.contains("'nowt")) {
+            proofSearchable = proofSearchable.replaceFirst("'nowt", "Q" + i + ":Qid");
+            i++;
+        }
+        return proofSearchable;
+    }
+
+	public Node proofSearch(Node proof) throws IOException, MaudeException, ProverException {
+	    //check if subatomised or not, and change the parse and module (future work)
+		proofSearch = true;
+		String trm = proofSearchableString(maudify(proof));
+		String reducedString = maude.reduce("SamStr", "unwrite(downTerm(start("+trm+"),E:Structure))");
+		return parse(reducedString, subatomiser);
+	}
+
 	public Node parse(String str, String inferencer) throws ProverException {
 		PushbackReader r = new PushbackReader(new StringReader(str), PUSHBACK_CAPACITY);
 		return parse(r, inferencer);
@@ -274,8 +315,16 @@ public class ODPE2Maude implements Prover {
 			Node conc = parse(parseTerm(r), inferencer); //downTerm(parseTerm(r), inferencer);
 			if (!lex(r).equals(","))
 				throw new ProverException("`,' expected");
-			String n = unquotemeta(lex(r).substring(1));
-			InferenceRule i = (InferenceRule) getSyntaxElement(n);
+			String k = lex(r);
+			InferenceRule i;
+			String n = null;
+			if ( !k.startsWith("'") ){
+				i = new InferenceRule("nowt", " ", system, "nowt", true, false);
+			}
+			else {
+				n = unquotemeta(k.substring(1));
+				i = (InferenceRule) getSyntaxElement(n);
+			}
 
 			if (r == null)
 				throw new ProverException("no such inference rule: " + n);
@@ -344,7 +393,6 @@ public class ODPE2Maude implements Prover {
 						new Vector<Node>());
 			} else if (rator instanceof Constant) {
 				return new Node(system, rator, new Vector<Node>());
-
 			} else {
 				curtk = lex(r);
 				if (!curtk.equals("("))
@@ -521,6 +569,7 @@ public class ODPE2Maude implements Prover {
 	}
 
 	public Node subatomise_reduce(Node proof) throws ProverException, IOException, MaudeException {
+		interpret = false;
 		String term = "gnf(" + maudify(proof) + ")";
 		//String term = "k(" + maude_subatomise(proof) + ")";
 		return parse(maude.reduce(subatomiser, term), subatomiser);
@@ -533,6 +582,7 @@ public class ODPE2Maude implements Prover {
 	public Node interpret_reduce(Node proof) throws ProverException, IOException, MaudeException {
 		String term = "I( "+ maudify(proof) + ")";
 		//String term = "I(" +maude_interpretise(proof) + ")";
+		interpret = true;
 		return parse(maude.reduce(interpreter, term), interpreter);
 	}
 	

@@ -43,8 +43,8 @@ public interface Prover {
 	 * @param args map of key-value pairs describing the parameter value
 	 * @throws ProverException
 	 */
-	public void setParam(String name, 
-			Map<String, String> args) throws ProverException;
+	public void setParam(String name,
+                         Map<String, String> args) throws ProverException;
 	
 	/**
 	 * Starts the prover. May throw a <code>ProverException</code>
@@ -89,9 +89,14 @@ public interface Prover {
 
 	public Node interpret_convert(Node derivation) throws ProverException, IOException, MaudeException;;
 
+	public Node test(String str) throws ProverException, IOException, MaudeException;
+
+	public Node proofSearch(Node proof) throws IOException, MaudeException, ProverException;
+
     Pair<Vector<Rewrite>, Vector<Rewrite>> findSubatomicRewrites(Node n, Collection<Rule> rules, boolean allLeft, boolean allRight, boolean isSingle)
 			throws ProverException;
 
 	Pair<Vector<Rewrite>, Vector<Rewrite>> findNormalRewrites(Node n, Collection<Rule> rules, boolean allLeft, boolean allRight, boolean isSingle)
 			throws ProverException;
+
 }

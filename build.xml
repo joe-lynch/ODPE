@@ -4,7 +4,7 @@
               Any modifications will be overwritten.
               Please edit build-user.xml instead.
 -->
-<project basedir="." default="build" name="GraPE">
+<project basedir="src" default="build" name="GraPE">
     &buildfile;
     <path id="project.classpath">
         <pathelement location="bin"/>

@@ -493,6 +493,5 @@ public class Node{
 		
 		return new Pair<Node, Vector<Node>>(rtn, list);
 	}
-	
 
 }
