@@ -1,0 +1,68 @@
+
+fmod SA-Signature is
+	
+	
+
+endfm
+
+mod SA-Inf is
+
+  protecting SA-Signature .
+
+ 
+ *** reduce downTerm(getTerm(metaNormalize(upModule('SA-Meta, false) , upTerm( a > [ 'i ] > b ) )), Error:UnitS) . ***
+  
+	
+ 
+endm
+
+mod SA-Meta is
+
+  protecting SA-Inf .
+  protecting Util .
+  
+  var Q : Qid .
+  vars A B E F S R : Structure .
+  var Un : Unit .
+  vars alpha beta : Atom .
+  
+  
+***  [ ff , R ] = R .
+***  { tt , R } = R .
+***  { ff , ff } = ff .
+***  [ tt , tt ] = tt .
+
+
+ 
+  *** turns atoms into the correct subatomic form *** 
+***  eq |- A    = < ff A tt > .
+***  eq |- - A  = < tt A ff > .
+***  eq |- ff   = < ff a ff > .
+***  eq |- tt   = < tt a tt > .
+  
+  
+  rl [mab] = beta < alpha < A ; B > ; alpha < E ; F > >   =>    alpha < beta < A ; E > ; beta < B ; F > > .
+  
+  
+  
+  *** This turns atoms that are alone in the correct form ***
+***  eq < ff A tt > > [ Q ] > S = < [ ff , ff ] A [ tt , tt ] > > [ Q ] > S .
+***  eq S > [ Q ] > < ff A tt > =  S  > [ Q ] > < [ ff , ff ] A [ tt , tt ] > .
+  
+***  eq < tt A ff > > [ Q ] > S = < [ tt , tt ] A [ ff , ff ] > > [ Q ] > S .
+***  eq S > [ Q ] > < tt A ff > =  S  > [ Q ] > < [ tt , tt ] A [ ff , ff ] > .
+  
+***  eq < ff a ff > > [ Q ] > S = < / ff , tt \ a / tt , ff \ > > [ Q ] > S .
+***  eq S > [ Q ] > < ff a ff > = S > [ Q ] > < / ff , tt \ a / tt , ff \ > .
+  
+***  eq < tt a tt > > [ Q ] > S = < [ ff , tt ] a [ tt , ff ] > > [ Q ] > S .
+***  eq S > [ Q ] > < tt a tt > = S > [ Q ] > < [ ff , tt ] a [ tt , ff ] > .
+  
+  *** CHECK THE SUBATOMIC PROOF SYSTEM FOR DECISION TREES PAPER / 2005 NOTES BY ALESSIO ***
+
+
+endm
+
+
+*** make some rewrite rules, that rewrite from normal derivations to subatomic derivations
+*** 

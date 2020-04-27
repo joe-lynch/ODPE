@@ -1,0 +1,524 @@
+*** structure in negation normal form. 
+***
+*** Author: Ozan Kahramanogullari [http://ozan-k.com/]
+
+fmod NNF is
+  protecting Util .
+  protecting HELPER .
+  sorts NegAtom Atom Unit SubStructure Structure Deriv DerivStructure SubAtom Config Rewritable .
+  subsort Atom < NegAtom < Structure .
+  subsort SubStructure < Structure < Deriv < DerivStructure .
+  subsort Unit < Structure .
+  subsort SubAtom < SubStructure .
+  subsort Config < Structure .
+  subsort Rewritable < DerivStructure  .
+
+  
+  op 1       : -> Unit .
+  op 0       : -> Unit .
+  op -_      : Atom -> NegAtom .
+  op [_,_]   : Structure Structure -> Structure [comm assoc] .
+  op {_,_}   : Structure Structure -> Structure [comm assoc] .
+  op [_,_]   : DerivStructure DerivStructure -> DerivStructure [comm assoc] .
+  op {_,_}   : DerivStructure DerivStructure -> DerivStructure [comm assoc] .
+  op [_,_]   : SubStructure SubStructure -> SubStructure [comm assoc] .
+  op {_,_}   : SubStructure SubStructure -> SubStructure [comm assoc] .
+  op ___     : DerivStructure Atom DerivStructure -> SubStructure [prec 1] .
+  op _>[_]>_ : Structure Qid DerivStructure -> Deriv [ gather (E & e) ] .
+  op _>[_]>_ : DerivStructure Qid DerivStructure -> Deriv [ gather (E & e) ] .
+  op r       : DerivStructure  ->  Rewritable .
+
+  sort StructureList .
+  subsort Structure < StructureList . 
+  op err : -> Structure .
+  op emptyStructure : -> Structure .
+  op _|_ : StructureList StructureList -> StructureList 
+    [ctor assoc comm id: emptyStructure format (d n d d)] .
+
+  op <_;_>   : Structure StructureList    -> Config .
+  
+  ops a b c d e f g h i j none : -> Atom .
+
+endfm
+
+mod SAM-Meta is
+  protecting NNF .
+
+  vars A B C D : Structure .
+  var SL : StructureList .
+  vars S T De De1 De2 De3 De4 : DerivStructure .
+  var atm batm : Atom .
+  var Q Q1 Q2 : Qid .
+  var QL : QidList .
+
+  *** having this rule makes it so that it can explore paths with parts frozen early - reaching the solution quicker
+  *** might have to make it nonexec as well
+  rl [r] : S => unRewrite(S) .
+
+  ***rl [g] : S => gtf(S) [nonexec] .
+
+
+*** nbu
+  rl [nbu] : r({ r(r(De1) batm r(De3)) , r(r(De2) batm r(De4)) })
+    =>  unRewrite({ De1 batm De3 , De2 batm De4 })
+          >['nbu]>
+        ***enRewrite(gtf(unRewrite({ De1, De2 } batm { De3 , De4 })) ) .
+        r( r({ r(De1) , r(De2) }) batm r({ r(De3) , r(De4) }) ) .
+
+  rl [nbu] : r( { S >[Q1]> r(r(De1) batm r(De3)) , r(r(De2) batm r(De4)) })
+    =>  unRewrite({ S >[Q1]> De1 batm De3 , De2 batm De4 })
+          >['nbu]>
+        ***enRewrite(gtf(unRewrite({ De1, De2 } batm { De3 , De4 })) ) .
+        r( r({ r(De1) , r(De2) }) batm r({ r(De3) , r(De4) }) ) .
+
+  rl [nbu] : r( { S >[Q1]> r(r(De1) batm r(De3)) , T >[Q2]> r(r(De2) batm r(De4)) })
+    =>  unRewrite({ S >[Q1]> De1 batm De3 , T >[Q2]> De2 batm De4 })
+          >['nbu]>
+        r( r({ r(De1) , r(De2) }) batm r({ r(De3) , r(De4) }) ) .
+        ***enRewrite(gtf(unRewrite({ De1, De2 } batm { De3 , De4 })) ) .
+
+*** ubu
+  rl [ubu] : r([ r( r(De1) batm r(De3) ) , r( r(De2) batm r(De4) ) ])
+    =>  unRewrite([ De1 batm De3 , De2 batm De4 ])
+          >['ubu]>
+        ***enRewrite(gtf(unRewrite([De1 , De2 ] batm [ De3 , De4 ]) )) .
+        r( r([ r(De1) , r(De2) ]) batm r([ r(De3) , r(De4) ]) ) .
+
+  rl [ubu] : r([ S >[Q1]> r( r(De1) batm r(De3) ) , r( r(De2) batm r(De4) ) ])
+    =>  unRewrite([ S >[Q1]> De1 batm De3 , De2 batm De4 ])
+          >['ubu]>
+        r( r([ r(De1) , r(De2) ]) batm r([ r(De3) , r(De4) ]) ) .
+        ***enRewrite(gtf(unRewrite([De1 , De2 ] batm [ De3 , De4 ]) )) .
+
+  rl [ubu] : r([ S >[Q1]> r( r(De1) batm r(De3) ) , T >[Q2]> r( r(De2) batm r(De4) ) ])
+    =>  unRewrite([ S >[Q1]> De1 batm De3 , T >[Q2]> De2 batm De4 ])
+          >['ubu]>
+        r( r([ r(De1) , r(De2) ]) batm r([ r(De3) , r(De4) ]) ) .
+        ***enRewrite(gtf(unRewrite([De1 , De2 ] batm [ De3 , De4 ]) )) .
+
+*** uuu
+  rl [uuu] : r([ r([ r(De1) , r(De3) ]) , r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ [ De1 , De3 ] , [ De2 , De4 ] ])
+              >['uuu]>
+             ***enRewrite(gtf(unRewrite([ [ De1, De2 ] , [ De1, De2 ] ] ))) . 
+             r([ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) ]) .
+
+  rl [uuu] : r([ S >[Q1]> r([ r(De1) , r(De3) ]) , r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ [ De1 , De3 ] , S >[Q1]> [ De2 , De4 ] ])
+              >['uuu]>
+            ***enRewrite(gtf(unRewrite([ [ De1, De2 ] , [ De1, De2 ] ] ))) . 
+            r([ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) ]) .
+
+  rl [uuu] : r([ S >[Q1]> r([ r(De1) , r(De3) ]) , T >[Q2]> r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ S >[Q1]> [ De1 , De3 ] , T >[Q2]> [ De2 , De4 ] ])
+              >['uuu]>
+              r([ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) ]) .
+             ***enRewrite(gtf(unRewrite([ [ De1, De2 ] , [ De1, De2 ] ] ))) . 
+
+*** unu
+  rl [unu] : r([ r({ r(De1) , r(De3) }) , r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ { De1 , De3 } , [ De2 , De4 ] ])
+              >['unu]>
+             ***enRewrite(gtf(unRewrite({ [ De1 , De2 ] , [ De3 , De4 ] } ))) .
+              r({ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) }) .
+
+  rl [unu] : r([ S >[Q1]> r({ r(De1) , r(De3) }) , r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ S >[Q1]> { De1 , De3 } , [ De2 , De4 ] ])
+              >['unu]>
+              r({ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) }) .
+              ***enRewrite(gtf(unRewrite({ [ De1 , De2 ] , [ De3 , De4 ] } ))) .
+
+  rl [unu] : r([ r({ r(De1) , r(De3) }) , T >[Q2]> r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ { De1 , De3 } , T >[Q2]> [ De2 , De4 ] ])
+              >['unu]>
+              r({ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) }) .
+              ***enRewrite(gtf(unRewrite({ [ De1 , De2 ] , [ De3 , De4 ] } ))) .
+
+  rl [unu] : r([ S >[Q1]> r({ r(De1) , r(De3) }) , T >[Q2]> r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ S >[Q1]> { De1 , De3 } , T >[Q2]> [ De2 , De4 ] ])
+              >['unu]>
+              r({ r([ r(De1) , r(De2) ]) , r([ r(De3) , r(De4) ]) }) .
+              ***enRewrite(gtf(unRewrite({ [ De1 , De2 ] , [ De3 , De4 ] } ))) .
+
+*** nun
+  rl [nun] : r([ r({ r(De1) , r(De3) }), r({ r(De2) , r(De4) }) ])  
+          => unRewrite([ { De1 , De3 }, { De2 , De4 } ])
+                    >['nun]>
+              r({ r([ r(De1) , r(De2) ]), r({ r(De3) , r(De4) }) }) .
+              ***enRewrite(gtf(unRewrite({ [ De1, De2 ] , [ De3, De4 ] } ))) .
+
+  rl [nun] : r([ S >[Q1]> r({ r(De1) , r(De3) }), r({ r(De2) , r(De4) }) ])    
+          => unRewrite([ S >[Q1]> { De1 , De3 }, { De2 , De4 } ])
+              >['nun]>
+              r({ r([ r(De1) , r(De2) ]), r({ r(De3) , r(De4) }) }) .
+              ***enRewrite( gtf( unRewrite({ [ De1, De2 ] , [ De3, De4 ] } ) ) ) .
+
+  rl [nun] : r([ S >[Q1]> r({ r(De1) , r(De3) }), T >[Q2]> r({ r(De2) , r(De4) }) ])      
+          => unRewrite([ T >[Q1]> { De1 , De3 }, S >[Q2]> { De2 , De4 } ])
+              >['nun]>
+              ***enRewrite( gtf( unRewrite({ [ De1, De2 ] , [ De3, De4 ] } ) ) ) .
+              r({ r([ r(De1) , r(De2) ]), r({ r(De3) , r(De4) }) }) .
+
+*** nnn
+  rl [nnn] : r({ r({ r(De1) , r(De3) }) , r({ r(De2) , r(De4) }) })
+          => unRewrite({ { De1 , De3 } , { De2 , De4 } })
+              >['nnn]>
+             ***enRewrite( gtf( unRewrite({ { De1, De2 } , { De3, De4 } } ))) .
+             r({ r({ r(De1) , r(De2) }) , r({ r(De3) , r(De4) }) }) .
+
+  rl [nnn] : r({ S >[Q1]> r({ r(De1) , r(De3) }) , r({ r(De2) , r(De4) }) })
+          => unRewrite({ S >[Q1]> { De1 , De3 } , { De2 , De4 } })
+              >['nnn]>
+              ***enRewrite( gtf( unRewrite({ { De1, De2 } , { De3, De4 } } ))) .
+              r({ r({ r(De1) , r(De2) }) , r({ r(De3) , r(De4) }) }) .
+
+  rl [nnn] : r({ S >[Q1]> r({ r(De1) , r(De3) }) , T >[Q2]> r({ r(De2) , r(De4) }) })
+          => unRewrite({ S >[Q1]> { De1 , De3 } , T >[Q2]> { De2 , De4 } })
+              >['nnn]>
+             ***enRewrite( gtf( unRewrite({ { De1, De2 } , { De3, De4 } } ))) .
+             r({ r({ r(De1) , r(De2) }) , r({ r(De3) , r(De4) }) }) .
+
+  *** nbn
+  rl [nbn] : r( r({ r(De1) , r(De3) }) batm r({ r(De2) , r(De4) }) )
+            => unRewrite({ De1 , De3 } batm { De2 , De4 })
+                >['nbn]>
+                ***enRewrite( gtf( unRewrite( { De1 batm De2, De3 batm De4 } ))) .
+                r({ r( r(De1) batm r(De2) ) , r( r(De3) batm r(De4) ) }) .
+  rl [nbn] : r( (S >[Q1]> r({ r(De1) , r(De3) })) batm r({ r(De2) , r(De4) }) )
+            => unRewrite((S >[Q1]> { De1 , De3 }) batm { De2 , De4 })
+                >['nbn]>
+                r({ r( r(De1) batm r(De2) ) , r( r(De3) batm r(De4) ) }) .
+                ***enRewrite( gtf( unRewrite( { De1 batm De2, De3 batm De4 } ))) .
+  rl [nbn] : r( (S >[Q1]> r({ r(De1) , r(De3) })) batm (T >[Q2]> r({ r(De2) , r(De4) })) )
+            => unRewrite((S >[Q1]> { De1 , De3 }) batm (T >[Q2]> { De2 , De4 }))
+                >['nbn]>
+                r({ r( r(De1) batm r(De2) ) , r( r(De3) batm r(De4) ) }) .
+                ***enRewrite( gtf( unRewrite( { De1 batm De2, De3 batm De4 } ))) .
+
+*** nuu
+  rl [nuu] : r({ r([ r(De1) , r(De3) ]) , r([ r(De2) , r(De4) ]) })
+          => unRewrite({ [ De1 , De3 ] , [ De2 , De4 ] })
+              >['nuu]>
+              r([ r({ r(De1), r(De2) }) , r({ r(De3), r(De4) }) ]) .
+              ***enRewrite( gtf( unRewrite( [ { De1, De2 } , { De3, De4 } ] ) ) ) .
+  rl [nuu] : r({ S >[Q1]> r([ r(De1) , r(De3) ]) , r([ r(De2) , r(De4) ]) })
+          => unRewrite({ S >[Q1]> [ De1 , De3 ] , [ De2 , De4 ] })
+              >['nuu]>
+              r([ r({ r(De1), r(De2) }) , r({ r(De3), r(De4) }) ]) .
+              ***enRewrite( gtf( unRewrite( [ { De1, De2 } , { De3, De4 } ] ) ) ) .
+  rl [nuu] : r({ S >[Q1]> r([ r(De1) , r(De3) ]) , T >[Q2]> r([ r(De2) , r(De4) ]) })
+          => unRewrite({ S >[Q1]> [ De1 , De3 ] , T >[Q2]> [ De2 , De4 ] })
+              >['nuu]>
+              r([ r({ r(De1), r(De2) }) , r({ r(De3), r(De4) }) ]) .
+              ***enRewrite( gtf( unRewrite( [ { De1, De2 } , { De3, De4 } ] ) ) ) .
+
+*** uun
+  rl [uun] : r([ r([ r(De1) , r(De3) ]) , r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ [ De1 , De3 ] , [ De2 , De4 ] ])
+              >['uun]>
+              r([ r([ r(De1), r(De2) ]) , r({ r(De3), r(De4) }) ]) .
+              ***enRewrite( gtf( unRewrite([ [ De1, De2 ] , { De3, De4 } ] ))) .
+             
+  rl [uun] : r([ S >[Q1]> r([ r(De1) , r(De3) ]) , r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ S >[Q1]> [ De1 , De3 ] , [ De2 , De4 ] ])
+              >['uun]>
+              r([ r([ r(De1), r(De2) ]) , r({ r(De3), r(De4) }) ]) .
+              ***enRewrite( gtf( unRewrite([ [ De1, De2 ] , { De3, De4 } ] ))) .
+  rl [uun] : r([ S >[Q1]> r([ r(De1) , r(De3) ]) , T >[Q2]> r([ r(De2) , r(De4) ]) ])
+          => unRewrite([ S >[Q1]> [ De1 , De3 ] , T >[Q2]> [ De2 , De4 ] ])
+              >['uun]>
+              r([ r([ r(De1), r(De2) ]) , r({ r(De3), r(De4) }) ]) .
+              ***enRewrite( gtf( unRewrite([ [ De1, De2 ] , { De3, De4 } ] ))) .
+
+*** ubn
+  rl [ubn] : r( r([ r(De1) , r(De3) ]) batm r([ r(De2) , r(De4) ]) )
+          => unRewrite([ De1 , De3 ] batm [ De2 , De4 ])
+              >['ubn]>
+              ***enRewrite( gtf( unRewrite( [ De1 batm De2 , De3 batm De4 ] ) ) ) .
+              r([ r( r(De1) batm r(De2) ) , r( r(De3) batm r(De4) ) ]) .
+  rl [ubn] : (S >[Q1]> [ De1 , De3 ]) batm [ De2 , De4 ]
+          => unRewrite((S >[Q1]> [ De1 , De3 ]) batm [ De2 , De4 ])          
+              >['ubn]>
+              r([ r( r(De1) batm r(De2) ) , r( r(De3) batm r(De4) ) ]) .
+              ***enRewrite( gtf( unRewrite( [ De1 batm De2 , De3 batm De4 ] ) ) ) .
+  rl [ubn] : (S >[Q1]> [ De1 , De3 ]) batm (T >[Q2]> [ De2 , De4 ])
+          => unRewrite((S >[Q1]> [ De1 , De3 ]) batm (T >[Q2]> [ De2 , De4 ]))
+              >['ubn]>
+              r([ r( r(De1) batm r(De2) ) , r( r(De3) batm r(De4) ) ]) .
+              ***enRewrite( gtf( unRewrite( [ De1 batm De2 , De3 batm De4 ] ) ) ) .
+
+*** auu
+  rl [auu] : r( r([ r(De1) , r(De3) ]) atm r([ r(De2) , r(De4) ]) )
+          => unRewrite([ De1 , De3 ] atm [ De2 , De4 ])                             
+             >['auu]>
+             ***enRewrite( gtf( unRewrite( [ De1 atm De2 , De3 atm De4 ] ) ) ) .
+             r([ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) ]) .
+  rl [auu] : r( (S >[Q1]> r([ r(De1) , r(De3) ])) atm r([ r(De2) , r(De4) ]) )
+          => unRewrite((S >[Q1]> [ De1 , De3 ]) atm [ De2 , De4 ])                  
+             >['auu]>
+             r({ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) }) .
+             ***enRewrite( gtf( unRewrite( [ De1 atm De2 , De3 atm De4 ] ) ) ) .
+  rl [auu] : r( (S >[Q1]> r([ r(De1) , r(De3) ])) atm (T >[Q2]> r([ r(De2) , r(De4) ])) )
+          => unRewrite((S >[Q1]> [ De1 , De3 ]) atm (T >[Q2]> [ De2 , De4 ])) 
+             >['auu]>
+             r({ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) }) .
+             ***enRewrite( gtf( unRewrite( [ De1 atm De2 , De3 atm De4 ] ) ) ) .
+
+*** anu
+  rl [anu] : r( r({ r(De1) , r(De3) }) atm r([ r(De2) , r(De4) ]) )
+          => unRewrite({ De1 , De3 } atm [ De2 , De4 ])
+            >['anu]>
+            ***enRewrite( gtf( unRewrite( { De1 atm De2 , De3 atm De4 } ) ) ) .
+            r({ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) }) .
+  rl [anu] : r( (S >[Q1]> r({ r(De1) , r(De3) })) atm r([ r(De2) , r(De4) ]) )
+          => unRewrite((S >[Q1]> { De1 , De3 }) atm [ De2 , De4 ])
+            >['anu]>
+             r({ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) }) .
+            ***enRewrite( gtf( unRewrite( { De1 atm De2 , De3 atm De4 } ) ) ) .
+  rl [anu] : r( r({ r(De1) , r(De3) }) atm (T >[Q2]> r([ r(De2) , r(De4) ])) )
+          => unRewrite({ De1 , De3 } atm (T >[Q2]> [ De2 , De4 ]))
+            >['anu]>
+             r({ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) }) .
+            ***enRewrite( gtf( unRewrite( { De1 atm De2 , De3 atm De4 } ) ) ) .
+  rl [anu] : r( (S >[Q1]> r({ r(De1) , r(De3) })) atm (T >[Q2]> r([ r(De2) , r(De4) ])) )
+          => unRewrite((S >[Q1]> { De1 , De3 }) atm (T >[Q2]> [ De2 , De4 ]))
+            >['anu]>
+            ***enRewrite( gtf( unRewrite( { De1 atm De2 , De3 atm De4 } ) ) ) .
+            r({ r(r(De1) atm r(De2)) , r(r(De3) atm r(De4)) }) .
+*** abu
+  rl [abu] : r( r(( r(De1) batm r(De3) )) atm r(( r(De2) batm r(De4) )) )
+          => unRewrite(( De1 batm De3 ) atm ( De2 batm De4 ))
+            >['abu]>
+            ***enRewrite( gtf( unRewrite( ( De1 atm De2 ) batm ( De3 atm De4 ) ) ) ) .
+            r( r(( r(De1) atm r(De2) )) batm r(( r(De3) atm r(De4) ))) .
+  rl [abu] : r( (S >[Q1]> r(( r(De1) batm r(De3) ))) atm r(( r(De2) batm r(De4) )) )
+          => unRewrite((S >[Q1]> ( De1 batm De3 )) atm ( De2 batm De4 ))
+            >['abu]>
+            ***enRewrite( gtf( unRewrite( ( De1 atm De2 ) batm ( De3 atm De4 ) ) ) ) .
+            r( r(( r(De1) atm r(De2) )) batm r(( r(De3) atm r(De4) ))) .
+  rl [abu] : r( (S >[Q1]> r(( r(De1) batm r(De3) ))) atm (T >[Q2]> r(( r(De2) batm r(De4) ))) )
+          => unRewrite((S >[Q1]> ( De1 batm De3 )) atm (T >[Q2]> ( De2 batm De4 )))
+            >['abu]>
+            ***enRewrite( gtf( unRewrite( ( De1 atm De2 ) batm ( De3 atm De4 ) ) ) ) .
+            r( r(( r(De1) atm r(De2) )) batm r(( r(De3) atm r(De4) ))) .
+
+*** aun
+  rl [aun] : r([ r(r(De1) atm r(De3)) , r(r(De2) atm r(De4)) ])
+          => unRewrite([ De1 atm De3 , De2 atm De4 ])
+            >['aun]>
+            ***enRewrite( gtf( unRewrite( [ De1, De2 ] atm [ De3, De4 ] ) ) ) .
+            r(r([ r(De1) , r(De2) ]) atm r({ r(De3) , r(De4) })) .
+  rl [aun] : r([ S >[Q1]> r(r(De1) atm r(De3)) , r(r(De2) atm r(De4)) ])
+          => unRewrite( S >[Q1]> [ De1 atm De3 , De2 atm De4 ])
+            >['aun]>
+            r(r([ r(De1) , r(De2) ]) atm r({ r(De3) , r(De4) })) .
+             ***enRewrite( gtf( unRewrite( [ De1, De2 ] atm [ De3, De4 ] ) ) ) .
+  rl [aun] : r([ S >[Q1]> r(r(De1) atm r(De3)) , T >[Q2]> r(r(De2) atm r(De4)) ])
+          => unRewrite([ S >[Q1]> De1 atm De3 , T >[Q2]> De2 atm De4 ])
+            >['aun]>
+             r(r([ r(De1) , r(De2) ]) atm r({ r(De3) , r(De4) })) .
+             ***enRewrite( gtf( unRewrite( [ De1, De2 ] atm [ De3, De4 ] ) ) ) .
+
+*** ann
+  rl [ann] : r({ r(r(De1) atm r(De3)) , r(r(De2) atm r(De4)) })
+          => unRewrite({ De1 atm De3 , De2 atm De4 })
+            >['ann]>
+            ***enRewrite( gtf( unRewrite( { De1 , De2 } atm { De3 , De4 } ) ) ) .
+            r(r({ r(De1) , r(De2) }) atm r({ r(De3) , r(De4) })) . 
+  rl [ann] : r({ S >[Q1]> r(r(De1) atm r(De3)) , r(r(De2) atm r(De4)) })
+          => unRewrite({ S >[Q1]> De1 atm De3 , De2 atm De4 })
+            >['ann]>
+            ***enRewrite( gtf( unRewrite( { De1 , De2 } atm { De3 , De4 } ) ) ) .
+            r(r({ r(De1) , r(De2) }) atm r({ r(De3) , r(De4) })) . 
+  rl [ann] : r({ S >[Q1]> r(r(De1) atm r(De3)) , T >[Q2]> r(r(De2) atm r(De4)) })
+          => unRewrite({ S >[Q1]> De1 atm De3 , T >[Q2]> De2 atm De4 })
+            >['ann]>
+            ***enRewrite( gtf( unRewrite( { De1 , De2 } atm { De3 , De4 } ) ) ) .
+            r(r({ r(De1) , r(De2) }) atm r({ r(De3) , r(De4) })) . 
+
+
+  rl [one]   : r(A) => unRewrite(A) >['one]> r(r(A) a r(0)) .
+  rl [two]   : r(A) => unRewrite(A) >['two]> r(r(0) a r(A)) .
+  rl [three] : r(r(A) atm r(1)) => unRewrite(A atm 1) >['three]> r(A) .
+  rl [four]  : r(r(1) atm r(A)) => unRewrite(1 atm A) >['four]> r(A) .
+
+***srewrite [1] in ST : enRewrite([{b,1 a 0},{c,0 a 1}]) using all ; all ; all ; all ; all ; all ; all ; match S such that gtf(unRewrite(S)) = b  a  c  .
+***srewrite [1] in ST : enRewrite([{b,1 a 0},{c,0 a 1}]) using all ; all ; all ; all ; all ; match S such that gtf(            unRewrite(S)) = [{0,0},{1,b}] a [{0,0},{1,c}] .
+
+  rl [eqq] : r([ r({ r(A) , r(1) }) , r({ r(0), r(0) }) ]) => unRewrite([{A,1},{0,0}]) >['eqq]> r(A) .
+
+  rl [eqq] : r(1)  =>
+             1 >['eqq]> r([ 1 , 1 ]) .
+
+  rl [eqq] : r({ r(0) , r(0) }) =>
+             { 0 , 0 } >['eqq]> r(0) .
+
+  rl [eqq] : r({ r(A) , r(1) }) =>
+             unRewrite({ A , 1 }) >['eqq]> r(A) .
+
+  rl [eqq] : r([ r(A) , r(0) ]) =>
+             unRewrite([ A , 0 ]) >['eqq]> r(A) .
+
+  rl [eqq] : r(A) =>
+             unRewrite(A) >['eqq]> r({ r(A) , r(1) }) .
+
+  rl [eqq] : r(A) =>
+             unRewrite(A) >['eqq]> r([ r(A) , r(0) ]) .
+
+  rl [eqq] : r(0) =>
+             unRewrite(0) >['eqq]> r(r(0) a r(0)) .
+
+  rl [eqq] : r(1) =>
+             unRewrite(1) >['eqq]> r(r(1) a r(1)) .
+
+  rl [eqq] : r(r(1) atm r(1)) =>
+             1 atm 1 >['eqq]> r(1) .
+
+  rl [eqq] : r(r(0) atm r(0)) =>
+             0 atm 0 >['eqq]> r(0) .
+
+  ***rl [eqq] : r([ r({ r(A) , r(1) }) , r({ r(1), r(0) }) ]) 
+
+
+
+  op unRewrite : DerivStructure -> DerivStructure .
+  eq unRewrite( S >[Q]> T ) = unRewrite(S) >[Q]> unRewrite(T) .
+  eq unRewrite( S atm T ) = unRewrite(S) atm unRewrite(T) .
+  eq unRewrite( {S,T} ) = { unRewrite(S) , unRewrite(T) } .
+  eq unRewrite( [S,T] ) = [ unRewrite(S) , unRewrite(T) ] .
+  eq unRewrite( r(S) ) = unRewrite(S) .
+  eq unRewrite( S ) = S .
+
+  op enRewrite : DerivStructure -> DerivStructure .
+  eq enRewrite( r( S atm T ) ) = r( enRewrite(S) atm enRewrite(T) ) .
+  eq enRewrite( r({S,T}) ) = r({ enRewrite(S), enRewrite(T) }) .
+  eq enRewrite( r([S,T]) ) = r([ enRewrite(S), enRewrite(T) ]) .
+  eq enRewrite( r(S) ) = r(S) .
+  eq enRewrite( S ) = enRewrite(r(S)) .
+  
+  ***(
+
+*** uuu
+  rl [uuu] : [ [ A , C ] , [ B , D ] ] => [ [ A , B ] , [ C , D ] ] .
+*** unu
+  rl [unu] : [ { A , C } , [ B , D ] ] => { [ A , B ] , [ C , D ] } .
+*** ubu
+  rl [ubu] : [ A batm C , B batm D] => [ A  , B ] batm [ C , D ] .
+*** nun
+  rl [nun] : [ { A , C }, { B , D } ] => { [ A , B ], { C , D } } .
+*** nnn
+  rl [nnn] : { { A , C } , { B , D } } => { { A , B } , { C , D } } .
+*** nbn
+  rl [nbn] : { A , C } batm { B , D } => { A batm B , C batm D } .
+*** nuu
+  rl [nuu] : { [ A , C ] , [ B , D ] } => [ { A , B } , { C , D } ] .
+*** nbu
+  rl [nbu] : { A batm C , B batm D } => { A , B } batm { C , D } .
+*** uun
+  rl [uun] : [ [ A , C ] , [ B , D ] ] =>[ [ A , B ] , { C, D } ] .
+*** ubn
+  rl [ubn] : [ A , C ] batm [ B , D ] => [ A batm B , C batm D ] .
+*** auu
+  rl [auu] : [ A , C ] atm [ B , D ] =>[ A atm B , C atm D ] .
+*** anu
+  rl [anu] : { A , C } atm [ B , D ] => { A atm B , C atm d } .
+*** abu
+  rl [abu] : ( A batm C ) atm ( B batm D ) => ( A atm B ) batm ( C atm D ) .
+*** aun
+  rl [aun] : [ A atm C , B atm D ] => [ A , B ] atm { C , D } .
+*** ann
+  rl [ann] : { A atm C , B atm D } => { A , B } atm { C , D } . 
+        
+*** ll1, ll2, ll3, ll4
+
+  crl [ll1] : A => A a 0
+    if A =/= a .
+  crl [ll2] : A => 0 a A
+    if A =/= a .
+  rl [ll3] : A atm 1 => A .
+  rl [ll4] : 1 atm A => A .
+
+  rl [eqq] : 1  => [ 1 , 1 ] .
+  rl [eqq] : { 0 , 0 } =>  0 .
+  rl [eqq] : 1 atm 1  => 1 .
+  rl [eqq] : 0 atm 0  => 0 .
+  rl [eqq] : [ A , 0 ]  => A .
+  crl [eqq] : A    => { A , 1 }
+    if A =/= a .
+  crl [eqq] : A    => [ A , 0 ]
+    if A =/= a .
+  rl [eqq] : { A , 1 }  => A .
+  rl [eqq] : 0    => 0 a 0 .
+  rl [eqq] : 1    => 1 a 1 .
+  rl [eqq] : [ {A,1} , {0,0} ] => A .
+*)
+
+
+
+  
+  var Trm : Term .
+  var TSet : TermSet .
+
+  op downTermSet : TermSet -> Structure .
+  eq downTermSet( emptyTermSet ) = emptyStructure .
+  eq downTermSet( Trm | TSet ) = downTerm(Trm, err) | downTermSet(TSet) .
+
+  op gtf : DerivStructure -> DerivStructure [memo] .
+  eq gtf( S ) = downTerm(getTopFormula(upTerm(S)),err) .
+
+endm
+
+smod ST is
+  protecting SAM-Meta .
+
+  strat fr : DerivStructure @ DerivStructure .
+  strat fr1 : DerivStructure Nat @  DerivStructure .
+  strat f : DerivStructure Nat @ DerivStructure .
+  strat f1 : DerivStructure @ DerivStructure .
+  strat f2 : DerivStructure @ DerivStructure .
+  strat f3 : DerivStructure @ DerivStructure .
+  strat f4 : DerivStructure @ DerivStructure .
+  strat f5 : DerivStructure @ DerivStructure .
+  strat test : Structure @ DerivStructure .
+  strat doit : @ DerivStructure .
+  strat con : Structure @ Structure .
+  strat nah : Structure @ Structure .
+  strat ch : @ Structure .
+  op err : -> Structure .
+  var A B : Structure .
+  var S T : DerivStructure .
+  var N : Nat .
+
+  ***(
+  csd fr( B, N ) := match S s.t. isSolution(gtf(S),B) | ( (all ; match S:DerivStructure) ; ( fr(B, N + 1) ) )
+    if N =/= 4 .
+  sd fr( B, N ) := fail .
+  *)
+
+***(
+  csd fr( B, N ) := (all ; match S:DerivStructure) ; ( match S:DerivStructure s.t. isSolution(S,B) or-else ( fr(B,N + 1) ) )
+    if N =/= 8 .
+  sd fr( B, N ) := fail .
+*)
+
+
+***sd ch := (one | two) ; match S:DerivStructure .
+
+
+***(
+  sd fr( B ) := (all ; match S:DerivStructure) ; ( match B 
+                  or-else (all ; match S:DerivStructure) ; (match B
+                  or-else (all ; match S:DerivStructure) ; (match B 
+                  or-else (all ; match S:DerivStructure) ; (match B
+                  or-else (all ; match S:DerivStructure) ; match B ))))  .
+
+*)
+  op isSolution : DerivStructure DerivStructure -> Bool [memo] .
+  eq isSolution( S , S ) = true [print S] .
+  eq isSolution( S , B ) = false [owise] .
+
+  op gtf : DerivStructure -> DerivStructure [memo] .
+  eq gtf( S ) = downTerm(getTopFormula(upTerm(S)),err)  .
+
+endsm
+

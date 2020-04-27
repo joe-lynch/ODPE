@@ -1,0 +1,68 @@
+fmod S-INT is 
+  protecting SAM-Signature .
+  protecting Util .
+ 
+  var A B C E : DerivStructure .
+  var Struct1 Struct2 : Structure .
+  var atm : Atom .
+  vars U1 U2 U3 U4 : Unit .
+  var SS1 SS2 : SubStructure .
+  var Q : Qid .
+  var DS1 DS2 : DerivStructure .
+
+  op I : DerivStructure -> DerivStructure .
+  op I* : Structure -> Unit .
+  op SI : Structure -> Structure .
+ 
+  eq I ( DS1 > [ Q ] > (DS2) ) = I ( DS1 ) > [ Q ] > I ( DS2 ) .
+  
+  eq I ( [ U1 , U2 ] atm [ U3 , U4 ] ) =  I ( I* ( [ U1 , U2 ] ) atm I* ( [ U3 , U4 ] ) ) .
+  eq I ( { U1 , U2 } atm { U3 , U4 } ) =  I ( I* ( { U1 , U2 } ) atm I* ( { U3 , U4 } ) ) .
+  
+  eq I* ( { U1 , tt } ) = U1 .
+  eq I* ( { ff , ff } ) = ff .
+  eq I* ( [ U1 , ff ] ) = U1 .
+  eq I* ( [ tt , tt ] ) = tt .
+  
+  eq I( tt ) = tt .
+  eq I( ff atm ff ) = ff .
+  eq I( ff atm tt ) = atm .
+  eq I( [ C , B ] ) = [ I( C ) , I( B ) ] .
+  
+  eq I( ff ) = ff .
+  eq I( tt atm tt ) = tt .
+  eq I( tt atm ff  ) = - atm .
+  eq I( { A , B } ) = { I( A ) , I( B ) } .
+
+endfm
+
+fmod S-REP is
+  protecting SAM-Signature .
+   
+  var A B C Z : Structure .
+  var atm atm1 atm2 atm3 : Atom .
+  var natm : NegAtom .
+  var U1 U2 U3 U4 : Unit .
+  var SS : SubStructure .
+  
+  op R : Structure -> Structure .
+  op E : Structure -> Structure .
+
+  eq R ( [ - atm , U1 ] ) = [ R( - atm ) , U1 atm U1 ] .
+  eq R ( [ atm , U1 ] ) = [ R( atm ) , U1 atm U1 ] .
+  eq R ( { - atm , U1 } ) = { R( - atm ) , U1 atm U1 } .
+  eq R ( { atm , U1 } ) = { R( atm ) , U1 atm U1 } .
+  
+  eq R ( E ( - atm  ) ) = [ tt , tt ] atm [ ff , ff ] .
+  eq R ( E ( atm ) ) = [ ff , ff ] atm [ tt , tt ] .
+  
+  eq R ( - atm ) = tt atm ff .
+  eq R ( { A , B } ) = { R( A ) , R( B ) } .
+ 
+  eq R ( atm ) =  ff atm tt .
+  ceq R ( [ A , B ] ) = [ R( A ) , R( B ) ]
+	if not ( A :: Unit ) /\ not ( B :: Unit ) .
+	
+  eq R ( U1 ) = U1 .
+
+endfm

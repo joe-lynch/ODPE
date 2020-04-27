@@ -1,0 +1,89 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE system SYSTEM "description.dtd" [
+    <!ENTITY % odpe2maude SYSTEM "odpe2maude.dtd">
+    %odpe2maude;
+]>
+
+<system name="KSg" subatomic-name="SAM">
+	<normal>
+		<syntax>
+			<unary-prefix  symbol="-" input="-"/>
+			<binary-outfix id="dis" symbol="[&vel;]" input="[,]"/>
+			<binary-outfix id="copar" symbol="(&wedge;)" input="(,)"/>
+			<constant      symbol="tt"/>
+			<constant      symbol="ff"/>
+			<constant      symbol="t"/>
+			<constants     symbols="a b c d e f g h i j"/>
+		</syntax>
+		  
+		<rules>
+			<inference-rule id="i-down"  name="i&downarrow;"/>
+			<inference-rule 			 name="s"/> 
+			<inference-rule id="w-down"  name="w&downarrow;"/>
+			<inference-rule id="c-down"  name="c&downarrow;"/>
+			<inference-rule id="c-up"    name="c&uparrow;"/>
+			<inference-rule 			 name="tt-dis" />
+			<inference-rule 			 name="ff-con"/>
+			<inference-rule 			 name="tt-elim"/>
+			<inference-rule id="equality" name="="/>
+
+			<reverse-inference-rule id="i-up-r"	 name="i&uparrow;"/>
+			<reverse-inference-rule id="s-r"	 name="s"/>
+			<reverse-inference-rule id="w-up-r"	 name="w&uparrow;"/>
+			<reverse-inference-rule id="c-up-r"	 name="c&uparrow;"/>
+			<reverse-inference-rule id="c-down-r"	 name="c&downarrow;"/>	
+		</rules>
+	</normal>
+	 
+	<subatomic>
+		<syntax>
+			<constant	   symbol="ff"/>
+			<constant 	   symbol="tt"/>
+		</syntax>
+		  
+		<rules>
+			<inference-rule id="eq" name="="/>
+			<inference-rule id="a-down" name="a&downarrow;"/>
+			<inference-rule id="a-up" name="a&uparrow;"/>
+			<inference-rule id="conj-down" name="&wedge;&downarrow;"/>
+			<inference-rule id="conj-d" name="&wedge;&downarrow;"/>
+			<inference-rule id="disj-up" name="&vel;&uparrow;"/>
+			<inference-rule id="m" name="m"/>
+			<inference-rule id="ac" name="ac"/>
+			<inference-rule id="acc" name="acc"/>
+			<inference-rule id="c-down" name="c&downarrow;"/>
+			<inference-rule id="c-up" name="c&uparrow;"/>
+				
+			<reverse-inference-rule id="eq-r" name="="/>
+			<reverse-inference-rule id="a-down-r" name="a&downarrow;"/>
+			<reverse-inference-rule id="a-up-r" name="a&uparrow;"/>
+			<reverse-inference-rule id="conj-down-r" name="&wedge;&downarrow;"/>
+			<reverse-inference-rule id="disj-up-r" name="&vel;&uparrow;"/>
+			<reverse-inference-rule id="m-r" name="m"/>
+			<reverse-inference-rule id="ac-r" name="ac"/>
+			<reverse-inference-rule id="acc-r" name="acc"/>
+			<reverse-inference-rule id="c-down-r" name="c&downarrow;"/>
+			<reverse-inference-rule id="c-up-r" name="c&uparrow;"/>
+		</rules>
+	</subatomic>
+  
+	<backend class="odpe.backend.odpe2maude.ODPE2Maude">
+		<load name="nnf_KS.maude"/>
+		<load name="sam.maude"/>
+		<load name="s.maude"/>
+		<load name="ksg.maude"/>
+		<inferencer name="KSg-Meta"/>
+		<reverseinferencer name="KSg-Meta-Reverse"/>
+		<sa_inferencer name="SAM-Meta"/>
+		<sa_reverseinferencer name="SAM-Meta-Reverse"/>
+		<normalizer name="NNF"/>
+		<subatomiser name="SAM-Meta"/>
+		<interpreter name="S-INT"/>
+		<maudename id="dis" name="[_,_]"/>
+		<maudename id="copar" name="{_,_}"/>
+		<result-sort name="Structure"/>
+	</backend>
+
+
+</system>
+

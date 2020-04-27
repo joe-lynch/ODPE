@@ -1,0 +1,53 @@
+*** Author: Joe Lynch
+
+fmod SKV-Signature is
+
+  sorts Atom Unit Structure .
+  subsort Atom < Structure .
+  subsort Unit < Structure .
+
+  op o     : -> Unit .
+  op *_    : Structure -> Structure .
+  op -_    : Atom -> Atom [ prec 50 ] .
+  op [_,_] : Structure Structure -> Structure [assoc comm id: o] .
+  op {_,_} : Structure Structure -> Structure [assoc comm id: o] .
+  op <_;_> : Structure Structure -> Structure [assoc id: o] .
+
+  ops a b c d e f g h i j a1 a2 a3 a4 b1 b2 b3 b4 c1 c2 c3 c4 d1 d2 d3 d4 e1 e2 e3 e4 f1 f2 f3 f4 g1 g2 g3 g4 h1 h2 h3 h4 : -> Atom . 
+
+endfm
+
+
+mod SKV-Inf is
+
+  protecting SKV-Signature .
+
+  var Atm : Atom .
+  var A B C D : Structure .
+
+  rl  [identity]       : [ Atm , - Atm ]       		=> o .
+  *** rl  [cut]	       : o				            => { Atm , - Atm } .
+
+  rl  [switch]         : [ { A , B } , C ]  		=> { A , [ B , C ] } .
+
+  rl  [seq]            : [ < A ; B > , < C ; D > ]  	=> < [ A , C ] ; [ B , D ] > .
+  rl  [coseq]          : < { A , C } ; { B , D } >  	=> { < A ; B > , < C ; D > } .
+
+  rl  [star]           : * o 				=> o .
+  rl  [costar]         : o				=> * o .
+
+  rl  [promotion]      : [ * A , * B ] 			=> * [ A , B ] .
+  rl  [copromotion]    : * { A , B } 			=> { * A , * B } .
+ 
+  rl  [cocontraction]  : < * A ; A > 			=> * A .
+  rl  [contraction]    : * A 				=> < * A ; A > .
+
+endm
+
+mod SKV-Meta is
+
+  protecting SKV-Inf .
+  protecting Util .
+  subsort Structure < Derivation .
+
+endm

@@ -1,0 +1,110 @@
+*** The original module KSg was written by Ozan Kahramanogullari 
+*** [http://www.doc.ic.ac.uk/~ozank/], it was adapted for
+*** use with the GraPE system (http://grape.sf.net) by Max Schaefer.
+
+fmod SAM-Signature is
+  protecting Util .
+  sorts NegAtom Atom Unit SubStructure Structure Deriv DerivStructure SubAtom .
+  subsort Atom < NegAtom < Structure .
+  subsort SubStructure < Structure < Deriv < DerivStructure .
+  subsort Unit < Structure .
+  subsort SubAtom < SubStructure .
+  
+  op tt      : -> Unit .
+  op ff      : -> Unit .
+  ops phi1 phi2 phi3 phi4 : -> Unit .
+  op -_      : Atom -> NegAtom .
+  op [_,_]   : Structure Structure -> Structure [comm assoc] .
+  op {_,_}   : Structure Structure -> Structure [comm assoc] .
+  op [_,_]   : DerivStructure DerivStructure -> DerivStructure [comm assoc] .
+  op {_,_}   : DerivStructure DerivStructure -> DerivStructure [comm assoc] .
+  op [_,_]   : SubStructure SubStructure -> SubStructure [comm assoc] .
+  op {_,_}   : SubStructure SubStructure -> SubStructure [comm assoc] .
+  op ___     : DerivStructure Atom DerivStructure -> SubStructure .
+  op _>[_]>_ : Structure Qid DerivStructure -> Deriv [ gather (E & e) ] .
+  op _>[_]>_ : DerivStructure Qid DerivStructure -> Deriv [ gather (E & e) ] .
+  
+  ops a b c d e f g h i j none : -> Atom .
+
+endfm
+
+mod SAM-Inf is
+	protecting SAM-Signature .
+	
+	var atm atm1 atm2 : Atom .
+	var A B C D : Structure .
+	var DS : DerivStructure .
+	var U U1 U2 : Unit .
+	var Q : Qid .
+	
+	
+	crl [c-down]     : A  => [ A  , A ] 
+						if not ( A :: SubStructure ) .
+	crl [c-up]       : { A , A } => A 
+						if not ( A :: SubStructure ) .
+						
+	rl [eq] 	   : { U , U } 					  =>	[ U , U ]  .
+	rl [eq] 	   : [ U , U ] 					  =>	{ U , U }  .
+	rl [a-down]    : [ A atm C , B atm D ]        => 	[ A , B ] atm [ C , D ] .
+	rl [a-up] 	   : { A , C } atm { B , D }      => 	{ A atm B , C atm D } .
+	rl [conj-down] : [ { A , C } , [ B , D ] ]    => 	{ [ A , B ] , [ C , D ] } .
+	rl [conj-d]    : [ { A , C } , B ]            => 	{ [ A , B ] , C } .
+	rl [disj-up]   : [ { A , C } , { B , D } ]    => 	{ [ A , B ] , { C , D } } .
+	rl [m]         : { [ A , C ] , [ B , D ] }    => 	[ { A , B } , { C , D } ] .
+	rl [ac]        : [ A , C ] atm [ B , D ]      =>    [ A atm B , C atm D ] .
+	rl [acc]       : { A atm C , B atm D }        => 	{ A , B } atm { C , D } .
+
+	rl [a] 	 	   : [e , [ g, g ] ]			  =>	b .
+	
+endm
+
+mod SAM-Inf-Reverse is
+	protecting SAM-Signature .
+	
+	var atm : Atom .
+	var A B C D : Structure .
+	var U : Unit .
+	
+	rl [c-down-r]      :  A  =>  [ A , A ] .
+	rl [c-up-r]        : { A , A } => A .
+  
+	rl [eq-r] : [ U , U ] => { U , U }  .
+  
+	rl [a-down-r]    : [ A , B ] atm [ C , D ]      => 		[ A atm C , B atm D ] .
+	rl [a-up-r] 	 : { A atm B , C atm D }        => 		{ A , C } atm { B , D } .
+	rl [conj-down-r] : { [ A , B ] , [ C , D ] }    => 		[ { A , C } , [ B , D ] ] .
+	rl [disj-up-r]   : { [ A , B ] , { C , D } }    => 		[ { A , C } , { B , D } ] .
+	rl [m-r]         : [ { A , B } , { C , D } ]    => 		{ [ A , C ] , [ B , D ] } .
+	rl [ac-r]        : [ A atm B , C atm D ]        => 		[ A , C ] atm [ B , D ] .
+	rl [acc-r]       : { A , B } atm { C , D }      => 		{ A atm C , B atm D } .
+  
+endm
+
+mod SAM-Meta is
+  protecting Util .
+  protecting SAM-Inf .
+  
+  var Q : Qid .
+  vars atm1 atm2 : Atom .
+  var DS DS1 DS2 : DerivStructure .
+  var Trm : Term .
+  var TL : TermList . 
+  op error : -> DerivStructure .
+  
+  op equal : DerivStructure DerivStructure -> Bool .
+  eq equal( DS1 , DS2 ) = if DS1 == DS2 then true else false fi .
+
+  op test : DerivStructure -> Derivation .
+  eq test( DS ) = convert( upTerm( DS ) ) .
+  
+  op gnf : DerivStructure -> DerivStructure .
+  eq gnf ( DS ) = downTerm(gnf( upTerm ( DS ) ) ,  error ) .
+
+endm
+
+
+mod SAM-Meta-Reverse is
+  protecting Util .
+  protecting SAM-Inf-Reverse .
+ 
+endm

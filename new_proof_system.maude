@@ -1,0 +1,256 @@
+*** The original module KSg was written by Ozan Kahramanogullari 
+*** [http://ozan-k.com/], it was adapted for
+*** use with the open deduction proof editor by Joe Lynch.
+
+fmod KSg-Signature is
+
+  sorts Atom Unit Structure OuterStructure .
+  subsort Atom < Structure .
+  subsort Unit < Structure .
+
+  op tt    : -> Unit .
+  op ff    : -> Unit .
+  op -_    : Atom -> Atom [ prec 50 ] .
+  op [_,_] : Structure Structure -> Structure [assoc comm id: ff] .
+  op {_,_} : Structure Structure -> Structure [assoc comm id: tt] .
+
+  ops a b c d e f g h i j a1 a2 a3 a4 b1 b2 b3 b4 c1 c2 c3 c4 d1 d2 d3 d4 e1 e2 e3 e4 f1 f2 f3 f4 g1 g2 g3 g4 h1 h2 h3 h4 : -> Atom . 
+
+endfm
+
+mod KSg-Inf is
+
+  protecting KSg-Signature .
+  
+  var atm : Atom .
+  var R A B C D : Structure .
+
+  rl  [i-down]  : [ atm , - atm ]                =>   tt .
+  rl  [s]       : [ { A , C } , B ]   		 =>   { [ A , B ] , C } .
+  rl  [m]       : { [ A , C ] , [ B , D ] }  =>   [ { A , B } , { C , D } ] .
+  rl  [c-down]  : R                          =>   [ R , R ] .
+  rl  [c-up]    : { A , A }             	 =>   A .
+  rl  [w-down]  : R                          =>   ff .
+
+
+endm
+
+mod KSg-Inf-Reverse is
+ 
+  protecting KSg-Signature .
+
+  var A : Atom .
+  var R T U  : Structure .
+  var atm : Atom .
+
+  rl  [i-up-r]    : { atm , - atm }      =>   ff .
+  rl  [s-r]       : { [ R , U ] , T }    =>   [ { R , T } , U ] .
+  rl  [w-up-r]    : R                    =>   tt .
+  rl  [c-down-r]  : [ R , R ]            =>    R .
+  rl  [c-up-r]    : R         		 	 =>   { R , R } .
+
+endm
+
+mod KSg-Meta is
+
+  protecting KSg-Inf .
+  protecting Util .
+  subsort Structure < Derivation .
+
+endm
+
+mod KSg-Meta-Reverse is
+
+  protecting KSg-Inf-Reverse .
+  protecting Util .
+  subsort Structure < Derivation .
+
+endm
+
+fmod EQQ is
+ protecting KSg-Signature .
+ protecting BOOL .
+ vars A B : Structure .
+ op equality : Structure Structure -> Bool .
+ eq equality ( A , B ) = if A == B then true else false fi .
+endfm
+
+
+***(
+
+ op goThrough : TermList Structure -> Structure .
+  
+  eq goThrough ( ( Trm TL ) , B ) = 
+	if I ( downTerm ( Trm , error ) ) == B then
+		downTerm ( Trm , error )
+	else
+		goThrough( TL , B )
+	fi .
+		
+  eq goThrough( empty , B ) = end .
+  
+ )
+ 
+ ***(
+	if metaMatch( upModule('SAM-Meta , false) , '`[_`,_`]['___['A:Structure,'atm:Atom,'C:Structure],'___['B:Structure,'atm:Atom, 'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+		input > [ Q ] > downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-down ) , upTerm ( B ) ) , error )
+	else if metaMatch( upModule('SAM-Meta , false) , '___['`{_`,_`}['A:Structure,'C:Structure],'atm:Atom,'`{_`,_`}['B:Structure,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then 
+		input > [ Q ] > downTerm( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-up ) , upTerm ( B  ) ) , error )
+	else if metaMatch( upModule('SAM-Meta , false) , '`[_`,_`]['B:Structure,'D:Structure,'`{_`,_`}['A:Structure,'C:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+		input > [ Q ] > downTerm( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'conj-down ) , upTerm ( B ) ) , error )
+	else if metaMatch( upModule('SAM-Meta , false) , '`[_`,_`]['`{_`,_`}['A:Structure,'C:Structure],'`{_`,_`}['B:Structure,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+		input > [ Q ] > downTerm( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'disj-up ) , upTerm ( B ) ) , error )
+	else if metaMatch( upModule('SAM-Meta , false) , '`{_`,_`}['`[_`,_`]['A:Structure,'C:Structure],'`[_`,_`]['B:Structure,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+		input > [ Q ] > downTerm( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'm ) , upTerm ( B ) ) , error )
+	else if metaMatch( upModule('SAM-Meta, false), '___['`[_`,_`]['A:Structure,'C:Structure],'atm:Atom,'`[_`,_`]['B:Structure,'D:Structure]], upTerm( input ) , nil, 0 ) =/= noMatch then
+		input > [ Q ] > downTerm( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'ac ) , upTerm ( B ) ) , error )
+	else if metaMatch( upModule('SAM-Meta, false), '`{_`,_`}['___['A:Structure,'atm:Atom,'C:Structure],'___['B:Structure,'atm:Atom,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+		input > [ Q ] > downTerm( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'acc ) , upTerm ( B ) ) , error )
+	else
+		nah1
+	fi fi fi fi	fi fi fi .
+	)
+	***(
+	eq test1( B > [ Q ] >  input ) = 
+		if metaMatch( upModule('SAM-Meta , false) , '`[_`,_`]['___['A:Structure,'atm:Atom,'C:Structure],'___['B:Structure,'atm:Atom, 'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then 
+			if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-down ) ) , error ) ) == B then
+				downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-down ) ) , error ) > [ Q ] > input  
+			else
+				nah1
+			fi
+		else
+			if metaMatch( upModule('SAM-Meta , false) , '___['`{_`,_`}['A:Structure,'C:Structure],'atm:Atom,'`{_`,_`}['B:Structure,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then 
+				if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-up ) ) , error ) ) == B then
+					downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-up ) ) , error ) > [ Q ] > input
+				else
+					nah
+				fi
+			else
+				if metaMatch( upModule('SAM-Meta , false) , '`[_`,_`]['B:Structure,'D:Structure,'`{_`,_`}['A:Structure,'C:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+					if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'conj-down ) ) , error ) ) == B then
+						downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'conj-down ) ) , error ) > [ Q ] > input
+					else
+						nah
+					fi
+				else
+					if metaMatch( upModule('SAM-Meta , false) , '`[_`,_`]['`{_`,_`}['A:Structure,'C:Structure],'`{_`,_`}['B:Structure,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+						if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'disj-up ) ) , error ) ) == B then
+							downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'disj-up ) ) , error ) > [ Q ] > input
+						else
+							nah
+						fi
+					else
+						if metaMatch( upModule('SAM-Meta , false) , '`{_`,_`}['`[_`,_`]['A:Structure,'C:Structure],'`[_`,_`]['B:Structure,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+							if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'm ) ) , error ) ) == B then
+								downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'm ) ) , error ) > [ Q ] > input
+							else
+								nah
+							fi
+						else
+							if metaMatch( upModule('SAM-Meta, false), '___['`[_`,_`]['A:Structure,'C:Structure],'atm:Atom,'`[_`,_`]['B:Structure,'D:Structure]], upTerm( input ) , nil, 0 ) =/= noMatch then
+								if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'ac ) ) , error ) ) == B then
+									downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'ac ) ) , error ) > [ Q ] > input 
+								else
+									nah
+								fi
+							else
+								if metaMatch( upModule('SAM-Meta, false), '`{_`,_`}['___['A:Structure,'atm:Atom,'C:Structure],'___['B:Structure,'atm:Atom,'D:Structure]] , upTerm( input ) , nil, 0 ) =/= noMatch then
+									if I ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'acc ) ) , error ) ) == B then
+										downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'acc ) ) , error ) > [ Q ] > input
+									else
+										nah
+									fi
+								else
+									nah
+								fi
+							fi
+						fi
+					fi
+				fi	
+			fi
+		fi .
+  )
+  
+  
+  ***(
+    eq k ( A ) = con ( A ) .
+  eq k( A > [ Q ] > B ) = test ( con ( A ) > [ Q ] > B ) .
+  eq k( A > [ Q ] > Deriv1 ) = tk ( A > [ Q ] > Deriv1 ) > [ Q ] > k ( Deriv1 ) .
+  eq k( A > [ Q ] > DStructure ) = tk ( A > [ Q ] > DStructure ) > [ Q ] > k ( DStructure ) .
+  
+  *** Deriv and DS
+  eq k( [ Deriv1 , DStructure ] ) = [ k ( Deriv1 ) , k ( DStructure ) ] .
+  eq k( { Deriv1 , DStructure } ) = [ k ( Deriv1 ) , k ( DStructure ) ] .
+  
+  *** Structure and Deriv
+  eq tk ( A > [ Q ] > Deriv1 ) = getFormula( k ( A > [ Q ] > getFormula( Deriv1 ) ) ) . 
+  
+  *** Structure and DerivStructure
+  eq tk ( A > [ Q ] > DStructure ) = getFormula( k ( A > [ Q ] > getFormula( DStructure ) ) ) . 
+  
+  
+  )
+
+
+***(
+
+  op error : -> Structure .
+  op getFormula : Deriv -> Structure .
+  op nah : -> Deriv .
+  op test : Deriv -> Deriv . 
+  op kk : Deriv -> Deriv .
+  op check : Deriv Deriv -> Deriv .
+  
+  var input A B C E : Structure .
+  var Deriv1 Deriv2 : Deriv .
+  var DStructure DStructure1 : DerivStructure .
+  var Q Q1 Q2 : Qid .
+  var TL : TermList .
+  var SS1 SS2 : SubStructure .
+  
+  eq getFormula( [ Deriv1 , DStructure ] ) = [ getFormula( Deriv1 ) , getFormula( DStructure ) ] .
+  eq getFormula( { Deriv1 , DStructure } ) = { getFormula( Deriv1 ) , getFormula( DStructure ) } .
+  eq getFormula( Deriv1 > [ Q ] > Deriv2 ) = getFormula( Deriv1 ) .
+  eq getFormula( A ) = A .
+  
+  eq kk ( A ) = R( A ) .
+  eq kk ( [ Deriv1 , DStructure ] ) = [ kk ( Deriv1 ) , kk ( DStructure ) ] .
+  eq kk ( { Deriv1 , DStructure } ) = { kk ( Deriv1 ) , kk ( DStructure ) } .
+  eq kk ( A > [ Q ] > DStructure ) = test ( R ( A ) > [ Q ] > DStructure ) .
+
+  eq test( input > [ Q ] >  DStructure ) =
+    if downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'disj-up 'm 'ac 'acc ) , upTerm ( getFormula ( DStructure ) ) ) , error )  =/= error then
+		input > [ Q ] > check ( downTerm ( getRewrites ( findRewrites ( upTerm ( input ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'disj-up 'm 'ac 'acc ) , upTerm ( getFormula( DStructure ) ) ) , error ) , DStructure )
+	else
+		error
+	fi .
+	
+  eq check ( [ SS1 , SS2 ] , [ Deriv1 , Deriv2 ] ) = 
+	if check ( SS1 , Deriv1 ) =/= nah then
+		[ check ( SS1 , Deriv1 ) , check ( SS2 , Deriv2 ) ]
+	else
+		[ check ( SS2 , Deriv1 ) , check ( SS1 , Deriv2 ) ]
+	fi .
+  
+  eq check ( { SS1 , SS2 } , { Deriv1 , Deriv2 } ) = 
+	if check ( SS1 , Deriv1 ) =/= nah then
+		{ check ( SS1 , Deriv1 ) , check ( SS2 , Deriv2 ) }
+	else
+		{ check ( SS2 , Deriv1 ) , check ( SS1 , Deriv2 ) }
+	fi .
+	
+  eq check ( A , B > [ Q ] > DStructure ) =
+    if B == I ( A ) then
+	    test ( A > [ Q ] > DStructure )
+	else
+	    nah
+	fi .
+	
+  eq check ( SS1, Deriv1 ) =
+    if Deriv1 == I ( SS1 ) then
+		SS1
+	else
+		nah
+	fi .
+
+)

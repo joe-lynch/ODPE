@@ -1,0 +1,31 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE system SYSTEM "description.dtd" [
+    <!ENTITY % odpe2maude SYSTEM "odpe2maude.dtd">
+    %odpe2maude;
+]>
+
+<system name="KSg">
+  <syntax>
+    <unary-prefix  symbol="-" input="-" tex="\overline{#1}"/>
+	<unary-prefix  symbol="|-" input="|-" />
+	<unary-prefix  symbol="." input="." />
+    <binary-outfix id="dis" symbol="[&vel;]" input="[,]"/>
+    <binary-outfix id="copar" symbol="(&wedge;)" input="(,)"/>
+    <constant      symbol="tt"/>
+    <constant      symbol="ff"/>
+    <constants     symbols="a b c d e f g h i j"/>
+
+  </syntax>
+  <rules>
+  </rules>
+  <backend class="odpe.backend.odpe2maude.ODPE2Maude">
+    <load name="nnf_KS.maude"/>
+    <load name="ksg.maude"/>
+    <inferencer name="KSg-Meta"/>
+    <normalizer name="NNF"/>
+	<subatomiser name="SAM-Meta">
+    <maudename id="dis" name="[_,_]"/>
+    <maudename id="copar" name="{_,_}"/>
+    <result-sort name="Structure"/>
+  </backend>
+</system>

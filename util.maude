@@ -1,0 +1,1008 @@
+*** adapted from Max Schafer ***
+
+fmod REWRITING is
+    protecting META-LEVEL .
+
+    sort Rewriting .
+
+    op rewriting : Qid Context TermList Term Substitution -> Rewriting [ctor] .
+
+
+    op getRewriterName : Rewriting -> Qid .
+    op getContext : Rewriting -> Qid .
+    op getResults : Rewriting -> TermList .
+    op getSubstitution : Rewriting -> Substitution .
+    op getOriginalTerm : Rewriting -> Term .
+
+    var Q : Qid .
+    var Ctxt : Context .
+    var TL : TermList .
+    var Trm : Term .
+    var Subst : Substitution .
+
+    eq getRewriterName(rewriting(Q, Ctxt, TL, Trm, Subst)) = Q .
+    eq getContext(rewriting(Q, Ctxt, TL, Trm, Subst)) = Ctxt .
+    eq getResults(rewriting(Q, Ctxt, TL, Trm ,Subst)) = TL .
+    eq getSubstitution(rewriting(Q, Ctxt, TL, Trm, Subst)) = Subst .
+    eq getOriginalTerm(rewriting(Q, Ctxt, TL, Trm, Subst)) = Trm .
+
+endfm
+
+fmod TERMSET is
+    protecting META-LEVEL .
+
+    sort TermSet .
+    subsort Term < TermSet .
+    op emptyTermSet : -> TermSet [ctor] .
+    op _|_ : TermSet TermSet -> TermSet
+    [ctor assoc comm id: emptyTermSet format (d n d d)] .
+    eq X:Term | X:Term = X:Term .
+    ceq X:Term | Y:Term = X:Term 
+        if getTerm(metaReduce(['SAM-Meta] , X:Term)) == getTerm(metaReduce(['SAM-Meta] , Y:Term)) .
+
+    op _in_ : Term TermSet -> Bool .
+    eq T:Term in (T:Term | TS:TermSet) = true .
+    eq T:Term in TS:TermSet = false [owise] .
+
+    op TermSet : TermList -> TermSet .
+    eq TermSet(empty) = emptyTermSet .
+    eq TermSet((T:Term,TL:TermList)) = T:Term | TermSet(TL:TermList) .
+
+    op TermList : TermSet -> TermList .
+    eq TermList(emptyTermSet) = empty .
+    eq TermList((T:Term | TSet:TermSet)) = T:Term, TermList(TSet:TermSet) .
+
+endfm
+
+view Rewriting from TRIV to REWRITING is
+    sort Elt to Rewriting .
+endv
+
+fmod Util is
+
+    including META-LEVEL .
+    including META-STRATEGY .
+    including META-MODULE .
+    including TERMSET .
+
+
+    sorts Derivation DerivationList Derivation? .
+    subsort Term < Derivation .
+    subsort Derivation < Derivation? .
+    subsort Derivation < DerivationList .
+
+    protecting SET{Rewriting} * (sort Set{Rewriting} to RewritingSet) .
+
+*** finds out whether and how a term can be rewritten using any among a list
+***  of inference rules and operators (where rewriting a term t using an
+***  operator o means that the term o(t) reduces to some term whose outermost
+***  functor is not o)
+
+    op findRewrites : Term Qid QidList -> RewritingSet .
+    op findRewritesForRule : Term Qid Qid Nat -> RewritingSet .
+    op extractRewriting : Term Qid Result4Tuple -> RewritingSet . 
+    op extractTermList : Term -> TermList .
+    op getElements : Term -> Term .
+    op error : -> Term .
+    op _>[_]>_ : Derivation Qid Derivation -> Derivation .
+
+
+    vars Trm Trm1 Trm2 Trm3 Trm4 T1 T2 T3 T4 input B TEST Top OrigTrm finalTrm : Term .
+    var Tp : Type .
+    var Attrs : AttrSet .
+    var M M1 M2 Q Q1 Q2 Q3 : Qid .
+    var N K : Nat .
+    var V V1 V2 : Variable .
+    var C : Constant .
+    var TL : TermList .
+    var Rewr op op1 ss : Qid .
+    var QL RewrList : QidList .
+    var Reing : Rewriting .
+    var ReingList : RewritingSet .
+    var Ctxt Ctxt1 : Context .
+    vars TL1 TL2 : TermList .
+    var Subst : Substitution .
+    var Mod : Module .
+    var Rls : RuleSet .
+    var Rle : Rule  .
+    var rp : ResultPair .
+    var cnst cnst1 cnst2 cnst3 : Constant .
+    var sub : Substitution .
+    var con : Context .
+    var nct : NeCTermList .
+    var mp : MatchPair .
+    var S1 S2 : Substitution .
+    var Tr Tr1 Tr2 : Trace .
+    var TrL : TraceList .
+    var TrSt TrSt1 TrSt2 : TraceStep .
+    var TSet TSet1 TSet2 : TermSet .
+
+    op ket : Term -> Term .
+    op getRewrites : RewritingSet Term -> Term .
+    op getRewrites1 : RewritingSet Term -> Term .
+    op getFormula : Term -> Term .
+
+*** getRewrites applies rules and gets rewrites of a subatomic formula,
+*** then compares the interpretation of the rewrite with the standard formula conclusion
+
+    op convert : Term -> Derivation .
+    eq convert( '_>`[_`]>_[ T1 , Q , T2 ] ) = convert(T1) > [ Q ] > convert(T2) .
+    eq convert( op [ Trm, cnst, Trm1 ] ) = '___[ convert(Trm), cnst, convert(Trm1) ] .
+    ceq convert( op [ Trm, TL ] ) = op [ convert(Trm), convert(TL) ]
+        if TL =/= empty .
+    ceq convert( (Trm, TL) ) = convert(Trm), convert(TL)
+        if TL =/= empty .
+    eq convert( Trm ) = Trm .
+
+
+    op getReplacement : MatchPair Term -> Term .
+    eq getReplacement ( { sub , op[ TL, con ] } , T1 ) = op [ TL , getReplacement ( { sub , con } , T1 ) ] .
+    eq getReplacement ( { Trm1 <- Trm2 , [] } , T1 ) = replace-conc( Trm2 , T1 ) . 
+
+    op replace-conc : Term Term -> Term .
+    eq replace-conc( Trm1, '_>`[_`]>_[ T1 , Q , T2 ] ) = test('_>`[_`]>_[ Trm1 , Q , T2 ]) . 
+
+    op peak : TermList -> Term .
+    eq peak ( ( Trm, TL ) ) = Trm .
+
+    op remove_top : TermList -> Term .
+    eq remove_top ( ( Trm, TL ) ) = TL .
+
+    op replace : Term Term Term  -> Term .
+    op replace1 : Term Term Term -> Term .
+    op replace2 : Term Term Term -> Term .
+    op replace10 : Term Term Term -> Term .
+
+    eq replace ( Trm , empty , '_>`[_`]>_[ Trm2 , Q , Trm3 ] ) =
+        if getTerm ( metaReduce(upModule('S-INT,false),'I[Trm]) ) == Trm2 then
+            replace-conc( Trm, '_>`[_`]>_[ Trm2 , Q , Trm3 ] )
+        else
+            'na
+        fi .    
+
+    eq replace ( Trm , empty , Trm2 ) = Trm .
+
+    eq replace ( Trm , ( Top , TL ) , Trm2 ) =
+        replace(
+            getReplacement(
+                metaXmatch(upModule('S-Inf,false),
+                        'S:Structure, Trm,
+                         getTerm ( metaReduce(upModule('S-INT,false),'I['S:Structure]) ) = getFormula(Top),
+                        0,unbounded,0 )
+                    ,Top)
+            ,TL, Trm2) .
+
+    op reassemble : Substitution -> TermList .
+    eq reassemble ( 'S:Structure <- Trm1 ; V1 <- Q ; 'T:DerivStructure <- Trm2 ) = '_>`[_`]>_[Trm1 , Q , Trm2] .
+
+    op extractContext : Context -> Term .
+    eq extractContext ( '_>`[_`]>_[ Trm1 , Q , con ] ) = '_>`[_`]>_[Trm1 , Q , extractContext(con) ] .
+    eq extractContext ( '_>`[_`]>_[ con , Q , Trm2 ] ) = '_>`[_`]>_[extractContext(con) , Q , Trm2 ] .
+    eq extractContext ( op [ TL , con ] ) = op [ TL , extractContext ( con ) ] .
+    eq extractContext ( [] ) = 'none.Atom .
+
+
+    op extractSubstitution : Substitution -> Term .
+    eq extractSubstitution ( V <- Trm ) = Trm .
+
+    op manyMatches : Term Context Nat -> Nat .
+    eq manyMatches( Trm , con , N ) =
+        if metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , extractContext(con) , 
+                        '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] = Trm , 0 , unbounded, N ) =/= noMatch
+        then
+            manyMatches( Trm , getContext(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , extractContext(con) , 
+                        '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] = Trm , 0 , unbounded, N )) , N + 1)
+    else
+        N
+    fi .
+
+    op duplicate : Term Nat -> TermList .
+    eq duplicate( Trm , 0 ) = Trm .
+    eq duplicate( Trm , N ) = Trm , duplicate( Trm , sd ( N , 1 ) ) .
+
+    op ket2 : Term Nat -> Term .
+    eq ket2 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] , N ) = ket2( Trm1 , N ) .
+    eq ket2 ( Trm , N ) =
+        if metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, N ) =/= noMatch 
+        then
+            duplicate( reassemble(getSubstitution(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , 
+                        unbounded, N ))),
+                        manyMatches(reassemble(getSubstitution(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, N ))),
+                        getContext(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, N )),0)),     
+            ket2(Trm, N + 1 )
+        else
+            empty
+        fi .
+
+    op inn : Term TermList -> Bool .
+    eq inn(Trm, op [Trm1,TL]) =
+        if inn(Trm,Trm1) then true else inn(Trm,TL) fi .
+    eq inn(Trm , Trm1) =
+        if Trm == Trm1 then true else false fi .
+    eq inn(Trm, (Trm1,TL)) =
+        if inn(Trm,Trm1) then true else inn(Trm,TL) fi .
+    eq inn(Trm,empty) = false .
+    
+    op ket3 : Term Nat -> Term .
+    eq ket3 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] , N ) = ket3( Trm1 , N ) .
+    eq ket3 ( Trm , N ) = 
+        if metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, 0 ) =/= noMatch then
+            if not inn( 'none.Atom , reassemble(getSubstitution(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , 
+                Trm , nil , 0 , unbounded, 0 ))))
+            then
+                reassemble(getSubstitution(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, 0 ))),
+                ket3(extractContext(getContext(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, 0 ))), 0)
+            else
+                ket3(extractContext(getContext(metaXmatch( upModule('S-Inf , false ) , '_>`[_`]>_['S:Structure, 'Q:Qid, 'T:DerivStructure] , Trm , nil , 0 , unbounded, 0 ))), 0)
+            fi
+        else
+            empty
+        fi .
+    
+    eq ket ( '_>`[_`]>_[ Trm2 , Q , Trm3 ] ) = '_>`[_`]>_[ Trm2 , Q , Trm3 ] .
+    eq ket ( op['_>`[_`]>_[ Trm2 , Q , Trm3 ]] ) =  ket('_>`[_`]>_[ Trm2 , Q , Trm3 ]) .
+    eq ket ( op [ cnst , TL1 ] ) = ket ( op [ TL1 ] ) .
+    eq ket ( op [ Trm1 , TL1 ] ) = ket ( Trm1 ) , ket ( op [ TL1 ] ) .
+    eq ket ( Trm ) = empty .
+    eq ket ( op [ empty ] ) = empty .
+
+    eq getRewrites ( (rewriting( Q , Ctxt, Trm1 , OrigTrm, Subst) , ReingList) , Trm2 ) = 
+        if getTerm ( metaReduce ( upModule( 'S-INT , false ) , 'I[ Trm1 ] ) ) == flatten(Trm2) then
+            Trm1 ***replace( Trm1 , ket3 ( Trm2 , 0 ) , Trm2 )
+        else
+            getRewrites( ReingList , Trm2 )
+        fi .
+    
+    eq getRewrites( empty, Trm2 ) = error .
+    
+  
+    eq getRewrites1 ( (rewriting( Q , Ctxt, Trm1, OrigTrm, Subst ) , ReingList) , Trm2 ) = 
+        if getTerm ( metaReduce ( upModule( 'S-INT , false ) , 'I[ Trm1 ] ) ) == flatten(getFormula(Trm2)) then
+            replace1( Trm1 , ket3 ( Trm2 , 0 ) , Trm2 )
+        else
+            getRewrites1( ReingList , Trm2 )
+        fi .
+    
+    eq getRewrites1( empty, Trm2 ) = error .
+  
+    ceq gnf1 ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) 
+        if flat ( Trm ) .
+    ceq gnf1 ( op [ Trm1 , Trm2 ] ) = op [ gnf1(Trm1) , gnf1(Trm2) ]
+        if op =/= '_>`[_`]>_ and Trm2 =/= empty .
+    ceq gnf1 ( op [ Trm1 , TL ] ) = op [ gnf1(Trm1) , gnf1(op[TL]) ]
+        if op =/= '_>`[_`]>_ and TL =/= empty .
+    ***eq gnf1 ( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gnf1(Trm1) , ''equality.Sort , gnf1(Trm2) ].
+    eq gnf1 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = test2 ('_>`[_`]>_[ gnf1(Trm1) , Q , gnf1(Trm2) ]) .
+    eq gnf1 ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) .
+
+
+*** gnf takes proof trees and converts them into their subatomic form
+    op gn : Term -> Term .
+    op gnf : Term -> Term .
+    op gnf1 : Term -> Term .
+    op gnf2 : Term -> Term .
+    op gnf3 : Term -> Term .
+    op gnf4 : Term -> Term .
+    op gnf5 : Term -> Term .
+    op gnf6 : Term -> Term .
+    op gnf7 : Term -> Term .
+
+    ceq gnf ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) 
+        if flat ( Trm ) .
+
+    ceq gnf ( op [ Trm1 , Trm2 ] ) = op [ gnf(Trm1) , gnf(Trm2) ]
+        if op =/= '_>`[_`]>_ and Trm2 =/= empty .
+
+    ceq gnf ( op [ Trm1 , TL ] ) = op [ gnf (Trm1) , gnf(op[TL]) ]
+        if op =/= '_>`[_`]>_ and TL =/= empty .
+
+    eq gnf ( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gnf1(Trm1) , ''equality.Sort , gnf1(Trm2) ].
+
+    eq gnf ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = test2 ('_>`[_`]>_[ gnf(Trm1) , Q , gnf(Trm2) ]) .
+    eq gnf ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) .
+
+ 
+  
+  
+    op test2 : Term -> Term .
+    ceq test2 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+            '_>`[_`]>_[ Trm1 ,
+                          getRewriterName(getRe(findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2)))),
+                          Trm2 ]
+        if getRe(findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2))) 
+            =/= empty .
+
+    ceq test2( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+    '_>`[_`]>_[ Trm1 ,
+                getRewriterName(getRe(
+                  findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                  interpret(getFormula(Trm2)), 0)),
+                getResults(getRe(
+                  findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                  interpret(getFormula(Trm2)), 0)) ]
+        if findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
+                                                              
+    ceq test2( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+        '_>`[_`]>_[ getResults(getRe(
+                      findRewrites ( flatten(getFormula(Trm2)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                      interpret(Trm1), 0)) ,
+                    getRewriterName(getRe(
+                      findRewrites ( flatten(getFormula(Trm2)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                      interpret(Trm1), 0)),
+                     Trm2 ]
+        if findRewrites ( flatten(getFormula(Trm2)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
+
+    eq test2 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 'd .
+
+    op interpret : Term -> Term .
+    eq interpret( Trm ) = flatten(getTerm(metaReduce(upModule( 'S-INT , false ), 'I[getFormula(Trm)]))) .
+
+*** check if a term has binary operators
+    op binop : Term -> Bool .
+    eq binop ( op [ Trm1 ] ) = false .
+    eq binop ( cnst ) = false .
+    eq binop ( op [ Trm1 , TL ] ) = true .
+
+*** check if a derivation is "flat" or not - if it contains other structures or not
+    op isflat : Term -> Bool .
+    op flat : Term -> Bool .
+    ceq flat ( op [ TL ] ) = isflat ( TL ) if op =/= '_>`[_`]>_ .
+    eq isflat ( ( Trm, TL ) ) = if binop ( Trm ) then false else isflat(TL) fi .
+    eq isflat ( empty ) = true .
+  
+    op test : Term -> Term .
+    eq test ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+        if Q == ''equality.Sort then
+            if 'true.Bool  == getTerm( metaReduce ( upModule ( 'EQQ , false ) , 'equality[getTerm(metaReduce(upModule( 'S-INT , false ), 'I[getTopFormula(Trm1)])),
+                getFormula(Trm2)] ) )
+            then
+                '_>`[_`]>_[ Trm1 , Q , replace(getTopFormula(Trm1),ket3(Trm2,0), Trm2) ]
+            else
+                'na
+            fi 
+        else if getRewrites ( findRewrites ( getTopFormula ( Trm1 ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , getFormula ( Trm2 ) ) 
+                =/= error
+        then
+            '_>`[_`]>_[ Trm1 , Q , getRewrites ( findRewrites ( getTopFormula ( Trm1 ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , Trm2 ) ]
+        else
+            test ( '_>`[_`]>_[getRewrites ( findRewrites ( getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ getFormula ( Trm2 ) ] ) ) , 'SAM-Meta , 'a-up 
+                                'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) ,
+                                getTerm ( metaReduce ( upModule( 'S-INT , false ) , 'I[ Trm1 ] ) ) ) , Q , Trm2] ) 
+        fi fi .
+    eq test ( Trm1 ) = Trm1 .
+    
+    op test1 : Term -> Term .
+    eq test1 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+        if Q == ''equality.Sort then
+            if 'true.Bool  == getTerm( metaReduce ( upModule ( 'EQQ , false ) , 'equality[getTerm(metaReduce(upModule( 'S-INT , false ), 'I[getTopFormula(Trm1)])),
+                getFormula(Trm2)] ) )
+            then
+                replace10(getTopFormula(Trm1),ket3(Trm2,0), Trm2) ***'_>`[_`]>_[ Trm1 , Q , replace(getTopFormula(Trm1),ket3(Trm2,0), Trm2) ]
+            else
+                'na
+            fi 
+        else if getRewrites ( findRewrites ( getTopFormula ( Trm1 ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , getFormula ( Trm2 ) )
+                =/= error
+        then
+            getRewrites1 ( findRewrites ( getTopFormula ( Trm1 ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , Trm2 ) ***'_>`[_`]>_[ Trm1 , Q , getRewrites ( findRewrites ( getTopFormula ( Trm1 ) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , Trm2 ) ]
+        else
+            test ( '_>`[_`]>_[getRewrites ( findRewrites ( getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ getFormula ( Trm2 ) ] ) ) , 'SAM-Meta , 'a-up 
+                                'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) ,
+                                getTerm ( metaReduce ( upModule( 'S-INT , false ) , 'I[ Trm1 ] ) ) ) , Q , Trm2] ) 
+        fi fi .
+    eq test1 ( Trm1 ) = Trm1 .
+
+*** flatten a derivation
+    op flatten : TermList -> TermList .
+    eq flatten( Trm ) = getTerm( metaReduce ( upModule( 'SAM-Meta , false ) , Trm ) ) .
+    eq flatten( (Trm, TL) ) = flatten(Trm) , flatten(TL) .
+
+*** get the bottom formula of a derivation
+    op getFormula : Term -> Term .
+    eq getFormula( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = getFormula(Trm1) . 
+    eq getFormula( op [ Trm , TL ] ) = flatten ( op [ getFormula( Trm ) , getFormula( TL ) ] ) .
+    eq getFormula( (Trm , empty ) ) = Trm .
+    eq getFormula( (Trm, TL) ) = getFormula(Trm) , getFormula( TL ) .
+    eq getFormula( empty ) = empty .
+
+*** get the top formula of a derivation
+    op getTopFormula : Term -> Term .
+    eq getTopFormula( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = getTopFormula(Trm2) . 
+    eq getTopFormula( op [ Trm , TL ] ) = flatten ( op [ getTopFormula( Trm ) , getTopFormula( TL ) ] ) .
+    eq getTopFormula( (Trm , empty ) ) = Trm .
+    eq getTopFormula( (Trm, TL) ) = getTopFormula(Trm) , getTopFormula( TL ) .
+    eq getTopFormula( empty ) = empty .
+
+    op getTopFormula : TermSet -> TermSet .
+    eq getTopFormula( emptyTermSet ) = emptyTermSet .
+    eq getTopFormula( (Trm | TSet) ) = getTopFormula(Trm) | getTopFormula(TSet) .
+  
+
+*** find the rewrites of a term with a list of rules
+    eq findRewrites(Trm, M, (Rewr RewrList)) =  findRewritesForRule(Trm, M, Rewr, 0) , findRewrites(Trm, M, RewrList) .
+    eq findRewrites(Trm, M, nil) = empty .
+
+*** find the rewrites for each rule 
+    eq findRewritesForRule(Trm, M, Q, N) = 
+        if  metaXapply([M], Trm, Q, none, 0, unbounded, N) == failure then
+            empty
+        else
+            extractRewriting(Trm, Q, metaXapply([M], Trm, Q, none, 0, unbounded, N)),
+            findRewritesForRule(Trm, M, Q, N + 1)
+        fi .
+
+*** gets the formulae of a ground term inside the operator
+    eq getElements( op [TL]) = TL .
+  
+*** These equations check if a formula is a subformula of another formula
+    op contains : Term TermList -> Bool .
+    eq contains(Trm, []) = false .
+    eq contains(Trm, Trm2) = (Trm == Trm2) .
+    eq contains(Trm, (Trm2, TL1)) = if Trm == Trm2 then true else contains(Trm, TL1) fi .
+
+*** extract the rewriting for all the above find rewrites functions
+    eq extractRewriting(OrigTrm, Q, {Trm2, Tp, Subst, Ctxt}) =
+        if Q == 'tt-norm then
+            if extractTermList(Trm2) =/= 'tt.Unit then
+                findRewritesForRule(Trm2, 'KSg-Meta, 'tt-norm, 0)
+            else
+                rewriting(Q, Ctxt, extractTermList(Trm2), OrigTrm, Subst)
+            fi
+        else
+            if Q == 'tt-elim then
+                if contains('tt.Unit, getElements(extractTermList(Trm2))) then
+                    findRewritesForRule(Trm2, 'KSg-Meta, 'tt-elim, 0)
+                else
+                    rewriting(Q, Ctxt, extractTermList(Trm2), OrigTrm, Subst)
+                fi
+            else
+                if OrigTrm == Trm2 or Ctxt =/= [] then
+                    empty
+                else
+                    rewriting(Q, Ctxt, extractTermList(Trm2), OrigTrm, Subst)
+                fi
+            fi
+        fi .
+
+    eq extractTermList(Q[TL]) =
+        if Q == '_;_ then TL else Q[TL] fi .
+
+*** C is constant, V is variable
+    eq extractTermList(C) = C .
+    eq extractTermList(V) = V .
+
+*** extracts binding - only deals with single bindings
+    op extractBinding : Variable Substitution -> Term .
+    eq extractBinding(V, V <- Trm ; Subst) = Trm .
+
+    op extractBinding : Substitution -> Term .
+    eq extractBinding( V <- Trm ) = Trm .
+
+    op extractBinding : MatchPair -> Term .
+    eq extractBinding( {V <- Trm , Ctxt} ) = Trm .
+
+ *** get the rule of a derivation
+    op getR : Term -> Term .
+    eq getR( '_>`[_`]>_[Trm, Q, Trm1] ) = Q .
+    eq getR ( Trm ) = empty .
+
+*** align the terms in a specific manner for this special proof search
+    op align : Term Term Term -> Term .
+    ceq align( Trm, Trm1, Trm2 ) = '_>`[_`]>_[matchbt(Trm,Trm1,0,0), getR(Trm1),Trm2]
+        if matchbt(Trm,Trm1,0,0) =/= empty .
+    eq align( Trm, Trm1, Trm2 ) = empty .
+    eq align( Trm, empty, Trm2 ) = empty .
+
+*** match and calculate the term at the bottom of the derivation
+    op matchbt : Term Term Nat Nat -> Term .
+    eq matchbt( Trm, '_>`[_`]>_[Trm1,Q,Trm2], N , K) = 
+            *** search for deeper derivations inside the "searched path"
+            if metaXmatch(['SAM-Meta], '_>`[_`]>_['Phi1:DerivStructure,'Phi2:Qid,'Phi3:DerivStructure], Trm1, nil , 0, unbounded, N) =/= noMatch then
+                *** match every possible part of the Trm
+                if metaXmatch(['SAM-Meta], 'S:Structure, Trm, nil, 0, unbounded,K) =/= noMatch then
+                    *** get the matched deeper derivation and check if the bottom formula of it matches the part of Trm
+                    if getFormula(substitute('_>`[_`]>_['Phi1:DerivStructure,'Phi2:Qid,'Phi3:DerivStructure], getSubstitution(metaXmatch(['SAM-Meta], '_>`[_`]>_['Phi1:DerivStructure,'Phi2:Qid,'Phi3:DerivStructure], Trm1, nil , 0, unbounded, N))))
+                        == extractBinding(getSubstitution(metaXmatch(['SAM-Meta], 'S:Structure, Trm, nil, 0, unbounded,K))) then
+                            *** check if the topFormulas are equal... leave it for now...
+                                    *** then replace the part of Trm with the deeper derivation, and call whole thing again in case there are multiple cases
+                                    *** had to replace chosen derivation in trm1 with 'a.Atom so that the same derivation doesn't get rechosen
+                                    matchbt(
+                                        replaceContext(getContext(metaXmatch(['SAM-Meta], 'S:Structure, Trm, nil, 0, unbounded,K)),                             
+                                                    substitute('_>`[_`]>_['Phi1:DerivStructure,'Phi2:Qid,'Phi3:DerivStructure],
+                                                            getSubstitution(metaXmatch(['SAM-Meta], '_>`[_`]>_['Phi1:DerivStructure,'Phi2:Qid,'Phi3:DerivStructure], Trm1, nil , 0, unbounded, N)))),
+                                            '_>`[_`]>_[replaceContext(getContext(metaXmatch(['SAM-Meta], '_>`[_`]>_['Phi1:DerivStructure,'Phi2:Qid,'Phi3:DerivStructure], Trm1, nil , 0, unbounded, N)),
+                                                            'a.Atom),
+                                                        Q,Trm2],
+                                            0,
+                                            0)
+                                        
+                    else
+                        matchbt(Trm, '_>`[_`]>_[Trm1,Q,Trm2], N, K + 1)
+                    fi
+                else
+                    matchbt(Trm, '_>`[_`]>_[Trm1,Q,Trm2], N + 1, 0)
+                fi
+            else
+                Trm
+            fi .
+    
+    eq matchbt(Trm, Trm1,  N, K) = empty .
+
+
+    op rew : TermSet Qid QidList Term -> TermSet .
+    eq rew( emptyTermSet, M, RewrList, Trm1 ) = emptyTermSet . 
+    eq rew( (Trm | TSet), M, RewrList, Trm1 ) = fr( Trm, M, RewrList, Trm1 ) | rew( TSet, M, RewrList, Trm1 ) .
+        
+*** find the rewrites for the special proof search with the list of rules
+    op fr : Term Qid QidList Term -> TermSet .
+    eq fr(Trm, M, (Rewr RewrList), Trm1) = frRule(Trm, M, Rewr, 0, Trm1) | fr(Trm, M, RewrList, Trm1) .
+    eq fr(Trm, M, nil, Trm1) = emptyTermSet .
+
+*** find the rewrites for each rule of the special proof search
+    op frRule : Term Qid Qid Nat Term -> TermSet .
+    eq frRule( Trm, M, Q, N, Trm1) = 
+        if metaXapply([M], Trm, Q, none, 0, 0, N) =/= failure then
+            if metaMatch([M],Trm1, getTerm(metaXapply([M], Trm, Q, none, 0, 0, N)),nil,0) =/= noMatch then
+                getTerm(metaXapply([M], Trm, Q, none, 0, 0, N)) |
+                frRule(Trm, M, Q, N + 1, Trm1)
+            else
+                frRule(Trm,M,Q,N + 1, Trm1)
+            fi
+        else
+            emptyTermSet
+        fi .
+
+*** find the rewrites of the term, and then the rewrites of the term already rewritten with particular rules
+    op proofSearch : Term Term -> TermSet .
+    eq proofSearch(Trm, Trm1) = fr(Trm, 'SAM-Meta, 'uuu 'unu 'ubu 'nun 'nnn 'nbn 'nuu 'nnu 'nbu 'uun 'ubn 'auu 'anu 'abu 'aun 'ann 'll1 'll2 'll3 'll4 'eqq, Trm1)
+                                      | fr-manage(getTopFormula(manage( Trm, 'll1 'll2 'll3 'll4, 1)), Trm1) .
+
+    op proofSearch1 : Term Term -> TermSet .
+    eq proofSearch1(Trm, Trm1) = fr(Trm, 'SAM-Meta, 'a-down 'a-up 'ac 'acc 'm 'conj-down 'conj-d 'disj-up 'c-up 'c-down, Trm1) 
+                                  | fr-manage(getTopFormula(manage1( Trm, 'c-down 'c-up, 2)), Trm1) .
+
+    op fr-manage : TermSet Term -> TermSet .
+    eq fr-manage( (Trm | TSet), Trm1 ) = fr(Trm, 'SAM-Meta, 'uuu 'unu 'ubu 'nun 'nnn 'nbn 'nuu 'nnu 'nbu 'uun 'ubn 'auu 'anu 'abu 'aun 'ann 'll1 'll2 'll3 'll4 'eqq, Trm1)
+                                        | fr-manage( TSet, Trm1 ) .   
+    eq fr-manage( emptyTermSet, Trm1 ) = emptyTermSet .
+
+    op formDeriv : Term Qid Term -> Term .
+    eq formDeriv( Trm, Q, Trm1 ) =  '_>`[_`]>_[ Trm, Q, Trm1 ] .
+
+
+    op ap : Qid Result4Tuple Qid Term -> Term .
+    ceq ap ( M, {Trm, Tp, Subst, Ctxt}, Rewr, OrigTrm ) = follow-trace(metaSearchPath(['SAM-Meta], OrigTrm, Trm, nil, '+, 3, 0),Trm)
+       if follow-trace(metaSearchPath(['SAM-Meta], OrigTrm, Trm, nil, '+, 3, 0),Trm) =/= empty /\
+           metaSearchPath(['SAM-Meta], OrigTrm, Trm, nil, '+, 3, 0) =/= failure .
+    eq ap( M, {Trm, Tp, Subst, Ctxt}, Rewr, OrigTrm ) = emptyTermSet .
+ 
+    op q : TermSet Qid Nat -> Term .
+    ceq q( Trm, Rewr, N ) = ap1( 'SAM-Meta, metaXapply(['SAM-Meta], Trm, Rewr, none, 1, 1, N), Rewr, Trm ) | q(Trm, Rewr, N + 1)
+        if metaXapply(['SAM-Meta], Trm, Rewr, none, 1, 1, N) =/= failure .
+    eq q( Trm, Rewr, N ) = emptyTermSet .
+
+    op mq : TermSet QidList -> TermSet .
+    eq mq( Trm, (Rewr RewrList) ) = q( Trm, Rewr, 0 ) | mq( Trm, RewrList ) .
+    eq mq( Trm, nil ) = emptyTermSet .
+
+    op ap1 : Qid Result4Tuple Qid Term -> Term .
+    ceq ap1 ( M, {Trm, Tp, Subst, Ctxt}, Rewr, OrigTrm ) = follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(OrigTrm), getTopFormula(Trm), nil, '+, 3, 0),getTopFormula(Trm))
+       if follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(OrigTrm), getTopFormula(Trm), nil, '+, 3, 0),getTopFormula(Trm)) =/= empty /\
+           metaSearchPath(['SAM-Meta], getTopFormula(OrigTrm), getTopFormula(Trm), nil, '+, 3, 0) =/= failure .
+
+    eq ap1( M, {Trm, Tp, Subst, Ctxt}, Rewr, OrigTrm ) = emptyTermSet .
+
+
+    op c : Context -> Term .
+
+    op q1 : TermSet Qid Nat -> Term .
+    ceq q1( Trm, Rewr, N ) = ap1( 'SAM-Meta, metaXapply(['SAM-Meta], Trm, Rewr, none, 1, 1, N), Rewr, Trm ) | q1(Trm, Rewr, N + 1)
+        if metaXapply(['SAM-Meta], Trm, Rewr, none, 1, 1, N) =/= failure .
+    eq q1( Trm, Rewr, N ) = emptyTermSet .
+
+    op mq1 : TermSet QidList -> TermSet .
+    eq mq1( Trm, (Rewr RewrList) ) = q1( Trm, Rewr, 0 ) | mq1( Trm, RewrList ) .
+    eq mq1( Trm, nil ) = emptyTermSet .
+
+    op master : TermSet QidList -> TermSet .
+    eq master( (Trm | TSet) , RewrList ) = mq(Trm, RewrList) | master(TSet, RewrList) .
+    eq master( emptyTermSet , RewrList ) = emptyTermSet .
+
+    op master1 : TermSet QidList -> TermSet .
+    eq master1( (Trm | TSet) , RewrList ) = mq1(Trm, RewrList) | master1(TSet, RewrList) .
+    eq master1( emptyTermSet , RewrList ) = emptyTermSet .
+
+    op manage : TermSet QidList Nat -> TermSet .
+    eq manage( TSet, RewrList, 0 ) = emptyTermSet .
+    eq manage( TSet, RewrList, N ) = master1(TSet, RewrList) | manage(master1(TSet,RewrList), RewrList, sd(N,1)) .
+
+    op manage1 : TermSet QidList Nat -> TermSet .
+    eq manage1( TSet, RewrList, 0 ) = emptyTermSet .
+    eq manage1( TSet, RewrList, N ) = master1(TSet, RewrList) . *** | master1(master1(TSet,RewrList), RewrList) .
+
+*** get value at index of term set
+    op get : TermSet Nat Nat -> Term .
+    eq get(emptyTermSet, N, K) = empty .
+    ceq get((Trm | TSet),N,K) = Trm
+        if N == K .
+    eq get((Trm | TSet), N, K) = get(TSet, N, K + 1) .
+
+*** get values at index of term list
+    op get : TermList Nat Nat -> Term .
+    eq get(empty, N, K) = empty .
+    ceq get((Trm,TL),N,K) = Trm
+        if N == K .
+    eq get((Trm,TL), N, K) = get(TL, N, K + 1) .
+
+    op size : TermList -> Nat .
+    eq size( TL ) = $size( TL, 0 ) .
+
+    op size : TermSet -> Nat .
+    eq size( TSet ) = $size( TSet, 0 ) .
+    
+    op $size : TermList Nat -> Nat .
+    eq $size( empty , N ) = N .
+    eq $size( (Trm,TL), N ) = $size(TL, N + 1) .
+
+    op $size : TermSet Nat -> Nat .
+    eq $size( empty , N ) = N .
+    eq $size( (Trm | TSet), N ) = $size(TSet, N + 1) .
+
+
+    op loop-ext : Term TermSet Term Nat -> Term .
+    eq loop-ext( '_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N ) =
+        if get(TSet,N,0) =/= empty then
+            if path(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0) =/= empty then
+                loopl(
+                    Trm2,
+                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)),
+                    path(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0)
+                ) , loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1)
+            else
+                loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1)
+            fi
+        else
+            empty
+        fi .
+
+    op loop-ext1 : Term TermSet Term Nat -> Term .
+    eq loop-ext1( '_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N ) = 
+        if get(TSet,N,0) =/= empty then
+            if path1(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0) =/= empty then
+                follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0))
+                ***( follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)) ***
+                loopl(
+                    Trm2,
+                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)),
+                    path1(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0)
+                )  ) ***(
+                loopl(
+                    Trm2,
+                    follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(Trm2), get(TSet,N,0), nil, '+, 3, 0), get(TSet,N,0)),
+                    path1(substitute(Trm1, metaMatch(['SAM-Meta], getFormula(Trm1), get(TSet,N,0), nil, 0)),0)
+                ) , loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1) )
+            else
+                loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], TSet, Trm2, N + 1)
+            fi 
+        else
+            empty
+        fi .
+
+
+    op crazy : Term -> TermSet .
+    eq crazy( op [ Trm , Trm1 ] ) = crazy1(unpack-structure( op , TermList(proofSearch( Trm, 'S:Structure )), TermList(proofSearch(Trm1, 'T:Structure)), 0 ), 0, 0) .
+
+    op crazy1 : TermList Nat Nat -> TermSet .
+    eq crazy1( empty , N, K ) = emptyTermSet .
+    ceq crazy1( (Trm, TL), N, K ) = proofSearch(Trm,'S:Structure) | crazy1( TL, size(TL) , size(proofSearch(Trm,'S:Structure)))
+        if K =/= 94  [print "N: " N ", K: " K]  .
+    eq crazy1( (Trm,TL), N, K ) = Trm [print Trm] .
+
+
+
+     op speed-test : Term Term -> Term .
+     eq speed-test( Trm, Trm1 ) = getTerm(metaSearch(['SAM-Meta], Trm, Trm1, nil, '*, 3, 0)) .
+
+
+
+*** loop through each derivation
+    op loop : Term TermList -> TermList .
+    eq loop( '_>`[_`]>_[ Trm, Q, Trm1 ], empty) = empty . 
+    eq loop( '_>`[_`]>_[ Trm, Q, Trm1 ], (Trm2,TL)  ) =
+        loop-ext('_>`[_`]>_[ Trm, Q, Trm1 ], proofSearch(getTopFormula(Trm2), getFormula(Trm1)), Trm2, 0) ,
+        loop('_>`[_`]>_[ Trm, Q, Trm1 ], TL) . 
+
+
+     op loop1 : Term TermList -> TermList .
+    eq loop1( '_>`[_`]>_[ Trm, Q, Trm1 ], empty) = empty . 
+    eq loop1( '_>`[_`]>_[ Trm, Q, Trm1 ], (Trm2,TL)  ) = loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], proofSearch1(getTopFormula(get((Trm2,TL),450,0)), getFormula(Trm1)), get((Trm2,TL),450,0), 0) . ***(
+        loop-ext1('_>`[_`]>_[ Trm, Q, Trm1 ], proofSearch1(getTopFormula(Trm2), getFormula(Trm1)), Trm2, 0) ,
+        loop1('_>`[_`]>_[ Trm, Q, Trm1 ], TL) . )
+
+*** loop through the conclusion
+    op loopl : Term Term TermList -> Term .
+    eq loopl( Trm, empty, TL) = empty .
+    eq loopl( Trm, Trm1, empty) = empty .
+    eq loopl( Trm, Trm1, (Trm2, TL) ) = align(Trm,Trm1,Trm2), loopl(Trm, Trm1, TL) .
+
+*** find the path for the incomplete derivation - I somehow increased the speed by using op [ TL ] ???
+    op path : Term Nat -> Term .
+    eq path( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) = loop('_>`[_`]>_[ Trm, Q, Trm1 ], path(Trm,0) ) .
+
+    op path1 : Term Nat -> Term .
+    eq path1( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) = loop('_>`[_`]>_[ Trm, Q, Trm1 ], path1(Trm,0) ) .
+
+    ceq path( '___[ Trm, cnst, Trm1 ], N ) = unpack-subatom(path(Trm,N), cnst, path(Trm1, N), N)
+        if path(Trm, N) =/= empty /\ path(Trm1, N) =/= empty .
+    eq path( '___[ Trm, cnst, Trm1 ], N ) = empty .
+
+    ***reduce in SAM-Meta : path( upTerm( ( ({[a,c],[e,g]} >['n]> S:Structure) a ({[b,d],[f,h]} >['n]> T:Structure) ) >['n]> [({a,S1:Structure} a {b,S2:Structure}) >['n]> {a a b,[e,g] a [f,h]}, ({c,S3:Structure} a {d,S3:Structure}) >['n]> {c a d,[e,g] a [f,h]}] ), 0) .
+    
+    *** sort this out
+    ceq path( op [ Trm, Trm1 ], N ) = flatten(unpack-structure(op, path(Trm,N), path(Trm1 ,N), N))
+        if Trm1 =/= empty /\  path(Trm, N) =/= empty /\ path(Trm1, N) =/= empty .
+    ceq path( op [ Trm, TL ], N ) = flatten(unpack-structure(op, path(Trm,N), path( op [ TL ] ,N), N))
+        if TL =/= empty /\  path(Trm, N) =/= empty /\ path(TL, N) =/= empty .
+    ceq path( op[ Trm, TL ], N ) = empty
+        if TL =/= empty .
+    
+    ceq path( (Trm, TL), N ) = path(Trm, N), path(TL, N)
+        if TL =/= empty .
+    eq path( Trm, N ) = Trm .
+
+
+
+    ceq path1( '___[ Trm, cnst, Trm1 ], N ) = unpack-subatom(path1(Trm,N), cnst, path1(Trm1, N), N)
+        if path1(Trm, N) =/= empty /\ path1(Trm1, N) =/= empty .
+    eq path1( '___[ Trm, cnst, Trm1 ], N ) = empty .
+    
+    *** sort this out
+    ceq path1( op [ Trm, Trm1 ], N ) = flatten(unpack-structure(op, path1(Trm,N), path1(Trm1 ,N), N))
+        if Trm1 =/= empty /\  path1(Trm, N) =/= empty /\ path1(Trm1, N) =/= empty .
+    ceq path1( op [ Trm, TL ], N ) = flatten(unpack-structure(op, path1(Trm,N), path1( op [ TL ] ,N), N))
+        if TL =/= empty /\  path1(Trm, N) =/= empty /\ path1(TL, N) =/= empty .
+    ceq path1( op[ Trm, TL ], N ) = empty
+        if TL =/= empty .
+    
+    ceq path1( (Trm, TL), N ) = path1(Trm, N), path1(TL, N)
+        if TL =/= empty .
+    eq path1( Trm, N ) = Trm .
+
+*** unpack structures made up of term lists
+    op unpack-structure : Qid TermList TermList Nat -> TermList .
+    eq unpack-structure( op, TL, TL1, N ) = unpack-structure( op, TL, TL1, N, TL) .
+
+    op unpack-structure : Qid TermList TermList Nat TermList -> TermList .
+    eq unpack-structure( op , (Trm,TL), (Trm1, TL1), N, (Trm2, TL2) ) = op [ Trm, Trm1 ], unpack-structure(op, TL, (Trm1, TL1), N, (Trm2, TL2) ) .
+    eq unpack-structure( op , (Trm,TL), empty , N, (Trm2, TL2) ) = empty .
+    eq unpack-structure( op , empty, (Trm1, TL1), N, (Trm2,TL2) ) = unpack-structure(op, (Trm2,TL2), TL1, N, (Trm2,TL2)) .
+    eq unpack-structure( op , empty, empty, N, (Trm2,TL2)) = empty .
+
+*** unpack subatoms made up of term lists
+    op unpack-subatom : TermList Term TermList Nat -> TermList .
+    eq unpack-subatom( TL, cnst, TL1, N ) = unpack-subatom(TL, cnst, TL1, N, TL) .
+
+    op unpack-subatom : TermList Term TermList Nat TermList -> TermList .
+    eq unpack-subatom( (Trm,TL), cnst, (Trm1,TL1), N, (Trm2,TL2)) = '___[Trm, cnst, Trm1] , unpack-subatom( TL, cnst, (Trm1, TL1) ,N, (Trm2,TL2)) .
+    eq unpack-subatom( (Trm,TL), cnst, empty, N, (Trm2,TL2)) = empty .
+    eq unpack-subatom( empty, cnst, (Trm1,TL1), N, (Trm2,TL2) ) = unpack-subatom((Trm2,TL2), cnst, TL1, N, (Trm2,TL2)) .
+    eq unpack-subatom( empty, cnst, empty, N, (Trm2,TL2) ) = empty .
+    
+
+*** follow the traces and construct a derivation
+    op follow-trace : Trace Term -> Term .
+    op follow-trace : Trace Term Term -> Term .
+    op follow-trace : Trace Term Rule Term Nat Term Nat -> Term .
+    
+    eq follow-trace( TrSt1 TrSt2 Tr, finalTrm) = follow-trace(TrSt1 TrSt2 Tr, getTerm(TrSt1), getRule(TrSt1), getTerm(TrSt2), 0, finalTrm, 0 ) .
+    eq follow-trace( TrSt1 Tr, finalTrm ) = follow-trace(TrSt1 Tr, getTerm(TrSt1), getRule(TrSt1), finalTrm, 0, finalTrm , 0) .
+    
+    eq follow-trace( TrSt1 TrSt2 Tr, Trm, finalTrm ) = follow-trace(TrSt1 TrSt2 Tr, Trm, getRule(TrSt1), getTerm(TrSt2), 0, finalTrm, 0 ) .
+    eq follow-trace( TrSt1 Tr, Trm, finalTrm ) = follow-trace(TrSt1 Tr, Trm, getRule(TrSt1), finalTrm, 0, finalTrm, 0 ) .
+    
+    eq follow-trace( nil, finalTrm ) = finalTrm .
+    eq follow-trace( nil, Trm, finalTrm ) = Trm .
+
+    op mp : MatchPair -> Term .
+
+    eq follow-trace( TrSt Tr , Trm1, Rle, Trm2, N, finalTrm , K) =
+        if metaXmatch(['SAM-Meta], getPr(Rle) , getTopFormula(Trm1), nil , 0, unbounded, N) =/= noMatch then 
+            if  getTopFormula(
+                        replaceContext(getContext(metaXmatch(['SAM-Meta], getPr(Rle), getTopFormula(Trm1), nil , 0, unbounded, N)),
+                                        '_>`[_`]>_[substitute(getPr(Rle), getSubstitution(metaXmatch(['SAM-Meta], getPr(Rle), getTopFormula(Trm1), nil , 0,
+                                                    unbounded, N))) ,
+                                                    upTerm(rulename(Rle)),
+                                                    substitute(getCo(Rle), getSubstitution(metaXmatch(['SAM-Meta], getPr(Rle), getTopFormula(Trm1), nil , 0, unbounded, N)))]))
+                == getFormula(Trm2)
+            then
+                    if metaXmatch(['SAM-Meta], 'Phi1:DerivStructure , Trm1 ,nil, 0, unbounded, K) =/= noMatch then
+                            if flatten(getTopFormula(extractBinding(getSubstitution(metaXmatch(['SAM-Meta], 'Phi1:DerivStructure , Trm1 ,nil,0, unbounded, K)))))
+                                == flatten(substitute(getPr(Rle), getSubstitution(metaXmatch(['SAM-Meta], getPr(Rle) , getTopFormula(Trm1), nil , 0, unbounded, N))))
+                            then
+                                follow-trace( Tr,
+                                              replaceContext(getContext(metaXmatch(['SAM-Meta], 'Phi1:DerivStructure , Trm1 ,nil,0, unbounded, K)),
+                                                        '_>`[_`]>_[extractBinding(getSubstitution(metaXmatch(['SAM-Meta], 'Phi1:DerivStructure , Trm1 ,nil,0,
+                                                                    unbounded, K))),
+                                                                    upTerm(rulename(Rle)),
+                                                                    substitute(getCo(Rle), getSubstitution(metaXmatch(['SAM-Meta], getPr(Rle) , getTopFormula(Trm1), nil , 0, unbounded, N)))]),
+                                              finalTrm)
+                            else
+                                follow-trace( TrSt Tr , Trm1, Rle, Trm2, N, finalTrm , K + 1)
+                            fi 
+                    else
+                        empty
+                    fi
+            else
+                follow-trace( TrSt Tr , Trm1, Rle, Trm2, N + 1 , finalTrm, 0 )
+            fi 
+            
+        else
+            empty
+        fi . 
+
+*** get the premise of a rule                                                 
+    op getPr : Rule -> Term .
+    eq getPr( crl Trm => Trm1 if Cond [Attrs]. ) = Trm .
+    eq getPr( rl Trm => Trm1 [Attrs]. ) = Trm .
+
+*** get the conclusion of a rule
+    op getCo : Rule -> Term .
+    eq getCo( crl Trm => Trm1 if Cond [Attrs]. ) = Trm1 .
+    eq getCo( rl Trm => Trm1 [Attrs]. ) = Trm1 .
+
+*** replace the context with a term
+    op replaceContext : Context Term -> Term .
+    eq replaceContext ( op [ TL , con, TL1 ], Trm3 ) = op [ TL , replaceContext ( con, Trm3 ) , TL1 ] .
+    eq replaceContext ( [] , Trm3 ) = Trm3 .
+
+    eq replaceContext( op [ Trm, con ], empty ) = Trm , replaceContext(con, empty) .
+    eq replaceContext( op [ con, Trm ], empty ) = replaceContext(con, empty), Trm .
+    eq replaceContext ( op [ TL , con, TL1 ], empty ) = op [ TL , replaceContext ( con, empty ) , TL1 ] .
+  
+    eq replaceContext ( [] , empty ) = empty .
+
+*** replace variables with substitutions
+    op substitute : Term Substitution -> Term .
+    ceq substitute( op [ Trm , TL ], Subst ) = op [ substitute( Trm, Subst ) , substitute( TL, Subst ) ]
+        if TL =/= empty .
+    ceq substitute( (Trm, TL), Subst ) = substitute( Trm, Subst ), substitute( TL, Subst )
+        if TL =/= empty .
+    eq substitute( Trm , V <- Trm2 ; Subst ) =
+        if Trm == V then 
+            Trm2
+        else
+            substitute( Trm, Subst )
+        fi .
+    eq substitute( Trm , none ) = Trm .                        
+                                        
+   op getRe : RewritingSet Term -> RewritingSet .
+   op getRe : RewritingSet Term Nat -> RewritingSet .
+   op getRe1 : RewritingSet Term -> RewritingSet .
+  
+   eq getRe( (rewriting( Q , Ctxt, Trm1, OrigTrm, Subst) , ReingList) , Trm2 , N ) =
+    if interpret(Trm1) == Trm2 then
+        rewriting( upTerm(Q) , Ctxt, Trm1, OrigTrm, Subst )
+    else
+        getRe( ReingList , Trm2 )
+    fi .
+  
+  eq getRe( (rewriting( Q , Ctxt, Trm1, OrigTrm, Subst ) , ReingList) , Trm2 ) =
+    if Trm1 == Trm2 then
+        rewriting( upTerm(Q) , Ctxt, Trm1, OrigTrm, Subst)
+    else
+        getRe( ReingList , Trm2 )
+    fi .
+    
+  eq getRe1( (rewriting( Q , Ctxt, Trm1, OrigTrm, Subst ) , ReingList) , Trm2 ) =
+    if getTopFormula(Trm1) == Trm2 then
+        rewriting( upTerm(Q) , Ctxt, Trm1, OrigTrm, Subst)
+    else
+        getRe1( ReingList , Trm2 )
+    fi .
+  
+  eq getRe (empty , Trm2 ) = empty .
+  eq getRe1( empty, Trm2 ) = empty .
+  
+  op getTerm : TraceStep -> Term .
+  eq getTerm( { Trm , Tp, Rle } ) = Trm .
+  
+  op getTerm : Trace -> Term .
+  eq getTerm( (TrSt Tr) ) = getTerm(Tr) .
+  
+  op getType : TraceStep -> Type .
+  eq getType( { Trm , Tp, Rle } ) = Tp .
+   
+  var Cond : Condition .
+  op rulename : Rule -> Qid .
+  op rulename : AttrSet -> Qid . 
+  eq rulename(rl Trm => Trm2 [Attrs].)          = rulename(Attrs) .
+  eq rulename(crl Trm => Trm2 if Cond [Attrs].) = rulename(Attrs) .
+  eq rulename(label(Q) Attrs)                   = Q .
+  
+  op getRule : TraceStep -> Rule .
+  eq getRule( { Trm , Tp, Rle } ) = Rle .
+  
+  sorts TraceList .
+  subsorts Trace < TraceList .
+  op empty : -> TraceList [ctor] .
+  op _,_ : TraceList TraceList -> TraceList [ctor assoc id: empty gather (e E) prec 121] .
+  op _[_] : Qid TraceList -> Trace [ctor] .
+ 
+  
+  
+   ***reduce in SAM-Meta : downTerm(path(upTerm(({[a,c],[e,g]} >['n]> S:Structure a ({[b,d],[f,h]} >['n]> S:Structure)) >['n]> [({a,P1:Structure} a {b,P2:Structure}) >['n]> {a a b,P8:Structure a P7:Structure},({c,P3:Structure} a {d,P4:Structure}) >['n]> {c a d,P5:Structure a P6:Structure}] >['n]> {[a a b,c a d],{P9:Structure a P10:Structure,P11:Structure a P12:Structure} >['n]> (P13:Structure a P14:Structure) >['n]> [e a f,g a h]}), 0), E:Structure) .
+
+
+   *** figure this out - could be helpful
+   *** you try index 0, doesn't work so try index 1 - it works!
+   *** there is something here... maybe use a list, if it's already in list then do next
+
+
+  op over : Term -> Term .
+  eq over ( '_>`[_`]>_[ Trm, Q, Trm1 ]  ) =
+    if metaSearch(['SAM-Meta], getTopFormula(overcome(Trm,0)), Trm1, nil, '+, 1, 0) =/= failure then
+             loopl(
+                overcome(Trm,0),
+                follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(overcome(Trm,0)), Trm1, nil, '+, 1, 0 ),
+                             getTerm(metaSearch(['SAM-Meta], getTopFormula(overcome(Trm,0)), Trm1, nil, '+, 1, 0))),
+                Trm1
+            )
+    else
+        overcome(Trm,1)
+    fi .
+
+  op overcome : Term Nat -> Term .
+  eq overcome( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) =
+    if overcome1(Trm, N) =/= empty then 
+        if metaSearch(['SAM-Meta], getTopFormula(overcome1(Trm,N)), Trm1, nil, '+, 1, 0) =/= failure then
+             loopl(
+                overcome1(Trm,N),
+                follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(overcome1(Trm,N)), Trm1, nil, '+, 1, 0 ),
+                             getTerm(metaSearch(['SAM-Meta], getTopFormula(overcome1(Trm,N)), Trm1, nil, '+, 1, 0))),
+                Trm1
+            )
+        else
+            *** increase the metasearch by +1 ... as we are dealing with structures - write this shit down so I have a clear idea
+            overcome( '_>`[_`]>_[ Trm, Q, Trm1 ], N + 1)
+        fi
+    else
+        empty
+    fi .
+
+        ***(
+
+        else if metaSearch(['SAM-Meta], getTopFormula(overcome1(Trm,1)), Trm1, nil, '+, 1, 0) =/= failure then
+            loopl(
+            overcome1(Trm,1),
+            follow-trace(metaSearchPath(['SAM-Meta], getTopFormula(overcome1(Trm,1)), Trm1, nil, '+, 1, 0 ),
+                         getTerm(metaSearch(['SAM-Meta], getTopFormula(overcome1(Trm,1)), Trm1, nil, '+, 1, 0))),
+            Trm1
+            )
+        else
+            empty
+        fi fi
+    else
+        empty
+    fi . )
+
+ op t : Trace -> Term .
+  op overcome1 : Term Nat -> Term .
+  eq overcome1( '_>`[_`]>_[ Trm, Q, Trm1 ], N ) =
+    if metaSearchPath(['SAM-Meta], Trm, Trm1, nil, '+, 3, N ) =/= failure then
+        follow-trace(metaSearchPath(['SAM-Meta], Trm, Trm1, nil, '+, 3, N ),
+                     getTerm(metaSearch(['SAM-Meta], Trm, Trm1, nil, '+, 3, N )))
+    else
+        empty
+    fi .
+
+
+*** reduce in SAM-Meta : overcome( upTerm( { a , a } >['n]> S:Structure >['n]> [ a , a ] ) ) .
+
+
+*** path( upTerm( ( ({[a,c],[e,g]} >['n]> S:Structure) a ({[b,d],[f,h]} >['n]> T:Structure) ) >['n]> [{a,P1:Structure} a {b,P2:Structure}, {c,P3:Structure} a {d,P4:Structure}] ), 0) .
+
+
+
+
+
+endfm

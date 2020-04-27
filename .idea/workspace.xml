@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="1fd10572-fe40-4b19-aadc-50d6ea319c77" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectId" id="1Ta9RquVAzC2lX0TdxLSWXxxjmY" />
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.0" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.postfix.templates" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager">
+    <configuration name="OpenDeductionProofEditor" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="odpe.OpenDeductionProofEditor" />
+      <module name="ODPE" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="odpe.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.OpenDeductionProofEditor" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1fd10572-fe40-4b19-aadc-50d6ea319c77" name="Default Changelist" comment="" />
+      <created>1573687333516</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1573687333516</updated>
+      <workItem from="1573687338473" duration="11673000" />
+      <workItem from="1573747805066" duration="40246000" />
+      <workItem from="1573835810643" duration="19025000" />
+      <workItem from="1576515399029" duration="166000" />
+      <workItem from="1580052732743" duration="2056000" />
+      <workItem from="1580157575242" duration="4381000" />
+      <workItem from="1580232799922" duration="2300000" />
+      <workItem from="1580237582068" duration="1064000" />
+      <workItem from="1580315530760" duration="5306000" />
+      <workItem from="1580423307487" duration="2688000" />
+      <workItem from="1580587760762" duration="4745000" />
+      <workItem from="1580653234394" duration="623000" />
+      <workItem from="1580673292412" duration="5178000" />
+      <workItem from="1580760219743" duration="4535000" />
+      <workItem from="1580831191780" duration="11838000" />
+      <workItem from="1580908119598" duration="1749000" />
+      <workItem from="1580938336519" duration="719000" />
+      <workItem from="1581270290975" duration="3737000" />
+      <workItem from="1581335588777" duration="7207000" />
+      <workItem from="1581443159927" duration="5052000" />
+      <workItem from="1581459623966" duration="2367000" />
+      <workItem from="1581527684191" duration="2975000" />
+    </task>
+    <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/odpe/backend/odpe2maude/ODPE2Maude.java</url>
+          <line>523</line>
+          <option name="timeStamp" value="163" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/odpe/OpenDeductionProofEditor.java</url>
+          <line>130</line>
+          <option name="timeStamp" value="169" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="Application">
+        <watch expression="maude_names" language="JAVA" />
+        <watch expression="entry" />
+      </configuration>
+    </watches-manager>
+  </component>
+</project>
