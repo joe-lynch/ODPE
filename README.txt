@@ -1,4 +1,39 @@
 ======================================================================
+GUIDE
+======================================================================
+You must have Maude 3.0 (or above) installed on your system.
+You can download it at the link below, see the section
+OPERATING SYSTEM, especially if you are on Windows.
+
+ - http://maude.cs.illinois.edu/w/index.php/The_Maude_System
+
+Please ensure the file is 'maude.linux64' for Linux, and
+'maude.darwin64' for MacOS. [See OPERATING SYSTEM].
+Make sure that 
+
+Java must also be on your system, and correctly configured.
+
+ - https://www.java.com/en/download/
+
+Run "odpe.jar" with 
+
+ - java -jar odpe.jar
+
+
+
+-------------------
+Small explanation
+-------------------
+Once the application has been launched, either click a button
+for the default proof system (SKSg at the time of writing), or
+select 'browse', and choose your own, or other's XML maude files.
+
+Enter an formula or derivation, and click 'Okay' (Ctrl + Enter).
+You can then highlight the formula, or a subformula, and right click.
+Choose to 'Do one proof step', and apply a rule from the list (if
+there are any valid rules applications).
+
+======================================================================
 FILE DESCRIPTIONS
 ======================================================================
  --- maude.linux64 / maude.darwin64 ---
@@ -68,38 +103,6 @@ Scenario 3 - derivation input
 Scenario 3 - proof search
  - Enter [example derivation here] and press OK
  - Press the button 'Proof Search'
-
-======================================================================
-GUIDE
-======================================================================
-You must have Maude 3.0 (or above) installed on your system.
-You can download it at the link below, see the section
-OPERATING SYSTEM, especially if you are on Windows.
-
- - http://maude.cs.illinois.edu/w/index.php/The_Maude_System
-
-Please rename the file to 'maude.linux64' for Linux, and
-'maude.darwin64' for MacOS. [See OPERATING SYSTEM].
-
-Java must also be on your system, and correctly configured.
-
- - https://www.java.com/en/download/
-
-Run the .jar file with 
-
- - java -jar odpe.jar
-
--------------------
-Small explanation
--------------------
-Once the application has been launched, either click a button
-for the default proof system (SKSg at the time of writing), or
-select 'browse', and choose your own, or other's XML maude files.
-
-Enter an formula or derivation, and click 'Okay' (Ctrl + Enter).
-You can then highlight the formula, or a subformula, and right click.
-Choose to 'Do one proof step', and apply a rule from the list (if
-there are any valid rules applications).
 
 ======================================================================
 PROOF SYSTEMS
