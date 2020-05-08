@@ -69,8 +69,6 @@ mod SAM-Inf-test is
 
 	***rl [c-down]   : e1  => [ nospec(e1,0)  , nospec(e1,0) ]  .
     rl [c-down]   : e1  => unwrite(e1) >['c-down]> [ nospec(e1,0)  , nospec(e1,0) ]  .
-
-
 	rl [c-up]     : { e1 , e1 } => unwrite({e1, e1}) >['c-up]> nospec(e1,1) . 
 
 
@@ -181,7 +179,6 @@ mod SAM-Inf is
 	rl [a-down]    : [ A atm C , B atm D ]        => 	[ A , B ] atm [ C , D ] .
 	rl [a-up] 	   : { A , C } atm { B , D }      => 	{ A atm B , C atm D } .
 	rl [conj-down] : [ { A , C } , [ B , D ] ]    => 	{ [ A , B ] , [ C , D ] } .
-	rl [conj-d]    : [ { A , C } , B ]            => 	{ [ A , B ] , C } .
 	rl [disj-up]   : [ { A , C } , { B , D } ]    => 	{ [ A , B ] , { C , D } } .
 	rl [m]         : { [ A , C ] , [ B , D ] }    => 	[ { A , B } , { C , D } ] .
 	rl [s] 		   : [ { A , C } , B ] 			  =>    { [ A , B ] , C } .
@@ -208,13 +205,36 @@ mod SAM-Meta is
   ***eq test( DS ) = convert( upTerm( DS ) ) .
   
   op gnf : DerivStructure -> DerivStructure .
-  eq gnf ( DS ) = downTerm(gnf( upTerm ( DS ) ) ,  error ) .
+  eq gnf ( DS ) = downTerm(gnf(upTerm( DS )), error) .
 
+endm
+
+mod SAM-Inf-Reverse is
+	protecting SAM-Signature .
+
+	var atm atm1 atm2 : Atom .
+	var A B C D : Structure .
+	var DS : DerivStructure .
+	var U U1 U2 : Unit .
+	var Q : Qid .
+
+	rl [c-down-r]     :  [ A  , A ] =>  A .
+	rl [c-up-r]       :  A => { A , A } .
+
+    rl [eq-r] 	   : [ U , U ] 					  =>	{ U , U }  .
+	rl [eq-r] 	   : { U , U } 					  =>	[ U , U ]  .
+	rl [a-down-r]    : [ A , B ] atm [ C , D ]      => [ A atm C , B atm D ] .
+	rl [a-up-r] 	   : { A atm B , C atm D } => { A , C } atm { B , D } .
+	rl [conj-down-r] : { [ A , B ] , [ C , D ] } => [ { A , C } , [ B , D ] ] .
+	rl [disj-up-r]   : { [ A , B ] , { C , D } } =>  [ { A , C } , { B , D } ]  .
+	rl [m-r]         : [ { A , B } , { C , D } ] => { [ A , C ] , [ B , D ] } .
+	rl [ac-r]        : [ A atm B , C atm D ] => [ A , C ] atm [ B , D ] .
+	rl [acc-r]       : { A , B } atm { C , D } => { A atm C , B atm D } .
 endm
 
 mod SAM-Meta-Reverse is
     protecting Util .
-    protecting SAM-Inf .
+    protecting SAM-Inf-Reverse .
 endm
 
 smod SamStr is
@@ -349,9 +369,10 @@ smod SamStr is
 	eq ppp( Trm ) = true [print Trm] .
 endsm
 
-
 ***(
 red downTerm(start(({[a,c],[e,g]}) a ({[b,d],[f,h]}), (({[a,c],[e,g]} >[Q6:Qid]> P1:Structure) a ({[b,d],[f,h]} >[Q7:Qid]> P2:Structure)) >[Q5:Qid]> ([{a,P3:Structure} a {b,P4:Structure} >[Q4:Qid]> {a a b,P5:Structure a P6:Structure},{c,P7:Structure} a {d,P8:Structure} >[Q3:Qid]> {c a d,P9:Structure a P10:Structure}] >[Q2:Qid]> {[a a b,c a d],{P11:Structure a P12:Structure,P13:Structure a P14:Structure} >[Q1:Qid]> (P15:Structure a P16:Structure >[Q:Qid]> [e a f,g a h]) })),E:Structure) .
 *)
 
-***( (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q:Qid]> [e a f,g a h]) }) *)
+***( ((
+
+{[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q:Qid]> [e a f,g a h]) }) *)

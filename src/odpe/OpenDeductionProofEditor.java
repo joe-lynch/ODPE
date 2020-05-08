@@ -46,6 +46,7 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 	private Node derivation;
 	private Selection current_selection;
 	private Stack<Node> undo_stack;
+	private Stack<Node> redo_stack;
 	private Node redexNode;
 	private File description_file;
 
@@ -63,6 +64,7 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 		redexNode = null;
 		curr_pair = new HashMap<Object, Selection>();
 		undo_stack = new Stack<Node>();
+		redo_stack = new Stack<Node>();
 	}
 
 	private void initialize_system(String sysfn) {
@@ -136,8 +138,8 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 					}
 				}
 
-				System.out.println("allRight: "+allRight);
-				System.out.println("allLeft: "+allLeft);
+				//System.out.println("allRight: "+allRight);
+				//System.out.println("allLeft: "+allLeft);
 
 				if(subatomised)
 					choicePair = system.getBackend().findSubatomicRewrites(n, rules, allLeft, allRight, isSingle);
@@ -154,8 +156,7 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 		else
 			return choicePair;
 	}
-	
-	
+
 	/**
 	 * This method modifies the derivation tree, in order to represent the application
 	 * of inference rules, and implement the rewrites into the tree. The tree is then
@@ -193,7 +194,7 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 				derivation = replacement;
 			else
 				parent.replaceChild(n, replacement);
-			undo_stack.push(replacement);
+			//undo_stack.push(replacement);
 		}
 		else if (multiple_derivations){
 			
@@ -259,7 +260,7 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 			while((p = n.getParent()) != null)
 				n = p;
 			derivation = n;
-			undo_stack.push(replacement);
+			//undo_stack.push(replacement);
 		}
         /* deep modification / single forumla **/
 		else {
@@ -276,13 +277,17 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 			while((p = n.getParent()) != null)
 				n = p;
 			derivation = n;
-			undo_stack.push(replacement);
+			//undo_stack.push(replacement);
 		}
 		curr_pair.clear();
 		multiple_derivations = false;
 		//derivation = system.getBackend().normalize(derivation);
 		current_selection = new Selection(derivation);
+		undo_stack.push(derivation.clone());
+		if (redo_stack != null && !redo_stack.isEmpty())
+			redo_stack.clear();
 		canUndo(true);
+		canRedo(false);
 	}
 
 	private void do_proofstep(Collection<Rule> rules) {
@@ -293,7 +298,7 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 			Pair<Vector<Rewrite>, Vector<Rewrite>> choices = read_choices(rules);
 
 			if(choices != null && (choices.fst != null || choices.snd !=null)) {
-				//gets the choice that the user selected
+				//gets the choice that the user selects
 				Rewrite r = get_choice(choices);
 				if (r != null) {
 					//update selection of tree with selected nodes if multiple formulae
@@ -317,17 +322,26 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 		subatomised = true;
 		ruleChooser.showSubatomicRules(true);
 		Node d = system.getBackend().subatomise_convert(derivation);
+		undo_stack.clear();
+		redo_stack.clear();
+		canUndo(false);
+		canRedo(false);
 		d.print();
 		derivation = d;
+		undo_stack.push(derivation.clone());
 		display_proof();	
 	}
 	
 	private void interpret() throws ProverException, IOException, MaudeException {
 		subatomised = false;
 		ruleChooser.showSubatomicRules(false);
+		undo_stack.clear();
+		redo_stack.clear();
+		canUndo(false);
+		canRedo(false);
 		Node d = system.getBackend().interpret_convert(derivation);
-		d.print();
 		derivation = d;
+		undo_stack.push(derivation.clone());
 		display_proof();
 	}
 
@@ -340,6 +354,31 @@ public class OpenDeductionProofEditor implements ActionListener, PropertyChangeL
 		display_proof();
 	}
 
+private synchronized void redo(){
+		if (redo_stack.isEmpty()){
+			return;
+		}
+		derivation = redo_stack.peek().clone();
+		Node last_deriv = redo_stack.pop();
+		undo_stack.push(last_deriv.clone());
+		curr_pair.clear();
+		current_selection = new Selection(derivation);
+		status(PROVING);
+}
+
+private synchronized void undo(){
+	if (undo_stack.size() <= 1){
+		return;
+	}
+
+	Node last_deriv = undo_stack.pop();
+	redo_stack.push(last_deriv.clone());
+	derivation = undo_stack.peek().clone();
+	curr_pair.clear();
+	current_selection = new Selection(derivation);
+	status(PROVING);
+}
+/*
 private synchronized void undo() {
 	if (undo_stack.empty())
 			return;
@@ -376,7 +415,7 @@ private synchronized void undo() {
 		derivation.setParent(null);
 	curr_pair.clear();
 	}
-
+*/
 	/**
 	 * Returns the currently enabled rules as a vector.
 	 */
@@ -396,12 +435,15 @@ private synchronized void undo() {
 	private JMenuItem stepItem2;
 	private JMenuItem undoItem1;
 	private JMenuItem undoItem2;
+	private JMenuItem redoItem1;
+	private JMenuItem redoItem2;
 	private JMenuItem exitItem;
 	private JButton newButton;
 	private JButton subatomiseButton;
 	private JButton interpretButton;
 	private JButton proofSearchButton;
 	private JButton undoButton;
+	private JButton redoButton;
 	private JButton stopButton;
 	private JPanel contentPanel;
 	private JPanel proofPanel;
@@ -415,6 +457,18 @@ private synchronized void undo() {
 		frame = new JFrame("Open Deduction Proof Editor");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		frame.addWindowListener(new java.awt.event.WindowAdapter() {
+			@Override
+			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+				if (JOptionPane.showConfirmDialog(frame,
+						"Are you sure you want to close this window?", "Close Window?",
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+					System.exit(0);
+				}
+			}
+		});
+
 		JMenuBar menuBar = new JMenuBar();
 		JMenu proofMenu = new JMenu("Proof");
 		proofMenu.setMnemonic(KeyEvent.VK_P);
@@ -425,10 +479,14 @@ private synchronized void undo() {
 		stepItem1 = new JMenuItem("Do One Proof Step...", KeyEvent.VK_S);
 		stepItem1.addActionListener(this);
 		proofMenu.add(stepItem1);
-		//undoItem1 = new JMenuItem("Undo Last Step", KeyEvent.VK_U);
-		//undoItem1.setEnabled(false);
-		//undoItem1.addActionListener(this);
-		//proofMenu.add(undoItem1);
+		undoItem1 = new JMenuItem("Undo Last Step", KeyEvent.VK_U);
+		undoItem1.setEnabled(false);
+		undoItem1.addActionListener(this);
+		proofMenu.add(undoItem1);
+		redoItem1 = new JMenuItem("Redo Last Step", KeyEvent.VK_U);
+		redoItem1.setEnabled(false);
+		redoItem1.addActionListener(this);
+		proofMenu.add(redoItem1);
 		proofMenu.addSeparator();
 		proofMenu.addSeparator();
 		exitItem = new JMenuItem("Exit", KeyEvent.VK_X);
@@ -486,6 +544,12 @@ private synchronized void undo() {
 		undoButton.addActionListener(this);
 		undoButton.setEnabled(false);
 		toolBar.add(undoButton);
+
+		redoButton = new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/Redo16.gif")));
+		redoButton.addActionListener(this);
+		redoButton.setEnabled(false);
+		toolBar.add(redoButton);
+
 		stopButton = new JButton(new ImageIcon(OpenDeductionProofEditor.class.getResource("icons/Stop16.gif")));
 		stopButton.addActionListener(this);
 		stopButton.setEnabled(false);
@@ -497,8 +561,10 @@ private synchronized void undo() {
 		popup = new JPopupMenu("Proof Actions");
 		stepItem2 = new JMenuItem("Do One Proof Step...", KeyEvent.VK_S);
 		stepItem2.addActionListener(this);
-		//undoItem2 = new JMenuItem("Undo", KeyEvent.VK_U);
-		//undoItem2.addActionListener(this);
+		undoItem2 = new JMenuItem("Undo", KeyEvent.VK_U);
+		undoItem2.addActionListener(this);
+		redoItem2 = new JMenuItem("Redo", KeyEvent.VK_U);
+		redoItem2.addActionListener(this);
 		
 		frame.pack();
 		frame.setLocationRelativeTo(null);
@@ -632,7 +698,7 @@ private synchronized void undo() {
 
 				derivation.prettyprint();
 				current_selection = new Selection(derivation);
-				undo_stack.push(derivation);
+				undo_stack.push(derivation.clone());
 				status(PROVING);
 				done = true;
 			} catch(ProverException e) {
@@ -673,6 +739,7 @@ private synchronized void undo() {
 			canNew(true);
 			canStep(false);
 			canUndo(false);
+			canRedo(false);
 			canStop(false);
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -690,6 +757,7 @@ private synchronized void undo() {
 			canNew(true);
 			canStep(true);
 			canUndo(true);
+			canRedo(true);
 			canStop(false);
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -704,6 +772,7 @@ private synchronized void undo() {
 			canNew(false);
 			canStep(false);
 			canUndo(false);
+			canRedo(false);
 			canStop(false);
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
@@ -716,6 +785,7 @@ private synchronized void undo() {
 			canNew(false);
 			canStep(false);
 			canUndo(false);
+			canRedo(false);
 			canStop(true);
 			SwingUtilities.invokeLater(() -> {
 				statusBar.setText("Reading Choices");
@@ -726,6 +796,7 @@ private synchronized void undo() {
 			canNew(false);
 			canStep(false);
 			canUndo(false);
+			canRedo(false);
 			canStop(false);
 			SwingUtilities.invokeLater(() -> {
 				statusBar.setText("Stopping Backend");
@@ -736,6 +807,7 @@ private synchronized void undo() {
 			canNew(false);
 			canStep(false);
 			canUndo(false);
+			canRedo(false);
 			canStop(true);
 			SwingUtilities.invokeLater(() -> {
 				statusBar.setText("Searching");
@@ -759,11 +831,20 @@ private synchronized void undo() {
 	
 	/** Called to indicate whether undo is possible. */
 	private void canUndo(boolean b) {
-		if(undo_stack.empty())
+		if(undo_stack.size() <= 1)
 			b = false;
-		//undoItem1.setEnabled(b);
-		//undoItem2.setEnabled(b);
-		//undoButton.setEnabled(b);
+		undoItem1.setEnabled(b);
+		undoItem2.setEnabled(b);
+		undoButton.setEnabled(b);
+	}
+
+	/** Called to indicate whether undo is possible. */
+	private void canRedo(boolean b) {
+		if(redo_stack.empty())
+			b = false;
+		redoItem1.setEnabled(b);
+		redoItem2.setEnabled(b);
+		redoButton.setEnabled(b);
 	}
 	
 	/** Called to indicate whether the backend can be interrupted. */
@@ -774,20 +855,25 @@ private synchronized void undo() {
 	/** Populates the popup menu with menu entries for every
 	 * currently activated rule
 	 */
+
+
 	private void populate_popup() {
+
 		RuleItem ri;
 		popup.removeAll();
 		popup.add(stepItem2);
-		//popup.add(undoItem2);
-		popup.addSeparator();
-		for(Rule r : system.getRules())
-			if(ruleChooser == null || ruleChooser.ruleActive(r)) {
-				ri = new RuleItem(r);
-				ri.addActionListener(this);
-				popup.add(ri);
-			}
+		popup.add(undoItem2);
+		popup.add(redoItem2);
+		//popup.addSeparator();
+		//for(Rule r : system.getRules())
+		//	if(ruleChooser == null || ruleChooser.ruleActive(r)) {
+		//		ri = new RuleItem(r);
+		//		ri.addActionListener(this);
+		//		popup.add(ri);
+		//	}
+
 	}
-	
+
 	private static class RuleItem extends JMenuItem {
 		
 		private Rule rule;
@@ -853,9 +939,11 @@ private synchronized void undo() {
 				}
 			} else if (src == exitItem) {
 				System.exit(0);
-			} //else if ((src == undoItem1) || (src == undoItem2) || (src == undoButton)) {
-				//undo();
-			//}
+			} else if ((src == undoItem1) || (src == undoItem2) || (src == undoButton)) {
+				undo();
+			} else if ((src == redoItem1) || (src == redoItem2) || (src == redoButton)) {
+				redo();
+			}
 			else if (src == stopButton) {
 				try {
 					status(STOPPING_BACKEND);

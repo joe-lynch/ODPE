@@ -1,0 +1,43 @@
+
+                      The Open Deduction Graphical Proof Editor
+
+Installation:
+=============
+There is an executable jar file named `OpenDeductionProofEditor.jar',
+it can be executed by invoking 'java - jar OpenDeductionProofEditor.jar'
+This supports the Linux operating system.
+
+A jar file for the OSX operating system has been included (but has not been tested).
+In the case of using OSX, 'java -jar OpenDeductionProofEditor-OSX' must be invoked.
+
+The source code is in the file 'src'.
+
+The system is an adaption of the graphical proof editor GraPE by Max Schaefer,
+which was created to work with the calculus of structures. The inference systems
+that are implemented into Maude at the backend are adapted and derived from
+Ozan Kahramanogullari's implementations [http://ozan-k.com/].
+
+An inference system must have:
+- A maude file e.g. 'ksg.maude'
+- A xml file e.g. 'ksg-maude.xml'
+
+All files within the directory are important to run the software.
+
+Operating System
+================
+The Open Deduction Graphical Proof Editor currently supports the Linux operating
+system, and the OSX operating system (not tested).
+
+The source files for both operating systems are included for the user to compile
+and run the code themselves.
+
+The main difference lies in how Maude is executed:
+- The file Maude.linux64 is used with Linux
+- The file Maude.darwin64 is used with OSX
+
+The Maude file must be executable for the proof editor to function.
+
+*** line 34 of Maude.java is where './maude.linux64' or '/maude.darwin64' is defined
+*** and is where Maude is executed from for the backend of the proof editor
+
+

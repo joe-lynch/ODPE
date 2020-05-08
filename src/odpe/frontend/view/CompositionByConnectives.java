@@ -91,7 +91,8 @@ public class CompositionByConnectives extends WidgetView {
 			}
 				
 			super.addMouseListener(this);
-			super.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.black),new EmptyBorder(10, 10, 10, 10)));
+			// sets the border around derivations composed by connectives
+			super.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.black),new EmptyBorder(0, 10, 10, 10)));
 			structure();
 		}
 		

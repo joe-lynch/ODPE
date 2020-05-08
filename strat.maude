@@ -1,0 +1,45 @@
+smod Equate is
+	protecting SAM-Inf .
+	protecting SamStr .
+	protecting S-INT .
+	protecting Util .
+
+	var Trm : Term .
+	var N : Nat .
+	var S T : DerivStructure .
+	var U : Unit .	
+	var Q : Qid .
+	var atm : Atom .
+
+	strat eqf : DerivStructure Nat @ DerivStructure .
+	csd eqf( S, N ) := equnit ; (match T s.t. itr(upTerm(S),upTerm(gtf(T)),0) or-else eqf(S, N + 1))
+	if N =/= 4 .
+
+	strat eqfrew : DerivStructure Nat @ DerivStructure .
+	csd eqfrew( S, N ) := ( all | ( errr ; all ) ) ; int ; match T s.t. I(T) == I(S) 
+	if N =/= 4 [print S] .
+
+	strat eqffull : DerivStructure Nat @ DerivStructure .
+	csd eqffull( S, N ) := (idle | er) ; (match T s.t. itr(upTerm(S),upTerm(T),0) or-else eqffull(S, N + 1))
+	if N =/= 4 [print S] .
+
+	strat errr : @ DerivStructure .
+	sd errr := er | (er ; er) | (er ; er ; er ) .
+
+	rl [equnit] : { U , U } => { U , U } >['equality]> [ U , U ] .
+	rl [equnit] : [ U, U ] => [ U , U ] >['equality]> { U, U } .
+	rl [int] : S => I(S) .
+
+	rl [er] : { ff, ff } => ff .
+	rl [er] : { U, tt }  => U  .
+	rl [er] : [ tt, tt ] => tt .
+	rl [er] : [ U, ff ]  => U  .
+
+ 	op gtf : DerivStructure -> DerivStructure .
+  	eq gtf( S >[Q]> T ) = gtf(T) .
+  	eq gtf( [ S , T ] ) = [ gtf(S), gtf(T) ] .
+  	eq gtf( { S , T } ) = { gtf(S), gtf(T) } .
+  	eq gtf( S atm T ) = gtf(S) atm gtf(T) .
+  	eq gtf( S ) = S .
+
+endsm

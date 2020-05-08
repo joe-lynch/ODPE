@@ -90,6 +90,7 @@
 	<backend class="odpe.backend.odpe2maude.ODPE2Maude">
 		<load name="sam.maude"/>
 		<load name="s.maude"/>
+		<load name="strat.maude"/>
 		<load name="ksg.maude"/>
 		<inferencer name="KSg-Meta"/>
 		<reverseinferencer name="KSg-Meta-Reverse"/>

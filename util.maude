@@ -1,5 +1,3 @@
-*** adapted from Max Schafer ***
-
 fmod REWRITING is
     protecting META-LEVEL .
 
@@ -76,54 +74,130 @@ fmod Util is
   var Subst : Substitution .
 
 
+
+  op interpret-helper : Term -> Term .
+***(
+  ceq interpret-helper ( op [ Trm1 , Trm2 ] ) = op [ ii(Trm1) , ii(Trm2) ]
+      if op =/= '_>`[_`]>_ and Trm2 =/= empty .
+  ceq interpret-helper ( op [ Trm1 , TL ] ) = op [ ii(Trm1) , ii(op[TL]) ]
+      if op =/= '_>`[_`]>_ and TL =/= empty .
+  *)
+  ***eq interpret-helper ( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ interpret-helper(Trm1) , ''equality.Sort , interpret-helper(Trm2) ].
+  
+
+ *** eq interpret-helper( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = '_>`[_`]>_[ Trm1 , Q , Trm2 ] .
+
+  eq interpret-helper( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = interpret-helper(Trm1) .
+  eq interpret-helper ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = findInterpretRule('_>`[_`]>_[interpret-helper(Trm1) , Q , interpret-helper(Trm2)]) .
+  eq interpret-helper( '___[ Trm1 , cnst, Trm2 ] ) = getTerm(metaReduce(['S-INT], 'I['___[interpret-helper(Trm1), cnst, interpret-helper(Trm2)]])) . 
+  ceq interpret-helper ( op [ Trm1 , Trm2 ] ) = op [ interpret-helper(Trm1) , interpret-helper(Trm2) ]
+      if Trm2 =/= empty and Trm2 =/= 'ff.Unit and Trm2 =/= 'tt.Unit and Trm1 =/= 'tt.Unit and Trm1 =/= 'ff.Unit .
+  eq interpret-helper( Trm ) = getTerm(metaReduce(['S-INT], 'I[Trm])) .
+   ***findInterpretRule('_>`[_`]>_[interpret-helper(Trm1) , Q , interpret-helper(Trm2)]) .
+  ***eq interpret-helper( Trm ) = getTerm(metaReduce(['S-INT], 'I[Trm])) . 
+
+
+   
+
+  op findInterpretRule : Term -> Term .
+  eq findInterpretRule( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+    '_>`[_`]>_[ Trm1,
+                getRewriterName(getRe(findRewrites(flatten(getTopFormula(Trm1)), 'KSg-Inf , 's 'i-down 'm 'c-down 'c-up 'w-down ) , flatten(getFormula(Trm2)))),
+                Trm2 ] .
+
   op gnf : Term -> Term .
+  op gn1 : Term -> Term .
+  op subatomise-helper : Term -> Term .
 
   ceq gnf ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) 
       if flat ( Trm ) .
-
   ceq gnf ( op [ Trm1 , Trm2 ] ) = op [ gnf(Trm1) , gnf(Trm2) ]
       if op =/= '_>`[_`]>_ and Trm2 =/= empty .
-
   ceq gnf ( op [ Trm1 , TL ] ) = op [ gnf (Trm1) , gnf(op[TL]) ]
       if op =/= '_>`[_`]>_ and TL =/= empty .
-
-  eq gnf ( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gnf(Trm1) , ''equality.Sort , gnf(Trm2) ].
-
-  eq gnf ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = test2('_>`[_`]>_[ gnf(Trm1) , Q , gnf(Trm2) ]) .
-
+  eq gnf ( '_>`[_`]>_[ Trm1, ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gnf(Trm1) , ''equality.Sort , gnf(Trm2) ].
+  eq gnf ( '_>`[_`]>_[ Trm1, Q, Trm2 ] ) = subatomise-helper('_>`[_`]>_[gn1(Trm1), Q, gn1(Trm2)]) .
   eq gnf ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) .
 
-  op test2 : Term -> Term .
-  ceq test2 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
-          '_>`[_`]>_[ Trm1 ,
-                        getRewriterName(getRe(findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta ,  'c-down 'c-up 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2)))),
-                        Trm2 ]
-      if getRe(findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'c-down 'c-up 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2))) 
-          =/= empty .
 
-  ceq test2( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+  ceq gn1 ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) 
+    if flat ( Trm ) .
+  ceq gn1 ( op [ Trm1 , Trm2 ] ) = op [ gn1(Trm1) , gn1(Trm2) ]
+      if op =/= '_>`[_`]>_ and Trm2 =/= empty .
+  ceq gn1 ( op [ Trm1 , TL ] ) = op [ gn1 (Trm1) , gn1(op[TL]) ]
+      if op =/= '_>`[_`]>_ and TL =/= empty .
+  eq gn1 ( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gn1(Trm1) , ''equality.Sort , gn1(Trm2) ].
+  eq gn1 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = subatomise-helper('_>`[_`]>_[ gn1(Trm1) , Q , gn1(Trm2) ]) .
+  eq gn1 ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) .
+
+
+  op replaceConc : Term Term -> Term .
+  eq replaceConc( '_>`[_`]>_[T1,Q,T2] , Trm2 ) = '_>`[_`]>_[Trm2,Q,T2] .
+
+  *** if we don't need to make any further deductions - because the conclusion fits an inference that agrees with the premiss
+  op subatomise-helper : Term -> Term .
+    op subatomise-helper2 : Term -> Term .
+  eq subatomise-helper ( '_>`[_`]>_[T1,''s.Sort,T2] ) = '_>`[_`]>_[T1,''conj-down.Sort,T2] . 
+  ceq subatomise-helper ( '_>`[_`]>_[ Trm1, Q, Trm2 ] ) = 
+      '_>`[_`]>_[ Trm1,
+                  getRewriterName(getRe(findRewrites(flatten(getTopFormula(Trm1)), 'SAM-Meta, 'c-down 'c-up 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ), flatten(getFormula(Trm2)))),
+                  Trm2]     
+ if getRe(findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2))) 
+        =/= empty . 
+
+  *** for special case when the premise is equal to the conclusion of another
+  ceq subatomise-helper ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+        '_>`[_`]>_[ Trm1,
+                    getRewriterName(getReEq(findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2)))),
+                    replaceConc(Trm2,getResults(getReEq(findRewrites(flatten(getTopFormula(Trm1)), 'SAM-Meta, 'c-down 'c-up 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ), flatten(getFormula(Trm2))))) ]
+      if getReEq(findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) , flatten(getFormula(Trm2))) 
+        =/= empty .
+
+  *** if there are potential rewrites, but the premiss doesn't agree, then try to adapt the premiss to agree -> [a,-a] >['i]> tt
+  ceq subatomise-helper( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
     '_>`[_`]>_[ Trm1,
                 getRewriterName(getRe(
-                  findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                  findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
                   interpret(getFormula(Trm2)), 0)),
                 getResults(getRe(
-                  findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                  findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
                   interpret(getFormula(Trm2)), 0)) ]
-        if findRewrites ( flatten(getTopFormula(Trm1)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
-                                                              
-    ceq test2( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
-        '_>`[_`]>_[ getResults(getRe(
-                      findRewrites ( flatten(getFormula(Trm2)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
-                      interpret(Trm1), 0)) ,
-                    getRewriterName(getRe(
-                      findRewrites ( flatten(getFormula(Trm2)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
-                      interpret(Trm1), 0)),
-                     Trm2 ]
-        if findRewrites ( flatten(getFormula(Trm2)) , 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
+      if findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta, 'r 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
+
+  *** if there are potential rewrites for the premiss to the conclusion
+
+  *** if there are potential rewrites for the premiss to the conclusion
+  ***(
+  ceq subatomise-helper( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+      '_>`[_`]>_[ getResults(getRe(
+                    findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                    interpret(Trm1), 0)) ,
+                  getRewriterName(getRe(
+                    findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                    interpret(Trm1), 0)),
+                  Trm2 ] 
+    if findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta, 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
+*)
+      *** if there are potential rewrites for the premiss to the conclusion
+  ceq subatomise-helper( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+  '_>`[_`]>_[getTerm(metaSrewrite(['Equate], getFormula(Trm2), 'eqfrew[[getTopFormula(Trm1), upTerm(0)]], breadthFirst, 0)),
+                 findRule( getTerm(metaSrewrite(['Equate], getFormula(Trm2), 'eqfrew[[getTopFormula(Trm1), upTerm(0)]], breadthFirst, 0)) , getFormula(Trm2) ),
+                Trm2]  
+      ***(
+      '_>`[_`]>_[ getResults(getRe(
+                    findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                    interpret(Trm1), 0)) ,
+                  getRewriterName(getRe(
+                    findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta , 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ),
+                    interpret(Trm1), 0)),
+                  Trm2 ] *)
+    if findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta, 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc ) =/= empty .
 
    op getRe : RewritingSet Term -> RewritingSet .
    op getRe : RewritingSet Term Nat -> RewritingSet .
    op getRe1 : RewritingSet Term -> RewritingSet .
+   op getReEq : RewritingSet Term -> RewritingSet .
+   op getReEqRew : RewritingSet Term -> RewritingSet .
   
    eq getRe( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 , N ) =
     if interpret(Trm1) == Trm2 then
@@ -138,7 +212,21 @@ fmod Util is
     else
         getRe( ReingList , Trm2 )
     fi .
-    
+
+  eq getReEq( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
+    if equal(Trm1,Trm2) =/= empty then
+        rewriting( upTerm(Q), Ctxt, equal(Trm1,Trm2) )
+    else
+        getReEq( ReingList , Trm2 )
+    fi .
+
+  eq getReEqRew( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
+    if equalfull(Trm1,Trm2) =/= empty then
+        rewriting( upTerm(Q), Ctxt, equalfull(Trm1,Trm2) )
+    else
+        getReEqRew( ReingList , Trm2 )
+    fi .
+
   eq getRe1( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
     if getTopFormula(Trm1) == Trm2 then
         rewriting( upTerm(Q) , Ctxt, Trm1)
@@ -146,8 +234,53 @@ fmod Util is
         getRe1( ReingList , Trm2 )
     fi .
 
+  eq getRe( empty, Trm ) = empty .
+  eq getReEq( empty, Trm ) = empty .
+  eq getReEqRew( empty, Trm ) = empty .
+
+  op findRule : Term Term -> Qid .
+  eq findRule( Trm1, Trm2 ) = 
+    if getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc), getFormula(Trm2)) =/= empty then
+      getRewriterName(getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc), getFormula(Trm2)))
+    else
+      empty
+    fi . 
+
+  op findRule2 : Term Term -> Qid .
+  eq findRule2( Trm1, Trm2 ) = 
+    if getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc), getFormula(Trm2)) =/= empty then
+      getRewriterName(getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a-up 'a-down 'conj-down 'conj-d 'disj-up 'm 'ac 'acc), getFormula(Trm2)))
+    else
+      empty
+    fi .  
+
+
   op interpret : Term -> Term .
   eq interpret( Trm ) = flatten(getTerm(metaReduce(upModule( 'S-INT , false ), 'I[getFormula(Trm)]))) .
+
+  op equal : Term Term -> Term .
+  eq equal( Trm1, Trm2 ) =
+    if metaSrewrite(['Equate], Trm1, 'eqf[[Trm2,upTerm(0)]], breadthFirst, 0) =/= failure then
+      getTerm(metaSrewrite(['Equate], Trm1, 'eqf[[Trm2,upTerm(0)]], breadthFirst, 0))
+    else
+      empty
+    fi .
+
+  op equalrew : Term Term -> Term .
+  eq equalrew( Trm1, Trm2 ) =
+    if metaSrewrite(['Equate], Trm1, 'eqfrew[[Trm2,upTerm(0)]], breadthFirst, 0) =/= failure then
+      getTerm(metaSrewrite(['Equate], Trm1, 'eqfrew[[Trm2,upTerm(0)]], breadthFirst, 0))
+    else
+      empty
+    fi .
+
+  op equalfull : Term Term -> Term .
+  eq equalfull( Trm1, Trm2 ) =
+    if metaSrewrite(['Equate], Trm2, 'eqffull[[Trm1,upTerm(0)]], breadthFirst, 0) =/= failure then
+      getTerm(metaSrewrite(['Equate], Trm2, 'eqffull[[Trm1 ,upTerm(0)]], breadthFirst, 0))
+    else
+      empty
+    fi . 
 
 
 *** find rewrites
@@ -327,8 +460,7 @@ fmod Util is
             substitute( Trm, Subst )
         fi .
     eq substitute( Trm , none ) = Trm .  
-
-***  
+ 
   op rulename : Rule -> Qid .
   op rulename : AttrSet -> Qid . 
   eq rulename(rl Trm => Trm2 [Attrs].)          = rulename(Attrs) .
@@ -336,18 +468,6 @@ fmod Util is
   eq rulename(label(Q) Attrs)                   = Q .    
 
 endfm
-
-
-
-
-
-
-
-
-
-
-
-
 
 smod HELPER is 
     protecting Util .

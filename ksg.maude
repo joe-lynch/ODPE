@@ -31,7 +31,7 @@ mod KSg-Inf is
   rl  [i-down]  : [ atm , - atm ]                =>   tt .
   rl  [s]       : [ { A , C } , B ]   		 =>   { [ A , B ] , C } .
   rl  [m]       : { [ A , C ] , [ B , D ] }  =>   [ { A , B } , { C , D } ] .
-  rl  [c-down]  : R                          =>   [ R , R ] .
+  rl  [c-down]  : R                         =>   [ R , R ] .
   rl  [c-up]    : { A , A }             	 =>   A .
   rl  [w-down]  : R                          =>   ff .
 

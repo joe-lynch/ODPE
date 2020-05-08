@@ -89,7 +89,7 @@ public class InferenceFork extends WidgetView {
 					if(w instanceof JComponent)
 						premisePanel.add(new InferenceForkWidget(w, label, null, false), c);
 					else if (w instanceof SubJoin)
-						premisePanel.add(new InferenceForkWidget(w, label, null, false), c);
+						premisePanel.add(new InferenceForkWidget(w, label, null, true), c);
 					else
 						premisePanel.add(w, c);
 					c.gridx++;

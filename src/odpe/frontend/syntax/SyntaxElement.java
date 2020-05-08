@@ -9,6 +9,7 @@ package odpe.frontend.syntax;
 
 import odpe.frontend.ast.Node;
 import odpe.frontend.model.InferenceSystem;
+import odpe.frontend.view.ViewableObject;
 import odpe.frontend.view.WidgetView;
 
 public abstract class SyntaxElement {

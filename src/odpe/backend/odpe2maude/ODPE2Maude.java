@@ -580,7 +580,7 @@ public class ODPE2Maude implements Prover {
 	}
 	
 	public Node interpret_reduce(Node proof) throws ProverException, IOException, MaudeException {
-		String term = "I( "+ maudify(proof) + ")";
+		String term = "interpret-reduce( "+maudify(proof)+")";
 		//String term = "I(" +maude_interpretise(proof) + ")";
 		interpret = true;
 		return parse(maude.reduce(interpreter, term), interpreter);
@@ -589,8 +589,6 @@ public class ODPE2Maude implements Prover {
 	public Node interpret_convert(Node proof) throws ProverException, IOException, MaudeException {
 		return proof.interpret(this);
 	}
-
-
 
 	private String maude_subatomise(Node tree) {
 		SyntaxElement elt = tree.getSyntax();

@@ -6,22 +6,23 @@ fmod S-INT is
   var Struct1 Struct2 : Structure .
   var atm : Atom .
   vars U1 U2 U3 U4 : Unit .
-  var Q : Qid .
+  var Q Q1 : Qid .
   var DS1 DS2 : DerivStructure .
+  op error : -> DerivStructure .
 
   op I : DerivStructure -> DerivStructure .
-  op I* : Structure -> Unit .
-  op SI : Structure -> Structure .
- 
-  eq I ( DS1 > [ Q ] > (DS2) ) = I ( DS1 ) > [ Q ] > I ( DS2 ) .
+  op I* : DerivStructure -> Unit .
+
+  op interpret-reduce : DerivStructure -> DerivStructure .
+  eq interpret-reduce( DS1 ) = downTerm(interpret-helper(upTerm( DS1 )), error) .
   
-  eq I ( [ U1 , U2 ] atm [ U3 , U4 ] ) =  I ( I* ( [ U1 , U2 ] ) atm I* ( [ U3 , U4 ] ) ) .
-  eq I ( { U1 , U2 } atm { U3 , U4 } ) =  I ( I* ( { U1 , U2 } ) atm I* ( { U3 , U4 } ) ) .
+  eq I( [ U1 , U2 ] atm [ U3 , U4 ] ) =  I ( I* ( [ U1 , U2 ] ) atm I* ( [ U3 , U4 ] ) ) .
+  eq I( { U1 , U2 } atm { U3 , U4 } ) =  I ( I* ( { U1 , U2 } ) atm I* ( { U3 , U4 } ) ) .
   
-  eq I* ( { U1 , tt } ) = U1 .
-  eq I* ( { ff , ff } ) = ff .
-  eq I* ( [ U1 , ff ] ) = U1 .
-  eq I* ( [ tt , tt ] ) = tt .
+  eq I*( { U1 , tt } ) = U1 .
+  eq I*( { ff , ff } ) = ff .
+  eq I*( [ U1 , ff ] ) = U1 .
+  eq I*( [ tt , tt ] ) = tt .
   
   eq I( tt ) = tt .
   eq I( ff atm ff ) = ff .

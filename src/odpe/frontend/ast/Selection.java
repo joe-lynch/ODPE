@@ -9,6 +9,7 @@ package odpe.frontend.ast;
 
 import java.util.Vector;
 
+import odpe.frontend.syntax.Constant;
 import odpe.frontend.syntax.SyntaxElement;
 import odpe.util.Triple;
 
@@ -45,6 +46,7 @@ public class Selection {
 	}
 	
 	public boolean isCompleteNode() {
+		if (node.getSyntax() instanceof Constant && node.getNumChildren() == 2) return true;
 		return start == 0 && end == node.getNumChildren() - 1;
 	}
 	
