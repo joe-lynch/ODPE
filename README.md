@@ -124,40 +124,40 @@ you download, but you must rename it to "maude.linux64".
 
 File Descriptions
 ---------------------------------------
- --- maude.linux64 / maude.darwin64 ---
+#### maude.linux64 / maude.darwin64 ####\
 This is the executable Maude program.
 
- --- prelude.maude ---
+#### prelude.maude ####\
 The majority of Maude is written in Maude. This is prelude file that
 the Maude team provides. It offers the very core functions of Maude.
 
- --- ksg.maude ---
+#### ksg.maude ####\
 Maude file for the proof system, defines grammar and rules.
 
- --- nnf_KS.maude ---
+#### nnf_KS.maude ####\
 Maude file for canonically simplifying a formula in KSg.
 
- --- sam.maude ---
+#### sam.maude ####\
 Maude file for the subatomic proof system SAKS, includes the object
 level strategies for proof searching.
 
- --- s.maude ---
+#### s.maude ####\
 Maude file with functional modules corresponding to representation
 and interpretation of SKS and SAKS, respectively.
 
- --- util.maude ---
+#### util.maude ####\
 Meta-level Maude file that provides many key utility functions. The GUI
 uses this to find rewrites, convert between subatomic systems etc. This
 is effectively the main file where all the meta-level computation is
 performed.
 
-_description.dtd_\
+#### description.dtd ####\
 declarations for XML files.
 
- --- odpe2maude.dtd ---\
+#### odpe2maude.dtd ####\
 declarations for XML files.
 
- --- ksg-maude.xml ---\
+#### ksg-maude.xml ####\
 XML file that stores the description of the proof system, used by the
 GUI to correctly display various symbols.
 
@@ -207,11 +207,11 @@ Within Maude files the structure is as follows:
 
 fmod\
 	- Grammar of the proof system\
-endm\
+endm
 
 mod\
 	- Rules of the proof system\
-endm\
+endm
 
 
 Future Work
