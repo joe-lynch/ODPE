@@ -1,11 +1,9 @@
-ODPE
+GUIDE
 ======================================================================
 The Open Deduction Proof Editor allows proof theorists (or anyone) to deconstruction proofs step by step. It currently supports deep inference formalisms, namely Open Deduction and naturally the Calculus of Structures. The front end of the application is written in Java, while the back end is written in Maude. There is also an implementation of proof search both with and without proof variables.
 Github: https://github.com/joe-lynch/ODPE
 
 
-GUIDE
-======================================================================
 MAUDE
 -------------
 You must have Maude 3.0 (or above) installed on your system.
@@ -28,6 +26,7 @@ installed.
 You can test if Maude is working by running
 - ./maude.linux64
 
+
 JAVA
 -------------
 Java must also be on your system - the odpe.jar file is compiled using
@@ -49,10 +48,12 @@ Test your version of Java with:
 Run the .jar file with:
 - java -jar odpe.jar
 
+
 GENERAL
 ======================================================================
 All files within the directory are vital for the functioning of
 the open deduction proof editor.
+
 
 INTRODUCTION
 -------------------
@@ -64,6 +65,7 @@ Enter a formula or derivation, and click 'Okay' (Ctrl + Enter).
 You can then highlight the formula, or a subformula, and right click.
 Choose to 'Do one proof step', and apply a rule from the list (if
 there are any valid rules applications).
+
 
 SIMPLE SCENARIOS ONE MAY WANT TO TRY
 -------------------------------------
@@ -95,6 +97,7 @@ Scenario 3 - proof search
 
 - Press OK
 - Press the button 'Proof Search'
+
 
 OPERATING SYSTEM
 ======================================================================
@@ -179,6 +182,7 @@ Note: If you have problems with the stack on linux - you can temporarily
 call
 - ulimit -s unlimited
 
+
 Editing Maude.java - for future troubleshooting
 ---------------------------------------------------
 In the file Maude.java at line 33,
@@ -200,6 +204,7 @@ must be replaced by
  - String cmd = "\"".concat(String.join(" ",maudecmd)).concat("\"");
  - ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
 
+
 PROOF SYSTEMS
 ======================================================================
 Proof systems are implemented in Maude and XML.
@@ -215,6 +220,7 @@ mod
 	- Rules of the proof system
 endm
 
+
 FUTURE WORK
 ======================================================================
 - Fix various bugs that occur.
@@ -227,7 +233,7 @@ proof search in other proof systems.
 - Make maude definitions more user-friendly (e.g. extract everything
 to the meta-level where the user does not need to see it).
 
-======================================================================
+
 CONTACT
 ======================================================================
 Joe Lynch
