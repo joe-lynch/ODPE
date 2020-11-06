@@ -4,8 +4,10 @@ The Open Deduction Proof Editor allows proof theorists (or anyone) to deconstruc
 Github: https://github.com/joe-lynch/ODPE
 
 
-MAUDE
--------------
+REQUIREMENTS
+---------------------------------------
+
+### MAUDE ###
 You must have Maude 3.0 (or above) installed on your system.
 You can download it at the link below, see the section
 OPERATING SYSTEM, especially if you are on Windows.
@@ -27,8 +29,7 @@ You can test if Maude is working by running
 - ./maude.linux64
 
 
-JAVA
--------------
+### JAVA ###
 Java must also be on your system - the odpe.jar file is compiled using
 jdk 13.0.2
 
@@ -50,13 +51,12 @@ Run the .jar file with:
 
 
 GENERAL
-======================================================================
+---------------------------------------
 All files within the directory are vital for the functioning of
 the open deduction proof editor.
 
 
-INTRODUCTION
--------------------
+### INTRODUCTION ###
 Once the application has been launched, either click a button
 for the default proof system (SKSg at the time of writing), or
 select 'browse', and choose your own, or other's XML maude files.
@@ -67,8 +67,7 @@ Choose to 'Do one proof step', and apply a rule from the list (if
 there are any valid rules applications).
 
 
-SIMPLE SCENARIOS ONE MAY WANT TO TRY
--------------------------------------
+### SIMPLE SCENARIOS ONE MAY WANT TO TRY ###
 Here are some scenarios you may try to test the system. Or use your
 own. These assume the proof system SKSg.
 
@@ -87,37 +86,32 @@ Scenario 2 - subatomic logic
 Scenario 3 - derivation input
 - Enter a >['c_down]> [a,a] and press OK
 
-Scenario 3 - proof search
-
+Scenario 4 - proof search
 - Enter:
 (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]>
 ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8}
 >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} 
 >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) 
-
 - Press OK
 - Press the button 'Proof Search'
 
 
 OPERATING SYSTEM
-======================================================================
+---------------------------------------
 Maude works 'out of the box' with Linux and MacOS.
 Maude works within the Windows Subsystem for Linux.
 
-Linux:
----------
+### Linux: ###
 There are two types of Maude 3.0 files, it does not matter which one
 you download, but you must rename it to "maude.linux64".
 
 
-Mac:
----------
+### Mac: ###
 There are two types of Maude 3.0 files, it does not matter which one
 you download, but you must rename it to "maude.darwin64".
 
 
-Windows:
----------
+### Windows: ###
 With the introduction of the Windows Subsystem for Linux
 this software can be run on Windows. In order to do so,
 one must install and enable the Windows Subsystem.
@@ -129,7 +123,7 @@ you download, but you must rename it to "maude.linux64".
 
 
 FILE DESCRIPTIONS
-======================================================================
+---------------------------------------
  --- maude.linux64 / maude.darwin64 ---
 This is the executable Maude program.
 
@@ -169,7 +163,7 @@ GUI to correctly display various symbols.
 
 
 TROUBLESHOOTING
-======================================================================
+---------------------------------------
 This information is for people who want to compile the code themselves
 from source.
 
@@ -183,8 +177,7 @@ call
 - ulimit -s unlimited
 
 
-Editing Maude.java - for future troubleshooting
----------------------------------------------------
+### Editing Maude.java - for future troubleshooting ###
 In the file Maude.java at line 33,
 
  - maudecmd[0] = "./maude.linux64"
@@ -206,7 +199,7 @@ must be replaced by
 
 
 PROOF SYSTEMS
-======================================================================
+---------------------------------------
 Proof systems are implemented in Maude and XML.
 Please see KSg.maude and KSg-maude.xml for examples.
 
@@ -222,7 +215,7 @@ endm
 
 
 FUTURE WORK
-======================================================================
+---------------------------------------
 - Fix various bugs that occur.
 - Improve support for representation of regular logic.
 - Completely generalise Maude strategies at the meta-level to support
@@ -235,6 +228,6 @@ to the meta-level where the user does not need to see it).
 
 
 CONTACT
-======================================================================
+---------------------------------------
 Joe Lynch
 joe.r.d.lynch@gmail.com
