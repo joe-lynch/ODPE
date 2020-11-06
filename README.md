@@ -1,11 +1,11 @@
-# ODPE
+ODPE
+======================================================================
 The Open Deduction Proof Editor allows proof theorists (or anyone) to deconstruction proofs step by step. It currently supports deep inference formalisms, namely Open Deduction and naturally the Calculus of Structures. The front end of the application is written in Java, while the back end is written in Maude. There is also an implementation of proof search both with and without proof variables.
 Github: https://github.com/joe-lynch/ODPE
 
-======================================================================
+
 GUIDE
 ======================================================================
--------------
 MAUDE
 -------------
 You must have Maude 3.0 (or above) installed on your system.
