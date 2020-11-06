@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="odpe_darwin:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/odpe_darwin_jar</output-path>
-    <root id="archive" name="odpe_window.jar">
-      <element id="module-output" name="odpe_window" />
-    </root>
-  </artifact>
-</component>

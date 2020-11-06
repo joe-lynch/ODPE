@@ -1,0 +1,155 @@
+<!-- Document type definition for describing inference systems to GraPE.
+     (C) 2006 Max Schaefer, licensed under the GPL (see COPYING) -->
+
+<!ELEMENT system (normal, subatomic, backend)>
+<!ATTLIST system	name CDATA #REQUIRED
+					subatomic-name CDATA #REQUIRED>
+
+<!ELEMENT normal (syntax, rules)>
+<!ELEMENT subatomic (syntax, rules)>
+
+<!ELEMENT syntax (binary-infix|binary-outfix|unary-outfix|unary-prefix|unary-postfix|constant|constants|name|embed)*>
+
+<!ELEMENT binary-infix   EMPTY>
+<!ATTLIST binary-infix   id        CDATA #IMPLIED
+                         symbol    CDATA #REQUIRED
+                         input     CDATA #IMPLIED
+						 tex       CDATA #IMPLIED
+					     prec      CDATA #IMPLIED
+						 assoc     (yes|no) "yes"
+						 comm      (yes|no) "yes"
+						 leftprec  CDATA #IMPLIED
+						 leftop    CDATA "singleton"
+						 rightprec CDATA #IMPLIED
+						 rightop   CDATA "singleton">
+
+<!ELEMENT binary-outfix  EMPTY>
+<!ATTLIST binary-outfix  id        CDATA #IMPLIED
+                         symbol    CDATA #IMPLIED
+						 startsym  CDATA #IMPLIED
+						 sepsym    CDATA #IMPLIED
+						 endsym    CDATA #IMPLIED
+                         input     CDATA #IMPLIED
+						 instart   CDATA #IMPLIED
+						 insep     CDATA #IMPLIED
+						 inend     CDATA #IMPLIED
+						 tex       CDATA #IMPLIED
+						 texstart  CDATA #IMPLIED
+						 texsep    CDATA #IMPLIED
+						 texend    CDATA #IMPLIED
+						 prec      CDATA #IMPLIED
+						 assoc     (yes|no) "yes"
+						 comm      (yes|no) "yes"
+						 leftprec  CDATA #IMPLIED
+						 leftop    CDATA "singleton"
+						 rightprec CDATA #IMPLIED
+						 rightop   CDATA "singleton">
+
+<!ELEMENT unary-outfix   EMPTY>
+<!ATTLIST unary-outfix   id        CDATA #IMPLIED
+                         symbol    CDATA #IMPLIED
+						 startsym  CDATA #IMPLIED
+						 endsym    CDATA #IMPLIED
+                         input     CDATA #IMPLIED
+						 instart   CDATA #IMPLIED
+						 inend     CDATA #IMPLIED
+						 tex       CDATA #IMPLIED
+						 texstart  CDATA #IMPLIED
+						 texend    CDATA #IMPLIED
+						 prec      CDATA #IMPLIED
+						 opprec    CDATA #IMPLIED
+						 op        CDATA "singleton"
+						 grouping  (yes|no) "no">
+
+<!ELEMENT unary-prefix   EMPTY>
+<!ATTLIST unary-prefix   id        CDATA #IMPLIED
+                         symbol    CDATA #REQUIRED
+                         input     CDATA #IMPLIED
+						 tex       CDATA #IMPLIED
+						 prec      CDATA #IMPLIED
+						 opprec    CDATA #IMPLIED
+						 op        CDATA "singleton">
+
+<!ELEMENT unary-postfix  EMPTY>
+<!ATTLIST unary-postfix  id        CDATA #IMPLIED
+                         symbol    CDATA #REQUIRED
+                         input     CDATA #IMPLIED
+						 tex       CDATA #IMPLIED
+						 prec      CDATA #IMPLIED
+						 opprec    CDATA #IMPLIED
+						 op        CDATA "singleton">
+
+<!ELEMENT constant       EMPTY>
+<!ATTLIST constant       id        CDATA #IMPLIED
+                         symbol    CDATA #REQUIRED
+                         input     CDATA #IMPLIED
+						 tex       CDATA #IMPLIED
+						 prec      CDATA #IMPLIED>
+
+<!ELEMENT constants      EMPTY>
+<!ATTLIST constants      ids       NMTOKENS #IMPLIED
+						 symbols   NMTOKENS #REQUIRED
+						 inputs    NMTOKENS #IMPLIED
+						 texs      NMTOKENS #IMPLIED
+						 prec      CDATA    #IMPLIED>
+			 
+<!ELEMENT name           EMPTY>
+<!ATTLIST name           prec   CDATA #IMPLIED>
+
+<!ELEMENT embed          EMPTY>
+<!ATTLIST embed          context CDATA #REQUIRED>
+
+<!ELEMENT rules (inference-rule|reverse-inference-rule|transformation-rule)*>
+
+<!ELEMENT inference-rule EMPTY>
+<!ATTLIST inference-rule id   CDATA #IMPLIED
+					     name CDATA #REQUIRED
+                         tex  CDATA #IMPLIED
+			             enabled (yes|no) "yes">
+							  
+<!ELEMENT reverse-inference-rule EMPTY>
+<!ATTLIST reverse-inference-rule id   CDATA #IMPLIED
+								 name CDATA #REQUIRED
+								 tex  CDATA #IMPLIED
+								 enabled (yes|no) "yes">
+
+<!ELEMENT backend ANY>
+<!ATTLIST backend class CDATA #REQUIRED>
+
+<!ENTITY leftPoint "&#x3c;">
+<!ENTITY leftTriangle "&#x25C1;"> 
+<!ENTITY circledTimes "&#8855;">
+<!ENTITY unfilledBullet "&#9675;">
+<!ENTITY neg   "&#x00AC;">
+<!ENTITY vel   "&#x2228;">
+<!ENTITY wedge "&#x2227;">
+<!ENTITY vdash "&#x22A2;">
+<!ENTITY bot   "&#x22A5;">
+<!ENTITY top   "&#x22A4;">
+<!ENTITY Leftarrow "&#x21D0;">
+<!ENTITY Uparrow "&#x21D1;">
+<!ENTITY Rightarrow "&#x21D2;">
+<!ENTITY Downarrow "&#x21D3;">
+<!ENTITY LeftRightarrow "&#x21D4;">
+<!ENTITY leftarrow "&#x2190;">
+<!ENTITY uparrow "&#x2191;">
+<!ENTITY rightarrow "&#x2192;">
+<!ENTITY downarrow "&#x2193;">
+<!ENTITY leftrightarrow "&#x2194;">
+<!ENTITY emptyset "&#x2205;">
+<!ENTITY horseshoe "&#x2283;">
+<!ENTITY amp "&#38;">
+<!ENTITY blackstar "&#x2605;">
+<!ENTITY blackstaroverline "&#773;&#x2605;">
+<!ENTITY zero "&#x2080;">
+<!ENTITY one "&#x2081;">
+<!ENTITY two "&#x2082;">
+<!ENTITY three "&#x2083;">
+<!ENTITY four "&#x2084;">
+<!ENTITY five "&#x2085;">
+<!ENTITY six "&#x2086;">
+<!ENTITY seven "&#x2087;">
+<!ENTITY eight "&#x2088;">
+<!ENTITY nine "&#x2089;">
+<!ENTITY macron "&#x304;">
+<!ENTITY phi "&#x03D5;">

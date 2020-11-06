@@ -1,0 +1,39 @@
+<!-- Document type definition for configuring the GraPE2Maude backend.
+     (C) 2006 Max Schaefer, licensed under the GPL (see COPYING) -->
+
+<!ELEMENT directory EMPTY>
+<!ATTLIST directory name CDATA #REQUIRED>
+
+<!ELEMENT load EMPTY>
+<!ATTLIST load name CDATA #REQUIRED>
+
+<!ELEMENT inferencer EMPTY>
+<!ATTLIST inferencer name CDATA #REQUIRED>
+
+<!ELEMENT reverseinferencer EMPTY>
+<!ATTLIST reverseinferencer name CDATA #REQUIRED>
+
+<!ELEMENT sa_inferencer EMPTY>
+<!ATTLIST sa_inferencer name CDATA #REQUIRED>
+
+<!ELEMENT sa_reverseinferencer EMPTY>
+<!ATTLIST sa_reverseinferencer name CDATA #REQUIRED>
+
+<!ELEMENT normalizer EMPTY>
+<!ATTLIST normalizer name CDATA #REQUIRED>
+
+<!ELEMENT subatomiser EMPTY>
+<!ATTLIST subatomiser name CDATA #REQUIRED>
+
+<!ELEMENT interpreter EMPTY>
+<!ATTLIST interpreter name CDATA #REQUIRED>
+
+<!ELEMENT maudename EMPTY>
+<!ATTLIST maudename id   CDATA #REQUIRED
+                    name CDATA #REQUIRED>
+
+<!ELEMENT ignore EMPTY>
+<!ATTLIST ignore pattern CDATA #REQUIRED>
+
+<!ELEMENT result-sort EMPTY>
+<!ATTLIST result-sort name CDATA #REQUIRED>

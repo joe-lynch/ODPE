@@ -1,0 +1,542 @@
+fmod REWRITING is
+    protecting META-LEVEL .
+
+    *** define the sort rewriting and the operations on it
+    sort Rewriting .
+    op rewriting : Qid Context TermList -> Rewriting [ctor] .
+    op rewriting : Qid Context TermList Term Substitution -> Rewriting [ctor] .
+
+    op getRewriterName : Rewriting -> Qid .
+    op getContext : Rewriting -> Context .
+    op getResults : Rewriting -> TermList .
+    op getSubstitution : Rewriting -> Substitution .
+    op getOriginalTerm : Rewriting -> Term .
+
+    var Q : Qid .
+    var Ctxt : Context .
+    var TL : TermList .
+    var Trm : Term .
+    var Subst : Substitution .
+
+    *** equations for extracting information from a rewriting
+    eq getRewriterName(rewriting(Q, Ctxt, TL)) = Q .
+    eq getContext(rewriting(Q, Ctxt, TL)) = Ctxt .
+    eq getResults(rewriting(Q, Ctxt, TL)) = TL .    
+
+    eq getRewriterName(rewriting(Q, Ctxt, TL, Trm, Subst)) = Q .
+    eq getContext(rewriting(Q, Ctxt, TL, Trm, Subst)) = Ctxt .
+    eq getResults(rewriting(Q, Ctxt, TL, Trm ,Subst)) = TL .
+    eq getOriginalTerm(rewriting(Q, Ctxt, TL, Trm, Subst)) = Trm .
+    eq getSubstitution(rewriting(Q, Ctxt, TL, Trm, Subst)) = Subst .
+
+endfm
+
+view Rewriting from TRIV to REWRITING is
+  sort Elt to Rewriting .
+endv
+
+fmod Util is
+
+  including META-LEVEL .
+
+  sorts Derivation DerivationList Derivation? .
+  subsort Derivation < Derivation? .
+  subsort Derivation < DerivationList .
+
+  protecting SET{Rewriting} * (sort Set{Rewriting} to RewritingSet) .
+
+  op findRewrites : Term Qid QidList -> RewritingSet .
+  op findRewritesForRule : Term Qid Qid Nat -> RewritingSet .
+  op extractRewriting : Term Qid Result4Tuple -> RewritingSet .	
+  op extractTermList : Term -> TermList .
+  op getElements : Term -> Term .
+
+  *** variables used in equations below
+  vars Trm Trm1 Trm2 Trm3 Trm4 T1 T2 T3 T4 OrigTrm : Term .
+  var Tp : Type .
+  var Attrs : AttrSet .
+  var M Q Q2 Q3 op : Qid .
+  var N : Nat .
+  var V : Variable .
+  var C : Constant .
+  var TL TL1 TL2 : TermList .
+  var Rewr : Qid .
+  var RewrList : QidList .
+  var Reing : Rewriting .
+  var ReingList : RewritingSet .
+  var Ctxt con : Context .
+  var cnst : Constant .
+  var Cond : Condition .
+  var Subst : Substitution .
+
+
+  *** used to get the correct rules when interpretting a subatomic derivation
+  op interpret-helper : Term -> Term .
+  eq interpret-helper( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = interpret-helper(Trm1) .
+  eq interpret-helper( '_>`[_`]>_[ Trm1 , ''eq.Sort , Trm2 ] ) = interpret-helper(Trm1) .
+  eq interpret-helper ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = findInterpretRule('_>`[_`]>_[interpret-helper(Trm1) , Q , interpret-helper(Trm2)]) .
+  eq interpret-helper( '___[ Trm1 , cnst, Trm2 ] ) = getTerm(metaReduce(['S-INT], 'I['___[interpret-helper(Trm1), cnst, interpret-helper(Trm2)]])) . 
+  ceq interpret-helper ( op [ Trm1 , Trm2 ] ) = op [ interpret-helper(Trm1) , interpret-helper(Trm2) ]
+      if Trm2 =/= empty and Trm2 =/= 'ff.Unit and Trm2 =/= 'tt.Unit and Trm1 =/= 'tt.Unit and Trm1 =/= 'ff.Unit .
+  eq interpret-helper( Trm ) = getTerm(metaReduce(['S-INT], 'I[Trm])) .
+
+  op findInterpretRule : Term -> Term .
+  eq findInterpretRule( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+    '_>`[_`]>_[ Trm1,
+                getRewriterName(getRe(findRewrites(flatten(getTopFormula(Trm1)), 'KSg-Inf , 's 'i_down 'm 'c_down 'c_up 'w_down ) , flatten(getFormula(Trm2)))),
+                Trm2 ] .
+
+  op gnf : Term -> Term .
+  op gn1 : Term -> Term .
+  op subatomise-helper : Term -> Term .
+
+
+  *** used to find the subatomic view of a derivation
+  ceq gnf ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) 
+      if flat ( Trm ) .
+  ceq gnf ( op [ Trm1 , Trm2 ] ) = op [ gnf(Trm1) , gnf(Trm2) ]
+      if op =/= '_>`[_`]>_ and Trm2 =/= empty .
+  ceq gnf ( op [ Trm1 , TL ] ) = op [ gnf (Trm1) , gnf(op[TL]) ]
+      if op =/= '_>`[_`]>_ and TL =/= empty .
+  eq gnf ( '_>`[_`]>_[ Trm1, ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gnf(Trm1) , ''equality.Sort , gnf(Trm2) ].
+  eq gnf ( '_>`[_`]>_[ Trm1, ''eq.Sort , Trm2 ] ) = '_>`[_`]>_[ gnf(Trm1) , ''eq.Sort , gnf(Trm2) ].
+  eq gnf ( '_>`[_`]>_[ Trm1, Q, Trm2 ] ) = subatomise-helper('_>`[_`]>_[gn1(Trm1), Q, gn1(Trm2)]) .
+  eq gnf ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) .
+
+
+  ceq gn1 ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) 
+    if flat ( Trm ) .
+  ceq gn1 ( op [ Trm1 , Trm2 ] ) = op [ gn1(Trm1) , gn1(Trm2) ]
+      if op =/= '_>`[_`]>_ and Trm2 =/= empty .
+  ceq gn1 ( op [ Trm1 , TL ] ) = op [ gn1 (Trm1) , gn1(op[TL]) ]
+      if op =/= '_>`[_`]>_ and TL =/= empty .
+  eq gn1 ( '_>`[_`]>_[ Trm1 , ''equality.Sort , Trm2 ] ) = '_>`[_`]>_[ gn1(Trm1) , ''equality.Sort , gn1(Trm2) ].
+  eq gn1 ( '_>`[_`]>_[ Trm1 , ''eq.Sort , Trm2 ] ) = '_>`[_`]>_[ gn1(Trm1) , ''eq.Sort , gn1(Trm2) ].
+  eq gn1 ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = subatomise-helper('_>`[_`]>_[ gn1(Trm1) , Q , gn1(Trm2) ]) .
+  eq gn1 ( Trm ) = getTerm ( metaReduce ( upModule( 'S-REP , false ) , 'R[ Trm ] ) ) .
+
+  *** replaces the conclusion
+  op replaceConc : Term Term -> Term .
+  eq replaceConc( '_>`[_`]>_[T1,Q,T2] , Trm2 ) = '_>`[_`]>_[Trm2,Q,T2] .
+  eq replaceConc( Trm1, Trm2 ) = Trm2 .
+
+  *** replaces the premise
+  op replacePrem : Term Term -> Term .
+  ceq replacePrem( '_>`[_`]>_[T1,Q,T2] , Trm2 ) = '_>`[_`]>_['_>`[_`]>_[T1,Q,T2], ''equality.Sort, Trm2] 
+    if getType(metaReduce(['SAM-Meta], T2)) == 'DerivStructure .
+  eq replacePrem( '_>`[_`]>_[T1,Q,T2] , Trm2 ) = '_>`[_`]>_[T1,Q,Trm2] .
+  ceq replacePrem( Trm1, Trm2 ) = '_>`[_`]>_[ Trm1, ''equality.Sort, Trm2 ] 
+    if getType(metaReduce(['SAM-Meta], Trm1)) == 'DerivStructure .
+  eq replacePrem( Trm1, Trm2 ) = Trm2 .
+
+  *** if we don't need to make any further deductions - because the conclusion fits an inference rule that agrees with the premiss
+  op subatomise-helper : Term -> Term .
+  op subatomise-helper2 : Term -> Term .
+  eq subatomise-helper ( '_>`[_`]>_[T1,''s.Sort,T2] ) = '_>`[_`]>_[T1,''conj_down.Sort,T2] . 
+  ceq subatomise-helper ( '_>`[_`]>_[ Trm1, Q, Trm2 ] ) = 
+      '_>`[_`]>_[ Trm1,
+                  getRewriterName(getRe(findRewrites(flatten(getTopFormula(Trm1)), 'SAM-Meta, 'c_down 'c_up 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ), flatten(getFormula(Trm2)))),
+                  Trm2]     
+ if getRe(findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ) , flatten(getFormula(Trm2))) 
+        =/= empty . 
+
+  *** for special case when the premise is equal to the conclusion of another
+  ceq subatomise-helper ( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+        '_>`[_`]>_[ Trm1,
+                    getRewriterName(getReEq(findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ) , flatten(getFormula(Trm2)))),
+                    replaceConc(Trm2,getResults(getReEq(findRewrites(flatten(getTopFormula(Trm1)), 'SAM-Meta, 'c_down 'c_up 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ), flatten(getFormula(Trm2))))) ]
+      if getReEq(findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta , 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ) , flatten(getFormula(Trm2))) 
+        =/= empty .
+
+  *** if there are potential rewrites, but the premiss doesn't agree, then try to adapt the premiss to agree -> [a,-a] >['i]> tt => [ff a tt,tt a ff] >[]> [tt,ff] a [tt,ff]
+  ceq subatomise-helper( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =
+    '_>`[_`]>_[ Trm1,
+                findRule( getTopFormula(Trm1) , getTerm(metaSrewrite(['Equate], getTopFormula(Trm1), 'eqfrewN[[getFormula(Trm2), upTerm(0)]], breadthFirst, 0))),
+                replaceConc(Trm2, getTerm(metaSrewrite(['Equate], getTopFormula(Trm1), 'eqfrewN[[getFormula(Trm2), upTerm(0)]], breadthFirst, 0))) ]  
+      if findRewrites ( flatten(getTopFormula(Trm1)), 'SAM-Meta, 'a_up 'a_down 'conj_down 'disj_up 'm 'ac 'acc ) =/= empty .
+
+  *** if there are potential rewrites for the premiss to the conclusion
+  ceq subatomise-helper( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) =  
+  '_>`[_`]>_[replacePrem(Trm1, getTerm(metaSrewrite(['Equate], getFormula(Trm2), 'eqfrew[[getTopFormula(Trm1), upTerm(0)]], breadthFirst, 0))),
+                 findRule( getTerm(metaSrewrite(['Equate], getFormula(Trm2), 'eqfrew[[getTopFormula(Trm1), upTerm(0)]], breadthFirst, 0)) , getFormula(Trm2) ),
+                Trm2] 
+    if findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta, 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ) =/= empty .
+
+  *** if there are potential rewrites for the premiss to the conclusion
+  ceq subatomise-helper2( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = 
+  '_>`[_`]>_[replacePrem(Trm1, getTerm(metaSrewrite(['Equate], getFormula(Trm2), 'eqfrew[[getTopFormula(Trm1), upTerm(0)]], breadthFirst, 0))),
+                 findRule( getTerm(metaSrewrite(['Equate], getFormula(Trm2), 'eqfrew[[getTopFormula(Trm1), upTerm(0)]], breadthFirst, 0)) , getFormula(Trm2) ),
+                Trm2]  
+    if findRewrites ( flatten(getFormula(Trm2)), 'SAM-Meta, 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc ) =/= empty . 
+
+    *** functions to extract information for the subatomise-helpers
+   op getRe : RewritingSet Term -> RewritingSet .
+   op getRe : RewritingSet Term Nat -> RewritingSet .
+   op getRe1 : RewritingSet Term -> RewritingSet .
+   op getReEq : RewritingSet Term -> RewritingSet .
+   op getReEqRew : RewritingSet Term -> RewritingSet .
+  
+   eq getRe( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 , N ) =
+    if interpret(Trm1) == Trm2 then
+        rewriting( upTerm(Q) , Ctxt, Trm1)
+    else
+        getRe( ReingList , Trm2 )
+    fi .
+  
+  eq getRe( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
+    if Trm1 == Trm2 then
+        rewriting( upTerm(Q) , Ctxt, Trm1)
+    else
+        getRe( ReingList , Trm2 )
+    fi .
+
+  eq getReEq( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
+    if equal(Trm1,Trm2) =/= empty then
+        rewriting( upTerm(Q), Ctxt, equal(Trm1,Trm2) )
+    else
+        getReEq( ReingList , Trm2 )
+    fi .
+
+  eq getReEqRew( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
+    if equalfull(Trm1,Trm2) =/= empty then
+        rewriting( upTerm(Q), Ctxt, equalfull(Trm1,Trm2) )
+    else
+        getReEqRew( ReingList , Trm2 )
+    fi .
+
+  eq getRe1( (rewriting( Q , Ctxt, Trm1) , ReingList) , Trm2 ) =
+    if getTopFormula(Trm1) == Trm2 then
+        rewriting( upTerm(Q) , Ctxt, Trm1)
+    else
+        getRe1( ReingList , Trm2 )
+    fi .
+
+  eq getRe( empty, Trm ) = empty .
+  eq getReEq( empty, Trm ) = empty .
+  eq getReEqRew( empty, Trm ) = empty .
+
+  op findRule : Term Term -> Qid .
+  eq findRule( Trm1, Trm2 ) = 
+    if getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc), getFormula(Trm2)) =/= empty then
+      getRewriterName(getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc), getFormula(Trm2)))
+    else
+      empty
+    fi . 
+
+  op findRule2 : Term Term -> Qid .
+  eq findRule2( Trm1, Trm2 ) = 
+    if getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc), getFormula(Trm2)) =/= empty then
+      getRewriterName(getReEqRew(findRewrites( getTopFormula(Trm1), 'SAM-Meta, 'a_up 'a_down 'conj_down 'conj_d 'disj_up 'm 'ac 'acc), getFormula(Trm2)))
+    else
+      empty
+    fi .  
+ 
+
+  *** directly interpret a formula 
+  op interpret : Term -> Term .
+  eq interpret( Trm ) = flatten(getTerm(metaReduce(upModule( 'S-INT , false ), 'I[getFormula(Trm)]))) .
+
+  *** use strategies for do various functions (look at strat.maude)
+  op equal : Term Term -> Term .
+  eq equal( Trm1, Trm2 ) =
+    if metaSrewrite(['Equate], Trm1, 'eqf[[Trm2,upTerm(0)]], breadthFirst, 0) =/= failure then
+      getTerm(metaSrewrite(['Equate], Trm1, 'eqf[[Trm2,upTerm(0)]], breadthFirst, 0))
+    else
+      empty
+    fi .
+
+  op equalrew : Term Term -> Term .
+  eq equalrew( Trm1, Trm2 ) =
+    if metaSrewrite(['Equate], Trm1, 'eqfrew[[Trm2,upTerm(0)]], breadthFirst, 0) =/= failure then
+      getTerm(metaSrewrite(['Equate], Trm1, 'eqfrew[[Trm2,upTerm(0)]], breadthFirst, 0))
+    else
+      empty
+    fi .
+
+  op equalfull : Term Term -> Term .
+  eq equalfull( Trm1, Trm2 ) =
+    if metaSrewrite(['Equate], Trm2, 'eqffull[[Trm1,upTerm(0)]], breadthFirst, 0) =/= failure then
+      getTerm(metaSrewrite(['Equate], Trm2, 'eqffull[[Trm1 ,upTerm(0)]], breadthFirst, 0))
+    else
+      empty
+    fi . 
+
+
+*** find rewrites
+  eq findRewrites(Trm, M, (Rewr RewrList)) =  findRewritesForRule(Trm, M, Rewr, 0) , findRewrites(Trm, M, RewrList) .
+  eq findRewrites(Trm, M, nil) = empty .
+  
+  eq findRewritesForRule(Trm, M, Q, N) =
+  	if  metaXapply([M], Trm, Q, none, 0, unbounded, N) == failure
+  	then empty
+  	else extractRewriting(Trm, Q, metaXapply([M], Trm, Q, none, 0, unbounded, N)),
+  	     findRewritesForRule(Trm, M, Q, N + 1)
+          fi .
+
+*** gets the formulae of a ground term without the connective stuff
+  eq getElements('`{_`,_`}[TL1]) = TL1 .
+  
+*** These equations check if a formula is a subformula of another formula
+  op contains : Term TermList -> Bool .
+  eq contains(Trm, []) = false .
+  eq contains(Trm, Trm2) = (Trm == Trm2) .
+  eq contains(Trm, (Trm2, TL1)) = if Trm == Trm2 then true else contains(Trm, TL1) fi .
+
+  eq extractRewriting(Trm, Q, {Trm2, Tp, Subst, Ctxt}) =
+    if Q == 'tt-norm then
+		if extractTermList(Trm2) =/= 'tt.Unit then
+    		findRewritesForRule(Trm2, 'KSg-Meta, 'tt-norm, 0)
+    	else
+    		rewriting(Q, Ctxt, extractTermList(Trm2))
+    	fi
+    else
+    	if Q == 'tt-elim then
+    		if contains('tt.Unit, getElements(extractTermList(Trm2))) then
+    			findRewritesForRule(Trm2, 'KSg-Meta, 'tt-elim, 0)
+    		else
+    			rewriting(Q, Ctxt, extractTermList(Trm2))
+    		fi
+    	else
+    		if Trm == Trm2 or Ctxt =/= [] then
+    			empty
+    		else
+    			rewriting(Q, Ctxt, extractTermList(Trm2))
+    		fi
+    	fi
+    fi .
+
+  eq extractTermList(Q[TL]) =
+	if Q == '_;_ then TL else Q[TL] fi .
+
+*** C is constant, V is variable
+  eq extractTermList(C) = C .
+  eq extractTermList(V) = V .
+
+*** flatten a derivation
+    op flatten : TermList -> TermList .
+    eq flatten( Trm ) = getTerm( metaReduce ( upModule( 'SAM-Meta , false ) , Trm ) ) .
+    eq flatten( (Trm, TL) ) = flatten(Trm) , flatten(TL) .
+
+*** check if a term has binary operators
+    op binop : Term -> Bool .
+    eq binop ( op [ Trm1 ] ) = false .
+    eq binop ( cnst ) = false .
+    eq binop ( op [ Trm1 , TL ] ) = true .
+
+*** check if a derivation is "flat" or not - if it contains other structures or not
+    op isflat : Term -> Bool .
+    op flat : Term -> Bool .
+    ceq flat ( op [ TL ] ) = isflat ( TL ) if op =/= '_>`[_`]>_ .
+    eq isflat ( ( Trm, TL ) ) = if binop ( Trm ) then false else isflat(TL) fi .
+    eq isflat ( empty ) = true .
+
+*** get the bottom formula of a derivation
+    op getFormula : Term -> Term .
+    eq getFormula( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = getFormula(Trm1) . 
+    eq getFormula( op [ Trm , TL ] ) = flatten ( op [ getFormula( Trm ) , getFormula( TL ) ] ) .
+    eq getFormula( (Trm , empty ) ) = Trm .
+    eq getFormula( (Trm, TL) ) = getFormula(Trm) , getFormula( TL ) .
+    eq getFormula( empty ) = empty .
+
+*** get the top formula of a derivation
+    op getTopFormula : Term -> Term .
+    eq getTopFormula( '_>`[_`]>_[ Trm1 , Q , Trm2 ] ) = getTopFormula(Trm2) . 
+    eq getTopFormula( op [ Trm , TL ] ) = flatten ( op [ getTopFormula( Trm ) , getTopFormula( TL ) ] ) .
+    eq getTopFormula( (Trm , empty ) ) = Trm .
+    eq getTopFormula( (Trm, TL) ) = getTopFormula(Trm) , getTopFormula( TL ) .
+    eq getTopFormula( empty ) = empty .
+
+*** extracts binding - only deals with single bindings
+    op extractBinding : Variable Substitution -> Term .
+    eq extractBinding(V, V <- Trm ; Subst) = Trm .
+
+    op extractBinding : Substitution -> Term .
+    eq extractBinding( V <- Trm ) = Trm .
+
+    op extractBinding : MatchPair -> Term .
+    eq extractBinding( {V <- Trm , Ctxt} ) = Trm .
+
+*** extract context
+    op extractContext : Context -> Term .
+    eq extractContext ( '_>`[_`]>_[ Trm1 , Q , con ] ) = '_>`[_`]>_[Trm1 , Q , extractContext(con) ] .
+    eq extractContext ( '_>`[_`]>_[ con , Q , Trm2 ] ) = '_>`[_`]>_[extractContext(con) , Q , Trm2 ] .
+    eq extractContext ( op [ TL , con ] ) = op [ TL , extractContext ( con ) ] .
+    eq extractContext ( [] ) = 'none.Atom .
+
+*** extract substituion
+    op extractSubstitution : Substitution -> Term .
+    eq extractSubstitution( V <- Trm ) = Trm .
+    eq extractSubstitution( none ) = empty .
+
+*** get the rule of a derivation
+    op getR : Term -> Term .
+    eq getR( '_>`[_`]>_[Trm, Q, Trm1] ) = Q .
+    eq getR ( Trm ) = empty .
+
+*** get the premise of a rule                                                 
+    op getPr : Rule -> Term .
+    eq getPr( crl Trm => Trm1 if Cond [Attrs]. ) = Trm .
+    eq getPr( rl Trm => Trm1 [Attrs]. ) = Trm .
+
+*** get the conclusion of a rule
+    op getCo : Rule -> Term .
+    eq getCo( crl Trm => Trm1 if Cond [Attrs]. ) = Trm1 .
+    eq getCo( rl Trm => Trm1 [Attrs]. ) = Trm1 .
+
+*** unpack structures made up of term lists
+    op unpack-structure : Qid TermList TermList Nat -> TermList .
+    eq unpack-structure( op, TL, TL1, N ) = unpack-structure( op, TL, TL1, N, TL) .
+
+    op unpack-structure : Qid TermList TermList Nat TermList -> TermList .
+    eq unpack-structure( op , (Trm,TL), (Trm1, TL1), N, (Trm2, TL2) ) = op [ Trm, Trm1 ], unpack-structure(op, TL, (Trm1, TL1), N, (Trm2, TL2) ) .
+    eq unpack-structure( op , (Trm,TL), empty , N, (Trm2, TL2) ) = empty .
+    eq unpack-structure( op , empty, (Trm1, TL1), N, (Trm2,TL2) ) = unpack-structure(op, (Trm2,TL2), TL1, N, (Trm2,TL2)) .
+    eq unpack-structure( op , empty, empty, N, (Trm2,TL2)) = empty .
+
+*** unpack subatoms made up of term lists
+    op unpack-subatom : TermList Term TermList Nat -> TermList .
+    eq unpack-subatom( TL, cnst, TL1, N ) = unpack-subatom(TL, cnst, TL1, N, TL) .
+
+    op unpack-subatom : TermList Term TermList Nat TermList -> TermList .
+    eq unpack-subatom( (Trm,TL), cnst, (Trm1,TL1), N, (Trm2,TL2)) = '___[Trm, cnst, Trm1] , unpack-subatom( TL, cnst, (Trm1, TL1) ,N, (Trm2,TL2)) .
+    eq unpack-subatom( (Trm,TL), cnst, empty, N, (Trm2,TL2)) = empty .
+    eq unpack-subatom( empty, cnst, (Trm1,TL1), N, (Trm2,TL2) ) = unpack-subatom((Trm2,TL2), cnst, TL1, N, (Trm2,TL2)) .
+    eq unpack-subatom( empty, cnst, empty, N, (Trm2,TL2) ) = empty .
+
+*** unpack derivations
+    op unpack-deriv : TermList Qid TermList Nat -> TermList .
+    eq unpack-deriv( TL, Q, TL1, N ) = unpack-deriv(TL, Q, TL1, N, TL) .
+
+    op unpack-deriv : TermList Term TermList Nat TermList -> TermList .
+    eq unpack-deriv( (Trm,TL), Q, (Trm1,TL1), N, (Trm2,TL2)) = getTerm(metaReduce(['SamStr],'_>`[_`]>_[Trm, Q, Trm1])) , unpack-deriv( TL, Q, (Trm1, TL1), N, (Trm2,TL2)) .
+    eq unpack-deriv( (Trm,TL), Q, empty, N, (Trm2,TL2)) = empty .
+    eq unpack-deriv( empty, Q, (Trm1,TL1), N, (Trm2,TL2) ) = unpack-deriv((Trm2,TL2), Q, TL1, N, (Trm2,TL2)) .
+    eq unpack-deriv( empty, Q, empty, N, (Trm2,TL2) ) = empty .
+
+*** replace the context with a term
+    op replaceContext : Context Term -> Term .
+    eq replaceContext ( op [ TL , con, TL1 ], Trm3 ) = op [ TL , replaceContext ( con, Trm3 ) , TL1 ] .
+    eq replaceContext ( [] , Trm3 ) = Trm3 .
+
+    eq replaceContext( op [ Trm, con ], empty ) = Trm , replaceContext(con, empty) .
+    eq replaceContext( op [ con, Trm ], empty ) = replaceContext(con, empty), Trm .
+    eq replaceContext ( op [ TL , con, TL1 ], empty ) = op [ TL , replaceContext ( con, empty ) , TL1 ] .
+  
+    eq replaceContext ( [] , empty ) = empty .
+
+*** replace variables with substitutions
+    op substitute : Term Substitution -> Term .
+    eq substitute( 'rewu[ Trm ], Subst ) = 'rewu[ substitute( Trm , Subst ) ] .
+    eq substitute( 'rewr[ Trm ], Subst ) = 'rewr[ substitute( Trm , Subst ) ] .
+    ceq substitute( op [ Trm , TL ], Subst ) = op [ substitute( Trm, Subst ) , substitute( TL, Subst ) ]
+        if TL =/= empty .
+    ceq substitute( (Trm, TL), Subst ) = substitute( Trm, Subst ), substitute( TL, Subst )
+        if TL =/= empty .
+    eq substitute( Trm , V <- Trm2 ; Subst ) =
+        if Trm == V then 
+            Trm2
+        else
+            substitute( Trm, Subst )
+        fi .
+    eq substitute( Trm , none ) = Trm .  
+ 
+  op rulename : Rule -> Qid .
+  op rulename : AttrSet -> Qid . 
+  eq rulename(rl Trm => Trm2 [Attrs].)          = rulename(Attrs) .
+  eq rulename(crl Trm => Trm2 if Cond [Attrs].) = rulename(Attrs) .
+  eq rulename(label(Q) Attrs)                   = Q .    
+
+endfm
+
+smod HELPER is 
+    protecting Util .
+
+
+    vars Rle Rle1 Rle2 : Rule .
+    var M Q Q1 Q2 : Qid . 
+    var Trm Trm1 Trm2 Trm3 Trm4 : Term .
+    var Attrs : AttrSet .
+    var Cond : Condition .
+    var Md : Module .
+
+    op appRule : Term Qid Qid -> Term .
+    eq appRule( Trm, Trm1, M ) = stratRewrite(Trm,extend(Trm1),um(M)) . 
+
+    op stratRewrite : Term Term Module ->  Term .
+    eq stratRewrite( Trm, Trm1, Md ) = 
+        if metaSrewrite(Md, Trm, all ; amatch Trm1 s.t. nil , breadthFirst, 0) =/= failure then
+            if getTopFormula(getTerm(metaSrewrite(Md, Trm, all ; amatch Trm1 s.t. nil , breadthFirst, 0))) == getTopFormula(Trm1) then
+                getTerm(metaSrewrite(Md, Trm, all ; amatch Trm1 s.t. nil , breadthFirst, 0))
+            else
+                empty
+            fi
+        else
+            getTerm(metaSrewrite(Md, Trm, all ; amatch Trm1 s.t. nil , breadthFirst, 0))
+        fi .
+
+    op um : Qid -> Module .
+    eq um( M ) = replaceRules(upModule(M,false)) .
+
+    op replaceRules : Module -> Module .
+    eq replaceRules( mod H:Header is I:ImportList sorts SS:SortSet . SSD:SubsortDeclSet OD:OpDeclSet MAS:MembAxSet ES:EquationSet RS:RuleSet endm ) = 
+         mod H:Header is I:ImportList sorts SS:SortSet . SSD:SubsortDeclSet OD:OpDeclSet MAS:MembAxSet ES:EquationSet redefineRules(RS:RuleSet) endm .
+
+    op tes : Module -> Module .
+    eq tes(
+        smod H:Header is 
+            I:ImportList
+            sorts SS:SortSet . 
+            SSD:SubsortDeclSet 
+            OD:OpDeclSet 
+            MAS:MembAxSet 
+            ES:EquationSet 
+            RS:RuleSet 
+            SDcS:StratDeclSet 
+            SDfS:StratDefSet 
+        endsm ) =
+                smod H:Header is 
+                    I:ImportList
+                    sorts SS:SortSet . 
+                    SSD:SubsortDeclSet 
+                    OD:OpDeclSet 
+                    MAS:MembAxSet 
+                    ES:EquationSet 
+                    redefineRules(RS:RuleSet)
+                    SDcS:StratDeclSet 
+                    SDfS:StratDefSet 
+                endsm .
+
+    op redefineRules : RuleSet -> RuleSet .
+    eq redefineRules( none ) = none .
+    eq redefineRules( Rle RS:RuleSet ) = redefineRule(Rle) redefineRules(RS:RuleSet) .
+
+    op redefineRule : Rule -> RuleSet .
+    eq redefineRule( rl Trm => Trm2 [Attrs]. ) =
+       rl Trm =>
+                constructRuleApplication(Trm,rulename(Attrs),Trm2) [Attrs] .
+
+       ***(
+
+        rl extend(Trm) =>
+                extend( constructRuleApplication(Trm,rulename(Attrs),Trm2) ) [Attrs].
+        rl '`[_`,_`][ Trm , 'T:NeqRewritable ] => 
+                '`[_`,_`] [ constructRuleApplication(Trm,rulename(Attrs),Trm2)  , 'T:NeqRewritable ] [Attrs].
+        rl '`[_`,_`] [ extend( Trm ) , 'T:NeqRewritable] =>
+                '`[_`,_`] [ extend( constructRuleApplication(Trm,rulename(Attrs),Trm2)) , 'T:NeqRewritable ] [Attrs].
+        rl '`{_`,_`}[ Trm , 'T:NeqRewritable] => 
+                '`{_`,_`} [ constructRuleApplication(Trm,rulename(Attrs),Trm2)  , 'T:NeqRewritable ] [Attrs].
+        rl '`{_`,_`} [ extend( Trm ) , 'T:NeqRewritable] =>
+                '`{_`,_`} [ extend( constructRuleApplication(Trm,rulename(Attrs),Trm2)) , 'T:NeqRewritable ] [Attrs]. ) .
+            ***)
+
+    op extend : Term -> Term .
+    eq extend( Trm ) = 
+        getTerm(metaSrewrite(['HELPER], Trm, 're[[empty]], breadthFirst, 0)) .
+
+    strat re @ Term .
+    sd re := idle .
+
+    op constructRuleApplication : Term Qid Term -> Term .
+    eq constructRuleApplication( Trm, Q, Trm1 ) = '_>`[_`]>_[ 'unwrite[Trm], upTerm(Q), Trm1 ] .
+
+endsm
