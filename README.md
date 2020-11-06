@@ -28,7 +28,6 @@ installed.
 You can test if Maude is working by running
 - ./maude.linux64
 
--------------
 JAVA
 -------------
 Java must also be on your system - the odpe.jar file is compiled using
@@ -50,17 +49,12 @@ Test your version of Java with:
 Run the .jar file with:
 - java -jar odpe.jar
 
-======================================================================
 GENERAL
 ======================================================================
 All files within the directory are vital for the functioning of
 the open deduction proof editor.
--------------------
-<<<<<<< HEAD:Linux/README.txt
-SMALL EXPLANATION
-=======
+
 INTRODUCTION
->>>>>>> 2b8617010c027118c9188d19c04bdce90af50dee:README.txt
 -------------------
 Once the application has been launched, either click a button
 for the default proof system (SKSg at the time of writing), or
@@ -70,7 +64,7 @@ Enter a formula or derivation, and click 'Okay' (Ctrl + Enter).
 You can then highlight the formula, or a subformula, and right click.
 Choose to 'Do one proof step', and apply a rule from the list (if
 there are any valid rules applications).
--------------------------------------
+
 SIMPLE SCENARIOS ONE MAY WANT TO TRY
 -------------------------------------
 Here are some scenarios you may try to test the system. Or use your
@@ -92,40 +86,33 @@ Scenario 3 - derivation input
 - Enter a >['c_down]> [a,a] and press OK
 
 Scenario 3 - proof search
-<<<<<<< HEAD:Linux/README.txt
 
-=======
->>>>>>> 2b8617010c027118c9188d19c04bdce90af50dee:README.txt
 - Enter:
 (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]>
 ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8}
 >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} 
 >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) 
-<<<<<<< HEAD:Linux/README.txt
 
-=======
->>>>>>> 2b8617010c027118c9188d19c04bdce90af50dee:README.txt
 - Press OK
 - Press the button 'Proof Search'
 
-======================================================================
 OPERATING SYSTEM
 ======================================================================
 Maude works 'out of the box' with Linux and MacOS.
 Maude works within the Windows Subsystem for Linux.
----------
+
 Linux:
 ---------
 There are two types of Maude 3.0 files, it does not matter which one
 you download, but you must rename it to "maude.linux64".
 
----------
+
 Mac:
 ---------
 There are two types of Maude 3.0 files, it does not matter which one
 you download, but you must rename it to "maude.darwin64".
 
----------
+
 Windows:
 ---------
 With the introduction of the Windows Subsystem for Linux
@@ -137,7 +124,7 @@ one must install and enable the Windows Subsystem.
 There are two types of Maude 3.0 files, it does not matter which one
 you download, but you must rename it to "maude.linux64".
 
-======================================================================
+
 FILE DESCRIPTIONS
 ======================================================================
  --- maude.linux64 / maude.darwin64 ---
@@ -178,7 +165,6 @@ XML file that stores the description of the proof system, used by the
 GUI to correctly display various symbols.
 
 
-======================================================================
 TROUBLESHOOTING
 ======================================================================
 This information is for people who want to compile the code themselves
@@ -193,7 +179,6 @@ Note: If you have problems with the stack on linux - you can temporarily
 call
 - ulimit -s unlimited
 
----------------------------------------------------
 Editing Maude.java - for future troubleshooting
 ---------------------------------------------------
 In the file Maude.java at line 33,
@@ -215,7 +200,6 @@ must be replaced by
  - String cmd = "\"".concat(String.join(" ",maudecmd)).concat("\"");
  - ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
 
-======================================================================
 PROOF SYSTEMS
 ======================================================================
 Proof systems are implemented in Maude and XML.
@@ -231,7 +215,6 @@ mod
 	- Rules of the proof system
 endm
 
-======================================================================
 FUTURE WORK
 ======================================================================
 - Fix various bugs that occur.
