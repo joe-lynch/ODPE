@@ -151,7 +151,7 @@ uses this to find rewrites, convert between subatomic systems etc. This
 is effectively the main file where all the meta-level computation is
 performed.
 
- --- description.dtd ---
+ #### description.dtd ####
 declarations for XML files.
 
  --- odpe2maude.dtd ---
@@ -205,13 +205,13 @@ Please see KSg.maude and KSg-maude.xml for examples.
 
 Within Maude files the structure is as follows:
 
-fmod 
-	- Grammar of the proof system
-endm
+fmod __
+	- Grammar of the proof system__
+endm__
 
-mod
-	- Rules of the proof system
-endm
+mod__
+	- Rules of the proof system__
+endm__
 
 
 Future Work
@@ -229,5 +229,5 @@ to the meta-level where the user does not need to see it).
 
 Contact
 ---------------------------------------
-Joe Lynch
+Joe Lynch__
 joe.r.d.lynch@gmail.com
