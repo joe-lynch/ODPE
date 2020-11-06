@@ -54,7 +54,7 @@ GENERAL
 All files within the directory are vital for the functioning of
 the open deduction proof editor.
 -------------------
-SMALL EXPLANATION
+INTRODUCTION
 -------------------
 Once the application has been launched, either click a button
 for the default proof system (SKSg at the time of writing), or
