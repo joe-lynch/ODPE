@@ -1,13 +1,13 @@
-GUIDE
+Guide
 ======================================================================
 The Open Deduction Proof Editor allows proof theorists (or anyone) to deconstruction proofs step by step. It currently supports deep inference formalisms, namely Open Deduction and naturally the Calculus of Structures. The front end of the application is written in Java, while the back end is written in Maude. There is also an implementation of proof search both with and without proof variables.
 Github: https://github.com/joe-lynch/ODPE
 
 
-REQUIREMENTS
+Requirements
 ---------------------------------------
 
-### MAUDE ###
+### Maude ###
 You must have Maude 3.0 (or above) installed on your system.
 You can download it at the link below, see the section
 OPERATING SYSTEM, especially if you are on Windows.
@@ -29,7 +29,7 @@ You can test if Maude is working by running
 - ./maude.linux64
 
 
-### JAVA ###
+### Java ###
 Java must also be on your system - the odpe.jar file is compiled using
 jdk 13.0.2
 
@@ -50,13 +50,13 @@ Run the .jar file with:
 - java -jar odpe.jar
 
 
-GENERAL
+General
 ---------------------------------------
 All files within the directory are vital for the functioning of
 the open deduction proof editor.
 
 
-### INTRODUCTION ###
+### Introduction ###
 Once the application has been launched, either click a button
 for the default proof system (SKSg at the time of writing), or
 select 'browse', and choose your own, or other's XML maude files.
@@ -67,7 +67,7 @@ Choose to 'Do one proof step', and apply a rule from the list (if
 there are any valid rules applications).
 
 
-### SIMPLE SCENARIOS ONE MAY WANT TO TRY ###
+### Simple scenarios one may want to try ###
 Here are some scenarios you may try to test the system. Or use your
 own. These assume the proof system SKSg.
 
@@ -96,7 +96,7 @@ Scenario 4 - proof search
 - Press the button 'Proof Search'
 
 
-OPERATING SYSTEM
+Operating System
 ---------------------------------------
 Maude works 'out of the box' with Linux and MacOS.
 Maude works within the Windows Subsystem for Linux.
@@ -122,7 +122,7 @@ There are two types of Maude 3.0 files, it does not matter which one
 you download, but you must rename it to "maude.linux64".
 
 
-FILE DESCRIPTIONS
+File Descriptions
 ---------------------------------------
  --- maude.linux64 / maude.darwin64 ---
 This is the executable Maude program.
@@ -162,7 +162,7 @@ XML file that stores the description of the proof system, used by the
 GUI to correctly display various symbols.
 
 
-TROUBLESHOOTING
+Troubleshooting
 ---------------------------------------
 This information is for people who want to compile the code themselves
 from source.
@@ -198,7 +198,7 @@ must be replaced by
  - ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
 
 
-PROOF SYSTEMS
+Proof Systems
 ---------------------------------------
 Proof systems are implemented in Maude and XML.
 Please see KSg.maude and KSg-maude.xml for examples.
@@ -214,7 +214,7 @@ mod
 endm
 
 
-FUTURE WORK
+Future Work
 ---------------------------------------
 - Fix various bugs that occur.
 - Improve support for representation of regular logic.
@@ -227,7 +227,7 @@ proof search in other proof systems.
 to the meta-level where the user does not need to see it).
 
 
-CONTACT
+Contact
 ---------------------------------------
 Joe Lynch
 joe.r.d.lynch@gmail.com
