@@ -89,9 +89,9 @@ own. These assume the proof system SKSg.
 #### Scenario 4 - proof search ####
 - Enter:
 (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]>
-([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8}
->[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} 
->[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) 
+([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]>
+{c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]>
+(phi15 a phi16 >[Q]> [e a f,g a h])}) 
 - Press OK
 - Press the button 'Proof Search'
 
@@ -178,11 +178,11 @@ call
 
 
 ### Editing Maude.java - for future troubleshooting ###
-In the file Maude.java at line 33,
+In the file Maude.java at line 33
 
- - maudecmd[0] = "./maude.linux64"
+ - maudecmd[0] = "./maude.linux64";
 
-It must be changed to the name of the Maude file,
+Must be changed to the name of the Maude file,
 therefore to switch between Mac and Linux it must
 be done here. (./maude.darwin64 or ./maude.linux64)
 
@@ -190,7 +190,7 @@ In order to use the software on Windows, then because
 bash commands can be run from a windows cmd, (if the 
 subsystem is installed), line 46 must be changed.
 
- - ProcessBuilder pb = new ProcessBuilder(maudecmd)
+ - ProcessBuilder pb = new ProcessBuilder(maudecmd);
 
 Must be replaced by
 
