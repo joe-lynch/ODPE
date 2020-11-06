@@ -14,8 +14,8 @@ OPERATING SYSTEM, especially if you are on Windows.
 
 - http://maude.cs.illinois.edu/w/index.php/The_Maude_System
 
-Please name the file to 'maude.linux64' for Linux \
-Please name the file to 'maude.darwin64' for MacOS\
+Please name the file to 'maude.linux64' for Linux.\
+Please name the file to 'maude.darwin64' for MacOS.\
 [See OPERATING SYSTEM]
 
 Ensure that you have made the file executable, for Linux you can do
@@ -71,22 +71,22 @@ there are any valid rules applications).
 Here are some scenarios you may try to test the system. Or use your
 own. These assume the proof system SKSg.
 
-Scenario 1 - open deduction
+#### Scenario 1 - open deduction ####
 - Enter a formula {[a,b],-a}
 - Apply the switch rule to the whole formula
 - Undo and redo
 - Then apply the interaction rule to [a,-a]
 
-Scenario 2 - subatomic logic
+#### Scenario 2 - subatomic logic ####
 - Enter a formula [a,-a]
 - Press the 'subatomise' button
 - Apply the rule a-down to [a,-a]
 - Press the 'interpret' button
 
-Scenario 3 - derivation input
+#### Scenario 3 - derivation input ####
 - Enter a >['c_down]> [a,a] and press OK
 
-Scenario 4 - proof search
+#### Scenario 4 - proof search ####
 - Enter:
 (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]>
 ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8}
@@ -124,40 +124,40 @@ you download, but you must rename it to "maude.linux64".
 
 File Descriptions
 ---------------------------------------
-#### maude.linux64 / maude.darwin64 ####\
+#### maude.linux64 / maude.darwin64 ####
 This is the executable Maude program.
 
-#### prelude.maude ####\
+#### prelude.maude ####
 The majority of Maude is written in Maude. This is prelude file that
 the Maude team provides. It offers the very core functions of Maude.
 
-#### ksg.maude ####\
+#### ksg.maude ####
 Maude file for the proof system, defines grammar and rules.
 
-#### nnf_KS.maude ####\
+#### nnf_KS.maude ####
 Maude file for canonically simplifying a formula in KSg.
 
-#### sam.maude ####\
+#### sam.maude ####
 Maude file for the subatomic proof system SAKS, includes the object
 level strategies for proof searching.
 
-#### s.maude ####\
+#### s.maude ####
 Maude file with functional modules corresponding to representation
 and interpretation of SKS and SAKS, respectively.
 
-#### util.maude ####\
+#### util.maude ####
 Meta-level Maude file that provides many key utility functions. The GUI
 uses this to find rewrites, convert between subatomic systems etc. This
 is effectively the main file where all the meta-level computation is
 performed.
 
-#### description.dtd ####\
-declarations for XML files.
+#### description.dtd ####
+Declarations for XML files.
 
-#### odpe2maude.dtd ####\
-declarations for XML files.
+#### odpe2maude.dtd ####
+Declarations for XML files.
 
-#### ksg-maude.xml ####\
+#### ksg-maude.xml ####
 XML file that stores the description of the proof system, used by the
 GUI to correctly display various symbols.
 
@@ -182,7 +182,7 @@ In the file Maude.java at line 33,
 
  - maudecmd[0] = "./maude.linux64"
 
-it must be changed to the name of the Maude file,
+It must be changed to the name of the Maude file,
 therefore to switch between Mac and Linux it must
 be done here. (./maude.darwin64 or ./maude.linux64)
 
@@ -192,7 +192,7 @@ subsystem is installed), line 46 must be changed.
 
  - ProcessBuilder pb = new ProcessBuilder(maudecmd)
 
-must be replaced by
+Must be replaced by
 
  - String cmd = "\"".concat(String.join(" ",maudecmd)).concat("\"");
  - ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
@@ -200,7 +200,7 @@ must be replaced by
 
 Proof Systems
 ---------------------------------------
-Proof systems are implemented in Maude and XML.
+Proof systems are implemented in Maude and XML.\
 Please see KSg.maude and KSg-maude.xml for examples.
 
 Within Maude files the structure is as follows:
