@@ -54,7 +54,11 @@ GENERAL
 All files within the directory are vital for the functioning of
 the open deduction proof editor.
 -------------------
+<<<<<<< HEAD:Linux/README.txt
 SMALL EXPLANATION
+=======
+INTRODUCTION
+>>>>>>> 2b8617010c027118c9188d19c04bdce90af50dee:README.txt
 -------------------
 Once the application has been launched, either click a button
 for the default proof system (SKSg at the time of writing), or
@@ -86,13 +90,19 @@ Scenario 3 - derivation input
 - Enter a >['c_down]> [a,a] and press OK
 
 Scenario 3 - proof search
+<<<<<<< HEAD:Linux/README.txt
 
+=======
+>>>>>>> 2b8617010c027118c9188d19c04bdce90af50dee:README.txt
 - Enter:
 (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]>
 ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8}
 >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} 
 >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) 
+<<<<<<< HEAD:Linux/README.txt
 
+=======
+>>>>>>> 2b8617010c027118c9188d19c04bdce90af50dee:README.txt
 - Press OK
 - Press the button 'Proof Search'
 
@@ -237,4 +247,3 @@ CONTACT
 ======================================================================
 Joe Lynch
 joe.r.d.lynch@gmail.com
-jl2553@bath.ac.uk
