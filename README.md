@@ -14,8 +14,8 @@ OPERATING SYSTEM, especially if you are on Windows.
 
 - http://maude.cs.illinois.edu/w/index.php/The_Maude_System
 
-Please name the file to 'maude.linux64' for Linux 
-Please name the file to 'maude.darwin64' for MacOS
+Please name the file to 'maude.linux64' for Linux \
+Please name the file to 'maude.darwin64' for MacOS\
 [See OPERATING SYSTEM]
 
 Ensure that you have made the file executable, for Linux you can do
