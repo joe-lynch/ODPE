@@ -1,8 +1,6 @@
 /*  
  * 
  * This file is part of the Open Deduction Proof Editor.
- * 
- * @author Originally created for GraPE by Max Schaefer
  *
  */
 package odpe.backend.odpe2maude;
