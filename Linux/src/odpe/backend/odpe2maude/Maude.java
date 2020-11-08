@@ -31,7 +31,7 @@ public class Maude {
     	this.ignore_patterns = ignore_patterns;
     	maudecmd = new String[files.length+5];
     	/** CHANGE "./maude.linux64" TO "./maude.darwin64" FOR MacOS **/
-    	maudecmd[0] = "./maude.darwin64";
+    	maudecmd[0] = "./maude.linux64";
     	maudecmd[1] = "-no-banner";
     	maudecmd[2] = "-no-ansi-color";
     	maudecmd[3] = "-no-mixfix";
