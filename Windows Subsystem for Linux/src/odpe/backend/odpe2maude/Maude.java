@@ -29,7 +29,7 @@ public class Maude {
     	this.ignore_patterns = ignore_patterns;
     	maudecmd = new String[files.length+5];
     	/** CHANGE "./maude.linux64" TO "./maude.darwin64" FOR MacOS **/
-    	maudecmd[0] = "./maude.darwin64";
+    	maudecmd[0] = "./maude.linux64";
     	maudecmd[1] = "-no-banner";
     	maudecmd[2] = "-no-ansi-color";
     	maudecmd[3] = "-no-mixfix";
@@ -46,11 +46,11 @@ public class Maude {
 		/** THESE TWO LINES RUN MAUDE AT THE BACKEND IN THE WINDOWS SUBSYSTEM FOR LINUX
 		 *  UNCOMMENT THIS LINE IF YOU WANT TO USE THE WINDOWS SUBSYSTEM FOR LINUX
 		 */
-		//String cmd = "\"".concat(String.join(" ",maudecmd)).concat("\"");
-		//ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
+		String cmd = "\"".concat(String.join(" ",maudecmd)).concat("\"");
+		ProcessBuilder pb = new ProcessBuilder("cmd.exe", "/c", "bash -c ".concat(cmd));
 
 		/** UNCOMMENT THIS LINE IF YOU WANT TO USE NORMAL LINUX OR MacOS **/
-		ProcessBuilder pb = new ProcessBuilder(maudecmd);
+		//ProcessBuilder pb = new ProcessBuilder(maudecmd);
 
 		if(dir != null)
     		pb.directory(dir);
@@ -61,7 +61,6 @@ public class Maude {
         start = true;
     }
 
-    // (({[a,c],[e,g]} >[Q1]> phi1) a ({[b,d],[f,h]} >[Q2]> phi2))>[Q3]>[{a,[e,g]} a {b,[f,h]},{c,[e,g]} a {d,[f,h]}]
 
 	private String readline() throws IOException, MaudeException {
 		StringBuffer buf = new StringBuffer();
@@ -133,8 +132,8 @@ public class Maude {
     	maudein.flush();
 		return readAnswer();
     }
- // (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h]) })
-	public void stop() throws IOException, MaudeException  {
+ 
+ 	public void stop() throws IOException, MaudeException  {
 		maude.destroy();
 		start_maude(dir, maudecmd);
 		readAnswer();
