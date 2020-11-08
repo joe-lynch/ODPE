@@ -10,6 +10,8 @@ Setup
 3. Navigate to the directory within the downloaded Github repository that corresponds to your operating system.
 4. Enter *java -jar odpe.jar*
 
+If your operating system is Windows, then you must download the Windows Subsystem for Linux. See the Operating System section and other sections for troubleshooting.
+
 Requirements
 ---------------------------------------
 
