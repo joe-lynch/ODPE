@@ -8,6 +8,9 @@ Requirements
 ---------------------------------------
 
 ### Maude ###
+Note: The Maude executable is included in the github directories.
+Follow these instructions to include it yourself and debug issues.
+
 You must have Maude 3.0 (or above) installed on your system.
 You can download it at the link below, see the section
 OPERATING SYSTEM, especially if you are on Windows.
