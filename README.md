@@ -7,7 +7,7 @@ Setup
 ---------------------------------------
 1. Download the Github repository.
 2. Open the terminal / command prompt.
-3. Navigate to the directory corresponding to your operating system.
+3. Navigate to the directory within the downloaded Github repository that corresponds to your operating system.
 4. Enter *java -jar odpe.jar*
 
 Requirements
