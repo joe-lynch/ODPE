@@ -34,7 +34,7 @@ You can test if Maude is working by running
 
 ### Java ###
 Java must also be on your system - the odpe.jar file is compiled using
-jdk 13.0.2
+jdk 13.0.2. It has also been tested using jdk 15.0.1.
 
 The odpe.jar file was tested with this version of Java on the
 Windows subsystem for Linux.
