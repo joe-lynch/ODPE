@@ -108,7 +108,14 @@ own. These assume the proof system SKSg.
 
 [![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
 
+[![ruleresult.png](images/scenario2/7ruleresult.png)](images/scenario2/7ruleresult.png)
+
 - Press the 'interpret' button
+
+[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)
+
+[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
+
 
 #### Scenario 3 - derivation input ####
 - Enter a >['c_down]> [a,a] and press OK
