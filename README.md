@@ -90,7 +90,7 @@ own. These assume the proof system SKSg.
 - Then apply the interaction rule to [a,-a]
 
 #### Scenario 2 - subatomic logic ####
-**1. Enter a formula [a,-a]**
+##### 1. Enter a formula [a,-a] #####
 
 [![input.png](images/scenario2/1input.png)](images/scenario2/1input.png) [![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
 
