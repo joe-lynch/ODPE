@@ -2,7 +2,7 @@ Guide
 ======================================================================
 The Open Deduction Proof Editor allows proof theorists (or anyone) to deconstruction proofs step by step. It currently supports deep inference formalisms, namely Open Deduction and naturally the Calculus of Structures. The front end of the application is written in Java, while the back end is written in Maude. There is also an implementation of proof search both with and without proof variables.
 
-A paper I wrote regarding this implementation is [available](https://github.com/joe-lynch/ODPE/blob/master/Development%20and%20Implementation%20of%20Open%20Deduction%20in%20Maude%20and%20a%20GUI.pdf). I also wrote a paper regarding the implementation and theory behind the proof search functionality is [available](https://github.com/joe-lynch/ODPE/blob/master/Proof%20search%20with%20Proof%20Variables%20in%20Maude%20and%20ODPE.pdf).
+A paper I wrote regarding this implementation is [available](https://github.com/joe-lynch/ODPE/blob/master/Development%20and%20Implementation%20of%20Open%20Deduction%20in%20Maude%20and%20a%20GUI.pdf). I also wrote a paper discussing the implementation and theory behind the proof search functionality is [available](https://github.com/joe-lynch/ODPE/blob/master/Proof%20search%20with%20Proof%20Variables%20in%20Maude%20and%20ODPE.pdf).
 
 Setup
 ---------------------------------------
