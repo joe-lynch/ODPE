@@ -94,17 +94,17 @@ own. These assume the proof system SKSg.
 
 [![input.png](images/scenario2/1input.png)](images/scenario2/1input.png) [![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
 
-**2. Press the 'subatomise' button**
+##### 2. Press the 'subatomise' button #####
 
 [![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png) [![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
 
-**3. Apply the rule a-down to [a,-a]**
+##### 3. Apply the rule a-down to [a,-a] #####
 
 [![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png) [![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
 
 [![ruleresult.png](images/scenario2/7ruleresult.png)](images/scenario2/7ruleresult.png)
 
-**4. Press the 'interpret' button**
+##### 4. Press the 'interpret' button #####
 
 [![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png) [![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
