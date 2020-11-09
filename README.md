@@ -90,27 +90,34 @@ own. These assume the proof system SKSg.
 - Then apply the interaction rule to [a,-a]
 
 #### Scenario 2 - subatomic logic ####
+
 ##### 1. Enter a formula [a,-a] #####
 
-[![input.png](images/scenario2/1input.png)](images/scenario2/1input.png) [![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
+[![input.png](images/scenario2/1input.png)](images/scenario2/1input.png)
+[![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
 
 ##### 2. Press the 'subatomise' button #####
 
-[![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png) [![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
+[![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png)
+[![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
 
 ##### 3. Apply the rule a-down to [a,-a] #####
 
-[![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png) [![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
+[![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png)
+[![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
 
 [![ruleresult.png](images/scenario2/7ruleresult.png)](images/scenario2/7ruleresult.png)
 
 ##### 4. Press the 'interpret' button #####
 
-[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png) [![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
-
+[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)
+[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
 #### Scenario 3 - derivation input ####
 - Enter a >['c_down]> [a,a] and press OK
+
+[![1.png](images/scenario2/1.png)](images/scenario2/1.png)
+[![2.png](images/scenario2/2.png)](images/scenario2/2.png)
 
 #### Scenario 4 - proof search ####
 - Enter:
