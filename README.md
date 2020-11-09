@@ -99,33 +99,33 @@ own. These assume the proof system SKSg.
 
 [![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png) [![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
 
-##### 3. Apply the rule a-down to [a,-a] #####
+	3. Apply the rule a-down to [a,-a]
 
 [![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png) [![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
 
 [![ruleresult.png](images/scenario2/7ruleresult.png)](images/scenario2/7ruleresult.png)
 
-##### 4. Press the 'interpret' button #####
+	4. Press the 'interpret' button
 
 [![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
 #### Scenario 3 - derivation input ####
 
-##### 1. Enter a >['c_down]> [a,a] and press OK #####
+	1. Enter a >['c_down]> [a,a] and press OK
 
 [![1.png](images/scenario3/1.png)](images/scenario3/1.png) [![2.png](images/scenario3/2.png)](images/scenario3/2.png)
 
 #### Scenario 4 - proof search ####
 
-##### 1. Enter a derivation such as (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) and press OK #####
+	1. Enter a derivation such as (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) and press OK
 
 [![4_1.png](images/scenario4/1.png)](images/scenario4/1.png) [![4_2.png](images/scenario4/2.png)](images/scenario4/2.png)
 
-##### 2. Press the button 'Proof Search' #####
+	2. Press the button 'Proof Search'
 
 [![4_3.png](images/scenario4/3.png)](images/scenario4/3.png)[![4_4.png](images/scenario4/4.png)](images/scenario4/4.png)
 
-##### 3. Wait for solution #####
+	3. Wait for solution
 
 [![4_5.png](images/scenario4/5.png)](images/scenario4/5.png)
 
