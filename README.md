@@ -91,11 +91,11 @@ own. These assume the proof system SKSg.
 
 #### Scenario 2 - subatomic logic ####
 
-##### 1. Enter a formula [a,-a] #####
+	1. Enter a formula [a,-a]
 
 [![input.png](images/scenario2/1input.png)](images/scenario2/1input.png) [![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
 
-##### 2. Press the 'subatomise' button #####
+	2. Press the 'subatomise' button
 
 [![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png) [![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
 
