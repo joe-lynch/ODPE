@@ -96,23 +96,17 @@ own. These assume the proof system SKSg.
 
 - Press the 'subatomise' button
 
-[![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png)
-
-[![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
+[![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png) [![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
 
 - Apply the rule a-down to [a,-a]
 
-[![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png)
-
-[![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
+[![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png) [![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
 
 [![ruleresult.png](images/scenario2/7ruleresult.png)](images/scenario2/7ruleresult.png)
 
 - Press the 'interpret' button
 
-[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)
-
-[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
+[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png) [![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
 
 #### Scenario 3 - derivation input ####
