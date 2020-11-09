@@ -121,7 +121,7 @@ own. These assume the proof system SKSg.
 
 ##### 2. Press the button 'Proof Search' #####
 
-[![4_3.png](images/scenario4/3.png)](images/scenario4/3.png) [![4_4.png](images/scenario4/4.png)](images/scenario4/4.png)
+[![4_3.png](images/scenario4/3.png)](images/scenario4/3.png)[![4_4.png](images/scenario4/4.png)](images/scenario4/4.png)
 
 ##### 3. Wait for solution #####
 
