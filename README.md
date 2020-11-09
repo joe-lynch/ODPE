@@ -84,10 +84,10 @@ Here are some scenarios you may try to test the system. Or use your
 own. These assume the proof system SKSg.
 
 #### Scenario 1 - open deduction ####
-   ##### 1. Enter a formula {[a,b],-a} #####
-   ##### 2. Apply the switch rule to the whole formula #####
-   ##### 3. Undo and redo #####
-   ##### 4. Then apply the interaction rule to [a,-a]  #####
+	1. Enter a formula {[a,b],-a}
+	2. Apply the switch rule to the whole formula
+	3. Undo and redo
+	4. Then apply the interaction rule to [a,-a] 
 
 #### Scenario 2 - subatomic logic ####
 
