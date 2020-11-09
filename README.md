@@ -2,7 +2,7 @@ Guide
 ======================================================================
 The Open Deduction Proof Editor allows proof theorists (or anyone) to deconstruction proofs step by step. It currently supports deep inference formalisms, namely Open Deduction and naturally the Calculus of Structures. The front end of the application is written in Java, while the back end is written in Maude. There is also an implementation of proof search both with and without proof variables.
 
-A research report regarding this implementation is available: https://github.com/joe-lynch/ODPE/blob/master/research_report.pdf
+A paper I wrote regarding this implementation is [available](https://github.com/joe-lynch/ODPE/blob/master/Development%20and%20Implementation%20of%20Open%20Deduction%20in%20Maude%20and%20a%20GUI.pdf). I also wrote a paper discussing the implementation and theory behind the proof search functionality is [available](https://github.com/joe-lynch/ODPE/blob/master/Proof%20search%20with%20Proof%20Variables%20in%20Maude%20and%20ODPE.pdf).
 
 Setup
 ---------------------------------------
@@ -84,46 +84,48 @@ Here are some scenarios you may try to test the system. Or use your
 own. These assume the proof system SKSg.
 
 #### Scenario 1 - open deduction ####
-- Enter a formula {[a,b],-a}
-- Apply the switch rule to the whole formula
-- Undo and redo
-- Then apply the interaction rule to [a,-a]
+	1. Enter a formula {[a,b],-a}
+	2. Apply the switch rule to the whole formula
+	3. Undo and redo
+	4. Then apply the interaction rule to [a,-a] 
 
 #### Scenario 2 - subatomic logic ####
 
-##### 1. Enter a formula [a,-a] #####
+	1. Enter a formula [a,-a]
 
-[![input.png](images/scenario2/1input.png)](images/scenario2/1input.png) [![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
+[![input.png](images/scenario2/1input.png)](images/scenario2/1input.png)[![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
 
-##### 2. Press the 'subatomise' button #####
+	2. Press the 'subatomise' button
 
-[![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png) [![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
+[![sa_button.png](images/scenario2/3sa_button.png)](images/scenario2/3sa_button.png)[![sa.png](images/scenario2/4sa.png)](images/scenario2/4sa.png)
 
-##### 3. Apply the rule a-down to [a,-a] #####
+	3. Apply the rule a-down to [a,-a]
 
-[![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png) [![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
+[![selection.png](images/scenario2/5selection.png)](images/scenario2/5selection.png)[![rules.png](images/scenario2/6rules.png)](images/scenario2/6rules.png)
 
 [![ruleresult.png](images/scenario2/7ruleresult.png)](images/scenario2/7ruleresult.png)
 
-##### 4. Press the 'interpret' button #####
+	4. Press the 'interpret' button
 
 [![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
 #### Scenario 3 - derivation input ####
-- Enter a >['c_down]> [a,a] and press OK
+
+	1. Enter a >['c_down]> [a,a] and press OK
 
 [![1.png](images/scenario3/1.png)](images/scenario3/1.png) [![2.png](images/scenario3/2.png)](images/scenario3/2.png)
 
 #### Scenario 4 - proof search ####
-##### 1. Enter a derivation such as (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) and press OK #####
+
+	1. Enter a derivation such as (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) and press OK
 
 [![4_1.png](images/scenario4/1.png)](images/scenario4/1.png) [![4_2.png](images/scenario4/2.png)](images/scenario4/2.png)
 
-##### 2. Press the button 'Proof Search' #####
+	2. Press the button 'Proof Search'
 
-[![4_3.png](images/scenario4/3.png)](images/scenario4/3.png) [![4_4.png](images/scenario4/4.png)](images/scenario4/4.png)
+[![4_3.png](images/scenario4/3.png)](images/scenario4/3.png)[![4_4.png](images/scenario4/4.png)](images/scenario4/4.png)
 
-##### 3. Wait for solution #####
+	3. Wait for solution
 
 [![4_5.png](images/scenario4/5.png)](images/scenario4/5.png)
 
@@ -234,6 +236,10 @@ Proof Systems
 ---------------------------------------
 Proof systems are implemented in Maude and XML.\
 Please see KSg.maude and KSg-maude.xml for examples.
+
+For more information about proof systems see [here](https://proofwiki.org/wiki/Definition:Proof_System).\
+For a detailed discussion about designing deep inference systems within Maude see Ozan Kahramanoğulları's work [here](https://doi.org/10.1016/j.entcs.2008.10.033).\
+For an greater understanding of how proof systems are implemented in the open deduction graphical proof editor, see my paper [here](https://github.com/joe-lynch/ODPE/blob/master/Development%20and%20Implementation%20of%20Open%20Deduction%20in%20Maude%20and%20a%20GUI.pdf).
 
 Within Maude files the structure is as follows:
 
