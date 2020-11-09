@@ -107,7 +107,7 @@ own. These assume the proof system SKSg.
 
 ##### 4. Press the 'interpret' button #####
 
-[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png) [![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
+[![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
 #### Scenario 3 - derivation input ####
 - Enter a >['c_down]> [a,a] and press OK
