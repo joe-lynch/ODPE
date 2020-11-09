@@ -116,8 +116,8 @@ own. These assume the proof system SKSg.
 #### Scenario 3 - derivation input ####
 - Enter a >['c_down]> [a,a] and press OK
 
-[![1.png](images/scenario2/1.png)](images/scenario2/1.png)
-[![2.png](images/scenario2/2.png)](images/scenario2/2.png)
+[![1.png](images/scenario2/1.png)](images/scenario3/1.png)
+[![2.png](images/scenario2/2.png)](images/scenario3/2.png)
 
 #### Scenario 4 - proof search ####
 - Enter:
