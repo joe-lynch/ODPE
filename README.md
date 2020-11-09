@@ -237,7 +237,7 @@ Please see KSg.maude and KSg-maude.xml for examples.
 
 For more information about proof systems see [here](https://proofwiki.org/wiki/Definition:Proof_System).\
 For a detailed discussion about designing deep inference systems within Maude see Ozan Kahramanoğulları's work [here](https://doi.org/10.1016/j.entcs.2008.10.033).\
-For an greater understanding of how proof systems are implemented in the open deduction graphical proof editor, see my paper [here](/Development and Implementation of Open Deduction in Maude and a GUI.pdf)
+For an greater understanding of how proof systems are implemented in the open deduction graphical proof editor, see my paper [here](Development%20and%20Implementation%20of%20Open%20Deduction%20in%20Maude%20and%20a%20GUI.pdf)
 
 Within Maude files the structure is as follows:
 
