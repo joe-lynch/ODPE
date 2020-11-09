@@ -91,6 +91,7 @@ own. These assume the proof system SKSg.
 
 #### Scenario 2 - subatomic logic ####
 - Enter a formula [a,-a]
+[![input.png](images/scenario2/input.png)](images/scenario2/input.png)]
 - Press the 'subatomise' button
 - Apply the rule a-down to [a,-a]
 - Press the 'interpret' button
