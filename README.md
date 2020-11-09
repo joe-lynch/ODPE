@@ -84,10 +84,10 @@ Here are some scenarios you may try to test the system. Or use your
 own. These assume the proof system SKSg.
 
 #### Scenario 1 - open deduction ####
-- Enter a formula {[a,b],-a}
-- Apply the switch rule to the whole formula
-- Undo and redo
-- Then apply the interaction rule to [a,-a]
+##### 1. Enter a formula {[a,b],-a} #####
+##### 2. Apply the switch rule to the whole formula #####
+##### 3. Undo and redo #####
+##### 4. Then apply the interaction rule to [a,-a]  #####
 
 #### Scenario 2 - subatomic logic ####
 
@@ -110,11 +110,13 @@ own. These assume the proof system SKSg.
 [![interpret_btn.png](images/scenario2/interpret_button.png)](images/scenario2/interpret_button.png)[![interpret_result.png](images/scenario2/interpret_result.png)](images/scenario2/interpret_result.png)
 
 #### Scenario 3 - derivation input ####
-- Enter a >['c_down]> [a,a] and press OK
+
+##### 1. Enter a >['c_down]> [a,a] and press OK #####
 
 [![1.png](images/scenario3/1.png)](images/scenario3/1.png) [![2.png](images/scenario3/2.png)](images/scenario3/2.png)
 
 #### Scenario 4 - proof search ####
+
 ##### 1. Enter a derivation such as (({[a,c],[e,g]} >[Q6]> phi1) a ({[b,d],[f,h]} >[Q7]> phi2)) >[Q5]> ([{a,phi3} a {b,phi4} >[Q4]> {a a b,phi5 a phi6},{c,phi7} a {d,phi8} >[Q3]> {c a d,phi9 a phi10}] >[Q2]> {[a a b,c a d],{phi11 a phi12,phi13 a phi14} >[Q1]> (phi15 a phi16 >[Q]> [e a f,g a h])}) and press OK #####
 
 [![4_1.png](images/scenario4/1.png)](images/scenario4/1.png) [![4_2.png](images/scenario4/2.png)](images/scenario4/2.png)
