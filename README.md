@@ -92,9 +92,7 @@ own. These assume the proof system SKSg.
 #### Scenario 2 - subatomic logic ####
 - Enter a formula [a,-a]
 
-[![input.png](images/scenario2/1input.png)](images/scenario2/1input.png)
-
-[![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
+[![input.png](images/scenario2/1input.png)](images/scenario2/1input.png) [![formula.png](images/scenario2/2formula.png)](images/scenario2/2formula.png)
 
 - Press the 'subatomise' button
 
