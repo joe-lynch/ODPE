@@ -8,11 +8,11 @@
 package odpe.backend.odpe2maude;
 
 public class MaudeException extends Exception {
-	
-	private static final long serialVersionUID = 1L;
+    
+    private static final long serialVersionUID = 1L;
 
-	public MaudeException(String msg) {
-		super(msg);
-	}
+    public MaudeException(String msg) {
+        super(msg);
+    }
 
 }

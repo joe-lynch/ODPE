@@ -10,6 +10,6 @@ package odpe.frontend.view;
 import javax.swing.JComponent;
 
 public abstract class WidgetView {
-	
-	public abstract JComponent getWidget();
+    
+    public abstract JComponent getWidget();
 }
