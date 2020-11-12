@@ -12,31 +12,31 @@ import odpe.frontend.model.InferenceSystem;
 import odpe.frontend.view.WidgetView;
 
 public class SingletonOperandPosition extends OperandPosition {
-	
-	public SingletonOperandPosition(InferenceSystem sys, 
-			int prec) {
-		super("singleton-operand", sys, prec);
-	}
+    
+    public SingletonOperandPosition(InferenceSystem sys, 
+            int prec) {
+        super("singleton-operand", sys, prec);
+    }
 
-	public Node parse(Lexer l, Parser p) 
-			throws ParseError {
-		return p.parse(l, precedence);
-	}
+    public Node parse(Lexer l, Parser p) 
+            throws ParseError {
+        return p.parse(l, precedence);
+    }
 
-	public WidgetView draw(Node n, WidgetView[] rands) {
-		return rands[0];
-	}
+    public WidgetView draw(Node n, WidgetView[] rands) {
+        return rands[0];
+    }
 
-	public String prettyprint(Node n, String[] rands) {
-		return rands[0];
-	}
+    public String prettyprint(Node n, String[] rands) {
+        return rands[0];
+    }
 
-	public String texify(Node n, String[] rands) {
-		return rands[0];
-	}
+    public String texify(Node n, String[] rands) {
+        return rands[0];
+    }
 
-	public int getOperandPrecedence(int i) {
-		return precedence;
-	}
+    public int getOperandPrecedence(int i) {
+        return precedence;
+    }
 
 }

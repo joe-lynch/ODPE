@@ -2,8 +2,8 @@
      (C) 2006 Max Schaefer, licensed under the GPL (see COPYING) -->
 
 <!ELEMENT system (normal, subatomic, backend)>
-<!ATTLIST system	name CDATA #REQUIRED
-					subatomic-name CDATA #REQUIRED>
+<!ATTLIST system    name CDATA #REQUIRED
+                    subatomic-name CDATA #REQUIRED>
 
 <!ELEMENT normal (syntax, rules)>
 <!ELEMENT subatomic (syntax, rules)>
@@ -14,85 +14,85 @@
 <!ATTLIST binary-infix   id        CDATA #IMPLIED
                          symbol    CDATA #REQUIRED
                          input     CDATA #IMPLIED
-						 tex       CDATA #IMPLIED
-					     prec      CDATA #IMPLIED
-						 assoc     (yes|no) "yes"
-						 comm      (yes|no) "yes"
-						 leftprec  CDATA #IMPLIED
-						 leftop    CDATA "singleton"
-						 rightprec CDATA #IMPLIED
-						 rightop   CDATA "singleton">
+                         tex       CDATA #IMPLIED
+                         prec      CDATA #IMPLIED
+                         assoc     (yes|no) "yes"
+                         comm      (yes|no) "yes"
+                         leftprec  CDATA #IMPLIED
+                         leftop    CDATA "singleton"
+                         rightprec CDATA #IMPLIED
+                         rightop   CDATA "singleton">
 
 <!ELEMENT binary-outfix  EMPTY>
 <!ATTLIST binary-outfix  id        CDATA #IMPLIED
                          symbol    CDATA #IMPLIED
-						 startsym  CDATA #IMPLIED
-						 sepsym    CDATA #IMPLIED
-						 endsym    CDATA #IMPLIED
+                         startsym  CDATA #IMPLIED
+                         sepsym    CDATA #IMPLIED
+                         endsym    CDATA #IMPLIED
                          input     CDATA #IMPLIED
-						 instart   CDATA #IMPLIED
-						 insep     CDATA #IMPLIED
-						 inend     CDATA #IMPLIED
-						 tex       CDATA #IMPLIED
-						 texstart  CDATA #IMPLIED
-						 texsep    CDATA #IMPLIED
-						 texend    CDATA #IMPLIED
-						 prec      CDATA #IMPLIED
-						 assoc     (yes|no) "yes"
-						 comm      (yes|no) "yes"
-						 leftprec  CDATA #IMPLIED
-						 leftop    CDATA "singleton"
-						 rightprec CDATA #IMPLIED
-						 rightop   CDATA "singleton">
+                         instart   CDATA #IMPLIED
+                         insep     CDATA #IMPLIED
+                         inend     CDATA #IMPLIED
+                         tex       CDATA #IMPLIED
+                         texstart  CDATA #IMPLIED
+                         texsep    CDATA #IMPLIED
+                         texend    CDATA #IMPLIED
+                         prec      CDATA #IMPLIED
+                         assoc     (yes|no) "yes"
+                         comm      (yes|no) "yes"
+                         leftprec  CDATA #IMPLIED
+                         leftop    CDATA "singleton"
+                         rightprec CDATA #IMPLIED
+                         rightop   CDATA "singleton">
 
 <!ELEMENT unary-outfix   EMPTY>
 <!ATTLIST unary-outfix   id        CDATA #IMPLIED
                          symbol    CDATA #IMPLIED
-						 startsym  CDATA #IMPLIED
-						 endsym    CDATA #IMPLIED
+                         startsym  CDATA #IMPLIED
+                         endsym    CDATA #IMPLIED
                          input     CDATA #IMPLIED
-						 instart   CDATA #IMPLIED
-						 inend     CDATA #IMPLIED
-						 tex       CDATA #IMPLIED
-						 texstart  CDATA #IMPLIED
-						 texend    CDATA #IMPLIED
-						 prec      CDATA #IMPLIED
-						 opprec    CDATA #IMPLIED
-						 op        CDATA "singleton"
-						 grouping  (yes|no) "no">
+                         instart   CDATA #IMPLIED
+                         inend     CDATA #IMPLIED
+                         tex       CDATA #IMPLIED
+                         texstart  CDATA #IMPLIED
+                         texend    CDATA #IMPLIED
+                         prec      CDATA #IMPLIED
+                         opprec    CDATA #IMPLIED
+                         op        CDATA "singleton"
+                         grouping  (yes|no) "no">
 
 <!ELEMENT unary-prefix   EMPTY>
 <!ATTLIST unary-prefix   id        CDATA #IMPLIED
                          symbol    CDATA #REQUIRED
                          input     CDATA #IMPLIED
-						 tex       CDATA #IMPLIED
-						 prec      CDATA #IMPLIED
-						 opprec    CDATA #IMPLIED
-						 op        CDATA "singleton">
+                         tex       CDATA #IMPLIED
+                         prec      CDATA #IMPLIED
+                         opprec    CDATA #IMPLIED
+                         op        CDATA "singleton">
 
 <!ELEMENT unary-postfix  EMPTY>
 <!ATTLIST unary-postfix  id        CDATA #IMPLIED
                          symbol    CDATA #REQUIRED
                          input     CDATA #IMPLIED
-						 tex       CDATA #IMPLIED
-						 prec      CDATA #IMPLIED
-						 opprec    CDATA #IMPLIED
-						 op        CDATA "singleton">
+                         tex       CDATA #IMPLIED
+                         prec      CDATA #IMPLIED
+                         opprec    CDATA #IMPLIED
+                         op        CDATA "singleton">
 
 <!ELEMENT constant       EMPTY>
 <!ATTLIST constant       id        CDATA #IMPLIED
                          symbol    CDATA #REQUIRED
                          input     CDATA #IMPLIED
-						 tex       CDATA #IMPLIED
-						 prec      CDATA #IMPLIED>
+                         tex       CDATA #IMPLIED
+                         prec      CDATA #IMPLIED>
 
 <!ELEMENT constants      EMPTY>
 <!ATTLIST constants      ids       NMTOKENS #IMPLIED
-						 symbols   NMTOKENS #REQUIRED
-						 inputs    NMTOKENS #IMPLIED
-						 texs      NMTOKENS #IMPLIED
-						 prec      CDATA    #IMPLIED>
-			 
+                         symbols   NMTOKENS #REQUIRED
+                         inputs    NMTOKENS #IMPLIED
+                         texs      NMTOKENS #IMPLIED
+                         prec      CDATA    #IMPLIED>
+             
 <!ELEMENT name           EMPTY>
 <!ATTLIST name           prec   CDATA #IMPLIED>
 
@@ -103,15 +103,15 @@
 
 <!ELEMENT inference-rule EMPTY>
 <!ATTLIST inference-rule id   CDATA #IMPLIED
-					     name CDATA #REQUIRED
+                         name CDATA #REQUIRED
                          tex  CDATA #IMPLIED
-			             enabled (yes|no) "yes">
-							  
+                         enabled (yes|no) "yes">
+                              
 <!ELEMENT reverse-inference-rule EMPTY>
 <!ATTLIST reverse-inference-rule id   CDATA #IMPLIED
-								 name CDATA #REQUIRED
-								 tex  CDATA #IMPLIED
-								 enabled (yes|no) "yes">
+                                 name CDATA #REQUIRED
+                                 tex  CDATA #IMPLIED
+                                 enabled (yes|no) "yes">
 
 <!ELEMENT backend ANY>
 <!ATTLIST backend class CDATA #REQUIRED>

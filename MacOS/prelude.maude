@@ -21,11 +21,11 @@
 )
 
 ***
-***	Maude interpreter standard prelude.
-***	Version 3.0.
+*** Maude interpreter standard prelude.
+*** Version 3.0.
 ***
-***	Some of the overall structure is taken from the OBJ3
-***	interpreter standard prelude.
+*** Some of the overall structure is taken from the OBJ3
+*** interpreter standard prelude.
 ***
 
 set include BOOL off .
@@ -93,7 +93,7 @@ fmod EXT-BOOL is
 endfm
 
 ***
-***	Builtin data types.
+*** Builtin data types.
 ***
 
 fmod NAT is
@@ -847,7 +847,7 @@ fmod QID is
 endfm
 
 ***
-***	Standard theories and views.
+*** Standard theories and views.
 ***
 
 fth TRIV is
@@ -1000,7 +1000,7 @@ view Qid0 from DEFAULT to QID is
 endv
 
 ***
-***	Container data types defined in Maude.
+*** Container data types defined in Maude.
 ***
 
 fmod LIST{X :: TRIV} is
@@ -1269,16 +1269,16 @@ endfm
 fmod SORTABLE-LIST-AND-SET{X :: STRICT-TOTAL-ORDER} is
   protecting SORTABLE-LIST{X} .
 ***
-***	This double renaming is needed for correct sharing of a renamed
-***	copy of LIST since Core Maude does not evaluate the composition
-***	of renamings but applies them sequentially.
+*** This double renaming is needed for correct sharing of a renamed
+*** copy of LIST since Core Maude does not evaluate the composition
+*** of renamings but applies them sequentially.
 ***
   protecting LIST-AND-SET{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X} *
               (sort NeList{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X} to NeList{STRICT-TOTAL-ORDER}{X},
                sort List{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X} to List{STRICT-TOTAL-ORDER}{X}) *
               (sort NeList{STRICT-TOTAL-ORDER}{X} to NeList{X},
                sort List{STRICT-TOTAL-ORDER}{X} to List{X},
-	       sort NeSet{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X} to NeSet{X},
+         sort NeSet{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X} to NeSet{X},
                sort Set{STRICT-WEAK-ORDER}{STRICT-TOTAL-ORDER}{X} to Set{X}) .
 
   var E : X$Elt .
@@ -1300,14 +1300,14 @@ endfm
 fmod SORTABLE-LIST-AND-SET'{X :: TOTAL-ORDER} is
   protecting SORTABLE-LIST'{X} .
 ***
-***	This double renaming is needed for the same reasons as above.
+*** This double renaming is needed for the same reasons as above.
 ***
   protecting LIST-AND-SET{TOTAL-PREORDER}{TOTAL-ORDER}{X} *
               (sort NeList{TOTAL-PREORDER}{TOTAL-ORDER}{X} to NeList{TOTAL-ORDER}{X},
                sort List{TOTAL-PREORDER}{TOTAL-ORDER}{X} to List{TOTAL-ORDER}{X}) *
               (sort NeList{TOTAL-ORDER}{X} to NeList{X},
                sort List{TOTAL-ORDER}{X} to List{X},
-	       sort NeSet{TOTAL-PREORDER}{TOTAL-ORDER}{X} to NeSet{X},
+         sort NeSet{TOTAL-PREORDER}{TOTAL-ORDER}{X} to NeSet{X},
                sort Set{TOTAL-PREORDER}{TOTAL-ORDER}{X} to Set{X}) .
 
   var E : X$Elt .
@@ -1559,7 +1559,7 @@ view Array{X :: TRIV, Y :: DEFAULT} from TRIV to ARRAY{X, Y} is
 endv
 
 ***
-***	Container instantiations on builtin data types needed by the metalevel.
+*** Container instantiations on builtin data types needed by the metalevel.
 ***
 
 fmod NAT-LIST is
@@ -1575,7 +1575,7 @@ fmod QID-SET is
 endfm
 
 ***
-***	The metalevel.
+*** The metalevel.
 ***
 
 fmod META-TERM is
@@ -2341,162 +2341,162 @@ fmod META-LEVEL is
 *** descent functions
   op metaReduce : Module Term ~> ResultPair
      [special (
-        id-hook MetaLevelOpSymbol	(metaReduce)
+        id-hook MetaLevelOpSymbol (metaReduce)
 
-        op-hook qidSymbol		(<Qids> : ~> Qid)
-        op-hook metaTermSymbol		(_[_] : Qid NeTermList ~> Term)
-        op-hook metaArgSymbol		(_,_ : NeTermList NeTermList ~> NeTermList)
-	op-hook emptyTermListSymbol	(empty : ~> GroundTermList)
+        op-hook qidSymbol   (<Qids> : ~> Qid)
+        op-hook metaTermSymbol    (_[_] : Qid NeTermList ~> Term)
+        op-hook metaArgSymbol   (_,_ : NeTermList NeTermList ~> NeTermList)
+  op-hook emptyTermListSymbol (empty : ~> GroundTermList)
 
-        op-hook assignmentSymbol	(_<-_ : Qid Term ~> Assignment)
-        op-hook substitutionSymbol	(_;_ : Substitution Substitution ~> Substitution)
-        op-hook emptySubstitutionSymbol	(none : ~> Substitution)
-        op-hook holeSymbol		([] : ~> Context)
+        op-hook assignmentSymbol  (_<-_ : Qid Term ~> Assignment)
+        op-hook substitutionSymbol  (_;_ : Substitution Substitution ~> Substitution)
+        op-hook emptySubstitutionSymbol (none : ~> Substitution)
+        op-hook holeSymbol    ([] : ~> Context)
 
-	op-hook failStratSymbol		(fail : ~> Strategy)
-	op-hook idleStratSymbol		(idle : ~> Strategy)
-	op-hook allStratSymbol		(all : ~> Strategy)
-	op-hook applicationStratSymbol	(_[_]{_} : Qid Substitution StrategyList ~> RuleApplication)
-	op-hook topStratSymbol		(top : RuleApplication ~> Strategy)
-	op-hook matchStratSymbol	(match_s.t._ : Term EqCondition ~> Strategy)
-	op-hook xmatchStratSymbol	(xmatch_s.t._ : Term EqCondition ~> Strategy)
-	op-hook amatchStratSymbol	(amatch_s.t._ : Term EqCondition ~> Strategy)
-	op-hook unionStratSymbol	(_|_ : Strategy Strategy ~> Strategy)
-	op-hook concatStratSymbol	(_;_ : Strategy Strategy ~> Strategy)
-	op-hook orelseStratSymbol	(_or-else_ : Strategy Strategy ~> Strategy)
-	op-hook plusStratSymbol		(_+ : Strategy ~> Strategy)
-	op-hook conditionalStratSymbol	(_?_:_ : Strategy Strategy Strategy ~> Strategy)
-	op-hook matchrewStratSymbol
-		(matchrew_s.t._by_ : Term EqCondition UsingPairSet ~> Strategy)
-	op-hook xmatchrewStratSymbol
-		(xmatchrew_s.t._by_ : Term EqCondition UsingPairSet ~> Strategy)
-	op-hook amatchrewStratSymbol
-		(amatchrew_s.t._by_ : Term EqCondition UsingPairSet ~> Strategy)
-	op-hook callStratSymbol		(_[[_]] : Qid TermList ~> Strategy)
-	op-hook oneStratSymbol		(one : Strategy ~> Strategy)
-	op-hook starStratSymbol		(_* : Strategy ~> Strategy)
-	op-hook normalizationStratSymbol
-			(_! : Strategy ~> Strategy)
-	op-hook notStratSymbol		(not : Strategy ~> Strategy)
-	op-hook testStratSymbol		(test : Strategy ~> Strategy)
-	op-hook tryStratSymbol		(try : Strategy ~> Strategy)
-	op-hook usingStratSymbol	(_using_ : Variable Strategy ~> UsingPair)
-	op-hook usingListStratSymbol 	(_,_ : UsingPairSet UsingPairSet ~> UsingPairSet)
-	op-hook emptyStratListSymbol 	(empty : ~> StrategyList)
-	op-hook stratListSymbol		(_,_ : StrategyList StrategyList ~> StrategyList)
+  op-hook failStratSymbol   (fail : ~> Strategy)
+  op-hook idleStratSymbol   (idle : ~> Strategy)
+  op-hook allStratSymbol    (all : ~> Strategy)
+  op-hook applicationStratSymbol  (_[_]{_} : Qid Substitution StrategyList ~> RuleApplication)
+  op-hook topStratSymbol    (top : RuleApplication ~> Strategy)
+  op-hook matchStratSymbol  (match_s.t._ : Term EqCondition ~> Strategy)
+  op-hook xmatchStratSymbol (xmatch_s.t._ : Term EqCondition ~> Strategy)
+  op-hook amatchStratSymbol (amatch_s.t._ : Term EqCondition ~> Strategy)
+  op-hook unionStratSymbol  (_|_ : Strategy Strategy ~> Strategy)
+  op-hook concatStratSymbol (_;_ : Strategy Strategy ~> Strategy)
+  op-hook orelseStratSymbol (_or-else_ : Strategy Strategy ~> Strategy)
+  op-hook plusStratSymbol   (_+ : Strategy ~> Strategy)
+  op-hook conditionalStratSymbol  (_?_:_ : Strategy Strategy Strategy ~> Strategy)
+  op-hook matchrewStratSymbol
+    (matchrew_s.t._by_ : Term EqCondition UsingPairSet ~> Strategy)
+  op-hook xmatchrewStratSymbol
+    (xmatchrew_s.t._by_ : Term EqCondition UsingPairSet ~> Strategy)
+  op-hook amatchrewStratSymbol
+    (amatchrew_s.t._by_ : Term EqCondition UsingPairSet ~> Strategy)
+  op-hook callStratSymbol   (_[[_]] : Qid TermList ~> Strategy)
+  op-hook oneStratSymbol    (one : Strategy ~> Strategy)
+  op-hook starStratSymbol   (_* : Strategy ~> Strategy)
+  op-hook normalizationStratSymbol
+      (_! : Strategy ~> Strategy)
+  op-hook notStratSymbol    (not : Strategy ~> Strategy)
+  op-hook testStratSymbol   (test : Strategy ~> Strategy)
+  op-hook tryStratSymbol    (try : Strategy ~> Strategy)
+  op-hook usingStratSymbol  (_using_ : Variable Strategy ~> UsingPair)
+  op-hook usingListStratSymbol  (_,_ : UsingPairSet UsingPairSet ~> UsingPairSet)
+  op-hook emptyStratListSymbol  (empty : ~> StrategyList)
+  op-hook stratListSymbol   (_,_ : StrategyList StrategyList ~> StrategyList)
 
-        op-hook headerSymbol		(_{_} : Qid ParameterDeclList ~> Header)
-        op-hook parameterDeclSymbol	(_::_ : Sort ModuleExpression ~> ParameterDecl)
-        op-hook parameterDeclListSymbol	(_,_ : ParameterDeclList ParameterDeclList ~> ParameterDeclList)
+        op-hook headerSymbol    (_{_} : Qid ParameterDeclList ~> Header)
+        op-hook parameterDeclSymbol (_::_ : Sort ModuleExpression ~> ParameterDecl)
+        op-hook parameterDeclListSymbol (_,_ : ParameterDeclList ParameterDeclList ~> ParameterDeclList)
 
-        op-hook emptyAttrSetSymbol	(none : ~> AttrSet)
-        op-hook attrSetSymbol		(__ : AttrSet AttrSet ~> AttrSet)
+        op-hook emptyAttrSetSymbol  (none : ~> AttrSet)
+        op-hook attrSetSymbol   (__ : AttrSet AttrSet ~> AttrSet)
 
-        op-hook sortRenamingSymbol	(sort_to_ : Qid Qid ~> Renaming)
-        op-hook opRenamingSymbol	(op_to_[_] : Qid Qid AttrSet ~> Renaming)
-        op-hook opRenamingSymbol2	(op_:_->_to_[_] : Qid TypeList Type Qid AttrSet ~> Renaming)
-        op-hook labelRenamingSymbol	(label_to_ : Qid Qid ~> Renaming)
-        op-hook stratRenamingSymbol	(strat_to_ : Qid Qid ~> Renaming)
-        op-hook stratRenamingSymbol2	(strat_:_@_to_ : Qid Qid TypeList Type ~> Renaming)
-        op-hook renamingSetSymbol	(_,_ : RenamingSet RenamingSet ~> RenamingSet)
+        op-hook sortRenamingSymbol  (sort_to_ : Qid Qid ~> Renaming)
+        op-hook opRenamingSymbol  (op_to_[_] : Qid Qid AttrSet ~> Renaming)
+        op-hook opRenamingSymbol2 (op_:_->_to_[_] : Qid TypeList Type Qid AttrSet ~> Renaming)
+        op-hook labelRenamingSymbol (label_to_ : Qid Qid ~> Renaming)
+        op-hook stratRenamingSymbol (strat_to_ : Qid Qid ~> Renaming)
+        op-hook stratRenamingSymbol2  (strat_:_@_to_ : Qid Qid TypeList Type ~> Renaming)
+        op-hook renamingSetSymbol (_,_ : RenamingSet RenamingSet ~> RenamingSet)
 
-        op-hook sumSymbol		(_+_ : ModuleExpression ModuleExpression ~> ModuleExpression)
-        op-hook renamingSymbol		(_*(_) : ModuleExpression RenamingSet ~> ModuleExpression)
-        op-hook instantiationSymbol	(_{_} : Expression ParameterList ~> Expression)
+        op-hook sumSymbol   (_+_ : ModuleExpression ModuleExpression ~> ModuleExpression)
+        op-hook renamingSymbol    (_*(_) : ModuleExpression RenamingSet ~> ModuleExpression)
+        op-hook instantiationSymbol (_{_} : Expression ParameterList ~> Expression)
 
-        op-hook protectingSymbol	(protecting_. : ModuleExpression ~> Import)
-        op-hook extendingSymbol		(extending_. : ModuleExpression ~> Import)
-        op-hook includingSymbol		(including_. : ModuleExpression ~> Import)
-        op-hook nilImportListSymbol	(nil : ~> ImportList)
-        op-hook importListSymbol	(__ : ImportList ImportList ~> ImportList)
+        op-hook protectingSymbol  (protecting_. : ModuleExpression ~> Import)
+        op-hook extendingSymbol   (extending_. : ModuleExpression ~> Import)
+        op-hook includingSymbol   (including_. : ModuleExpression ~> Import)
+        op-hook nilImportListSymbol (nil : ~> ImportList)
+        op-hook importListSymbol  (__ : ImportList ImportList ~> ImportList)
 
-        op-hook emptySortSetSymbol	(none : ~> SortSet)
-        op-hook sortSetSymbol		(_;_ : SortSet SortSet ~> SortSet)
+        op-hook emptySortSetSymbol  (none : ~> SortSet)
+        op-hook sortSetSymbol   (_;_ : SortSet SortSet ~> SortSet)
 
-        op-hook subsortSymbol		(subsort_<_. : Sort Sort ~> SubsortDecl)
-        op-hook emptySubsortDeclSetSymbol	(none : ~> SubsortDeclSet)
-        op-hook subsortDeclSetSymbol	(__ : SubsortDeclSet SubsortDeclSet ~> SubsortDeclSet)
+        op-hook subsortSymbol   (subsort_<_. : Sort Sort ~> SubsortDecl)
+        op-hook emptySubsortDeclSetSymbol (none : ~> SubsortDeclSet)
+        op-hook subsortDeclSetSymbol  (__ : SubsortDeclSet SubsortDeclSet ~> SubsortDeclSet)
 
-        op-hook nilQidListSymbol	(nil : ~> QidList)
-        op-hook qidListSymbol		(__ : QidList QidList ~> QidList)
+        op-hook nilQidListSymbol  (nil : ~> QidList)
+        op-hook qidListSymbol   (__ : QidList QidList ~> QidList)
 
-        op-hook emptyQidSetSymbol	(none : ~> QidSet)
-        op-hook qidSetSymbol		(_;_ : QidSet QidSet ~> QidSet)
+        op-hook emptyQidSetSymbol (none : ~> QidSet)
+        op-hook qidSetSymbol    (_;_ : QidSet QidSet ~> QidSet)
 
-        op-hook succSymbol		(s_ : Nat ~> NzNat)
-        op-hook natListSymbol		(__ : NeNatList NeNatList ~> NeNatList)
-        op-hook unboundedSymbol		(unbounded : ~> Bound)
-        op-hook noParentSymbol		(none : ~> Parent)
+        op-hook succSymbol    (s_ : Nat ~> NzNat)
+        op-hook natListSymbol   (__ : NeNatList NeNatList ~> NeNatList)
+        op-hook unboundedSymbol   (unbounded : ~> Bound)
+        op-hook noParentSymbol    (none : ~> Parent)
 
-        op-hook stringSymbol		(<Strings> : ~> String)
-        op-hook idHookSymbol		(id-hook : Qid QidList ~> Hook)
-        op-hook opHookSymbol		(op-hook : Qid Qid QidList Qid ~> Hook)
-        op-hook termHookSymbol		(term-hook : Qid Term ~> Hook)
-        op-hook hookListSymbol		(__ : HookList HookList ~> HookList)
+        op-hook stringSymbol    (<Strings> : ~> String)
+        op-hook idHookSymbol    (id-hook : Qid QidList ~> Hook)
+        op-hook opHookSymbol    (op-hook : Qid Qid QidList Qid ~> Hook)
+        op-hook termHookSymbol    (term-hook : Qid Term ~> Hook)
+        op-hook hookListSymbol    (__ : HookList HookList ~> HookList)
 
-        op-hook assocSymbol		(assoc : ~> Attr)
-        op-hook commSymbol		(comm : ~> Attr)
-        op-hook idemSymbol		(idem : ~> Attr)
-        op-hook iterSymbol		(iter : ~> Attr)
-        op-hook idSymbol		(id : Term ~> Attr)
-        op-hook leftIdSymbol		(left-id : Term ~> Attr)
-        op-hook rightIdSymbol		(right-id : Term ~> Attr)
-        op-hook stratSymbol		(strat : NeNatList ~> Attr)
-        op-hook memoSymbol		(memo : ~> Attr)
-        op-hook precSymbol		(prec : Nat ~> Attr)
-        op-hook gatherSymbol		(gather : QidList ~> Attr)
-        op-hook formatSymbol		(format : QidList ~> Attr)
-        op-hook ctorSymbol		(ctor : ~> Attr)
-        op-hook frozenSymbol		(frozen : NeNatList ~> Attr)
-        op-hook polySymbol		(poly : NeNatList ~> Attr)
-        op-hook configSymbol		(config : ~> Attr)
-        op-hook objectSymbol		(object : ~> Attr)
-        op-hook msgSymbol		(msg : ~> Attr)
-        op-hook specialSymbol		(special : NeHookList ~> Attr)
+        op-hook assocSymbol   (assoc : ~> Attr)
+        op-hook commSymbol    (comm : ~> Attr)
+        op-hook idemSymbol    (idem : ~> Attr)
+        op-hook iterSymbol    (iter : ~> Attr)
+        op-hook idSymbol    (id : Term ~> Attr)
+        op-hook leftIdSymbol    (left-id : Term ~> Attr)
+        op-hook rightIdSymbol   (right-id : Term ~> Attr)
+        op-hook stratSymbol   (strat : NeNatList ~> Attr)
+        op-hook memoSymbol    (memo : ~> Attr)
+        op-hook precSymbol    (prec : Nat ~> Attr)
+        op-hook gatherSymbol    (gather : QidList ~> Attr)
+        op-hook formatSymbol    (format : QidList ~> Attr)
+        op-hook ctorSymbol    (ctor : ~> Attr)
+        op-hook frozenSymbol    (frozen : NeNatList ~> Attr)
+        op-hook polySymbol    (poly : NeNatList ~> Attr)
+        op-hook configSymbol    (config : ~> Attr)
+        op-hook objectSymbol    (object : ~> Attr)
+        op-hook msgSymbol   (msg : ~> Attr)
+        op-hook specialSymbol   (special : NeHookList ~> Attr)
 
-        op-hook labelSymbol		(label : Qid ~> Attr)
-        op-hook metadataSymbol		(metadata : String ~> Attr)
-        op-hook owiseSymbol		(owise : ~> Attr)
-        op-hook variantAttrSymbol	(variant : ~> Attr)
-        op-hook narrowingSymbol		(narrowing : ~> Attr)
-        op-hook nonexecSymbol		(nonexec : ~> Attr)
-        op-hook printSymbol		(print : QidList ~> Attr)
+        op-hook labelSymbol   (label : Qid ~> Attr)
+        op-hook metadataSymbol    (metadata : String ~> Attr)
+        op-hook owiseSymbol   (owise : ~> Attr)
+        op-hook variantAttrSymbol (variant : ~> Attr)
+        op-hook narrowingSymbol   (narrowing : ~> Attr)
+        op-hook nonexecSymbol   (nonexec : ~> Attr)
+        op-hook printSymbol   (print : QidList ~> Attr)
 
-        op-hook opDeclSymbol		(op_:_->_[_]. : Qid TypeList Type AttrSet ~> OpDecl)
-        op-hook emptyOpDeclSetSymbol	(none : ~> OpDeclSet)
-        op-hook opDeclSetSymbol		(__ : OpDeclSet OpDeclSet ~> OpDeclSet)
+        op-hook opDeclSymbol    (op_:_->_[_]. : Qid TypeList Type AttrSet ~> OpDecl)
+        op-hook emptyOpDeclSetSymbol  (none : ~> OpDeclSet)
+        op-hook opDeclSetSymbol   (__ : OpDeclSet OpDeclSet ~> OpDeclSet)
 
-        op-hook noConditionSymbol	(nil : ~> EqCondition)
-        op-hook equalityConditionSymbol	(_=_ : Term Term ~> EqCondition)
-        op-hook sortTestConditionSymbol	(_:_ : Term Sort ~> EqCondition)
-        op-hook matchConditionSymbol	(_:=_ : Term Term ~> EqCondition)
-        op-hook rewriteConditionSymbol	(_=>_ : Term Term ~> Condition)
-        op-hook conjunctionSymbol	(_/\_ : Condition Condition ~> Condition)
+        op-hook noConditionSymbol (nil : ~> EqCondition)
+        op-hook equalityConditionSymbol (_=_ : Term Term ~> EqCondition)
+        op-hook sortTestConditionSymbol (_:_ : Term Sort ~> EqCondition)
+        op-hook matchConditionSymbol  (_:=_ : Term Term ~> EqCondition)
+        op-hook rewriteConditionSymbol  (_=>_ : Term Term ~> Condition)
+        op-hook conjunctionSymbol (_/\_ : Condition Condition ~> Condition)
 
-        op-hook mbSymbol		(mb_:_[_]. : Term Sort AttrSet ~> MembAx)
-        op-hook cmbSymbol		(cmb_:_if_[_]. : Term Sort EqCondition AttrSet ~> MembAx)
-        op-hook emptyMembAxSetSymbol	(none : ~> MembAxSet)
-        op-hook membAxSetSymbol		(__ : MembAxSet MembAxSet ~> MembAxSet)
+        op-hook mbSymbol    (mb_:_[_]. : Term Sort AttrSet ~> MembAx)
+        op-hook cmbSymbol   (cmb_:_if_[_]. : Term Sort EqCondition AttrSet ~> MembAx)
+        op-hook emptyMembAxSetSymbol  (none : ~> MembAxSet)
+        op-hook membAxSetSymbol   (__ : MembAxSet MembAxSet ~> MembAxSet)
 
-        op-hook eqSymbol		(eq_=_[_]. : Term Term AttrSet ~> Equation)
-        op-hook ceqSymbol		(ceq_=_if_[_]. : Term Term EqCondition AttrSet ~> Equation)
-        op-hook emptyEquationSetSymbol	(none : ~> EquationSet)
-        op-hook equationSetSymbol	(__ : EquationSet EquationSet ~> EquationSet)
+        op-hook eqSymbol    (eq_=_[_]. : Term Term AttrSet ~> Equation)
+        op-hook ceqSymbol   (ceq_=_if_[_]. : Term Term EqCondition AttrSet ~> Equation)
+        op-hook emptyEquationSetSymbol  (none : ~> EquationSet)
+        op-hook equationSetSymbol (__ : EquationSet EquationSet ~> EquationSet)
 
-        op-hook rlSymbol		(rl_=>_[_]. : Term Term AttrSet ~> Rule)
-        op-hook crlSymbol		(crl_=>_if_[_]. : Term Term Condition AttrSet ~> Rule)
-        op-hook emptyRuleSetSymbol	(none : ~> RuleSet)
-        op-hook ruleSetSymbol		(__ : RuleSet RuleSet ~> RuleSet)
+        op-hook rlSymbol    (rl_=>_[_]. : Term Term AttrSet ~> Rule)
+        op-hook crlSymbol   (crl_=>_if_[_]. : Term Term Condition AttrSet ~> Rule)
+        op-hook emptyRuleSetSymbol  (none : ~> RuleSet)
+        op-hook ruleSetSymbol   (__ : RuleSet RuleSet ~> RuleSet)
 
-	op-hook stratDeclSymbol		(strat_:_@_[_]. : Qid TypeList Type AttrSet ~> StratDecl)
-	op-hook emptyStratDeclSetSymbol (none : ~> StratDeclSet)
-	op-hook stratDeclSetSymbol	(__ : StratDeclSet StratDeclSet ~> StratDeclSet)
+  op-hook stratDeclSymbol   (strat_:_@_[_]. : Qid TypeList Type AttrSet ~> StratDecl)
+  op-hook emptyStratDeclSetSymbol (none : ~> StratDeclSet)
+  op-hook stratDeclSetSymbol  (__ : StratDeclSet StratDeclSet ~> StratDeclSet)
 
-	op-hook sdSymbol		(sd_:=_[_]. : CallStrategy Strategy AttrSet ~> StratDefinition)
-	op-hook csdSymbol
-		(csd_:=_if_[_]. : CallStrategy Strategy Condition AttrSet ~> StratDefinition)
-	op-hook emptyStratDefSetSymbol 	(none : ~> StratDefSet)
-	op-hook stratDefSetSymbol	(__ : StratDefSet StratDefSet ~> StratDefSet)
+  op-hook sdSymbol    (sd_:=_[_]. : CallStrategy Strategy AttrSet ~> StratDefinition)
+  op-hook csdSymbol
+    (csd_:=_if_[_]. : CallStrategy Strategy Condition AttrSet ~> StratDefinition)
+  op-hook emptyStratDefSetSymbol  (none : ~> StratDefSet)
+  op-hook stratDefSetSymbol (__ : StratDefSet StratDefSet ~> StratDefSet)
 
         op-hook fmodSymbol
                 (fmod_is_sorts_.____endfm :
@@ -2514,386 +2514,386 @@ fmod META-LEVEL is
                 (th_is_sorts_._____endth :
                         Qid ImportList SortSet SubsortDeclSet OpDeclSet 
                         MembAxSet EquationSet RuleSet ~> Module)
-	op-hook smodSymbol
-		  (smod_is_sorts_._______endsm :
-			Qid ImportList SortSet SubsortDeclSet OpDeclSet
-			MembAxSet EquationSet RuleSet StratDeclSet StratDefSet ~> StratModule)
-	op-hook sthSymbol
-		  (sth_is_sorts_._______endsth :
-			Qid ImportList SortSet SubsortDeclSet OpDeclSet
-			MembAxSet EquationSet RuleSet StratDeclSet StratDefSet ~> StratModule)
+  op-hook smodSymbol
+      (smod_is_sorts_._______endsm :
+      Qid ImportList SortSet SubsortDeclSet OpDeclSet
+      MembAxSet EquationSet RuleSet StratDeclSet StratDefSet ~> StratModule)
+  op-hook sthSymbol
+      (sth_is_sorts_._______endsth :
+      Qid ImportList SortSet SubsortDeclSet OpDeclSet
+      MembAxSet EquationSet RuleSet StratDeclSet StratDefSet ~> StratModule)
 
-        op-hook sortMappingSymbol	(sort_to_. : Sort Sort ~> SortMapping [ctor] .)
-	op-hook emptySortMappingSetSymbol	(none : ~> SortMappingSet)
-        op-hook sortMappingSetSymbol	(__ : SortMappingSet SortMappingSet ~> SortMappingSet)
+        op-hook sortMappingSymbol (sort_to_. : Sort Sort ~> SortMapping [ctor] .)
+  op-hook emptySortMappingSetSymbol (none : ~> SortMappingSet)
+        op-hook sortMappingSetSymbol  (__ : SortMappingSet SortMappingSet ~> SortMappingSet)
 
-        op-hook opMappingSymbol		(op_to_. : Qid Qid ~> OpMapping)
-        op-hook opSpecificMappingSymbol	(op_:_->_to_. : Qid TypeList Type Qid ~> OpMapping)
-        op-hook opTermMappingSymbol	(op_to`term_. : Term Term ~> OpMapping)
+        op-hook opMappingSymbol   (op_to_. : Qid Qid ~> OpMapping)
+        op-hook opSpecificMappingSymbol (op_:_->_to_. : Qid TypeList Type Qid ~> OpMapping)
+        op-hook opTermMappingSymbol (op_to`term_. : Term Term ~> OpMapping)
 
-	op-hook emptyOpMappingSetSymbol	(none : ~> OpMappingSet)
-        op-hook opMappingSetSymbol	(__ : OpMappingSet OpMappingSet ~> OpMappingSet)
+  op-hook emptyOpMappingSetSymbol (none : ~> OpMappingSet)
+        op-hook opMappingSetSymbol  (__ : OpMappingSet OpMappingSet ~> OpMappingSet)
 
-	op-hook stratMappingSymbol	(strat_to_. : Qid Qid ~> StratMapping)
-        op-hook stratSpecificMappingSymbol	(strat_:_@_to_. : Qid TypeList Type Qid ~> StratMapping)
-        op-hook stratExprMappingSymbol	(strat_to expr_. : CallStrategy Strategy ~> StratMapping)
+  op-hook stratMappingSymbol  (strat_to_. : Qid Qid ~> StratMapping)
+        op-hook stratSpecificMappingSymbol  (strat_:_@_to_. : Qid TypeList Type Qid ~> StratMapping)
+        op-hook stratExprMappingSymbol  (strat_to expr_. : CallStrategy Strategy ~> StratMapping)
 
-        op-hook emptyStratMappingSetSymbol	(none : ~> StratMappingSet)
-        op-hook stratMappingSetSymbol	(__ : StratMappingSet StratMappingSet ~> StratMappingSet)
+        op-hook emptyStratMappingSetSymbol  (none : ~> StratMappingSet)
+        op-hook stratMappingSetSymbol (__ : StratMappingSet StratMappingSet ~> StratMappingSet)
 
         op-hook viewSymbol
                 (view_from_to_is___endv : Header ModuleExpression ModuleExpression
                  SortMappingSet OpMappingSet StratMappingSet ~> View)
 
-        op-hook anyTypeSymbol		(anyType : ~> Type?)
+        op-hook anyTypeSymbol   (anyType : ~> Type?)
 
-	op-hook unificandPairSymbol	(_=?_ : Term Term ~> UnificandPair)
+  op-hook unificandPairSymbol (_=?_ : Term Term ~> UnificandPair)
         op-hook unificationConjunctionSymbol
                 (_/\_ : UnificationProblem UnificationProblem ~> UnificationProblem)
 
-        op-hook resultPairSymbol	({_,_} : Term Type ~> ResultPair)
-        op-hook resultTripleSymbol	({_,_,_} : Term Type Substitution ~> ResultTriple)
-        op-hook result4TupleSymbol	({_,_,_,_} : Term Type Substitution Context ~> Result4Tuple)
-        op-hook matchPairSymbol		({_,_} : Substitution Context ~> MatchPair)
-        op-hook unificationTripleSymbol	({_,_,_} : Substitution Substitution Qid ~> UnificationTriple)
-        op-hook variantSymbol		({_,_,_,_,_} : Term Substitution Qid Parent Bool ~> Variant)
+        op-hook resultPairSymbol  ({_,_} : Term Type ~> ResultPair)
+        op-hook resultTripleSymbol  ({_,_,_} : Term Type Substitution ~> ResultTriple)
+        op-hook result4TupleSymbol  ({_,_,_,_} : Term Type Substitution Context ~> Result4Tuple)
+        op-hook matchPairSymbol   ({_,_} : Substitution Context ~> MatchPair)
+        op-hook unificationTripleSymbol ({_,_,_} : Substitution Substitution Qid ~> UnificationTriple)
+        op-hook variantSymbol   ({_,_,_,_,_} : Term Substitution Qid Parent Bool ~> Variant)
         op-hook narrowingApplyResultSymbol
-		({_,_,_,_,_,_,_} : Term Type Context Qid Substitution Substitution Qid ~> NarrowingApplyResult)
+    ({_,_,_,_,_,_,_} : Term Type Context Qid Substitution Substitution Qid ~> NarrowingApplyResult)
         op-hook narrowingSearchResultSymbol
-		({_,_,_,_,_,_} : Term Type Substitution Qid Substitution Qid ~> NarrowingSearchResult)
+    ({_,_,_,_,_,_} : Term Type Substitution Qid Substitution Qid ~> NarrowingSearchResult)
         op-hook narrowingSearchPathResultSymbol
-		({_,_,_,_,_,_} : Term Type Substitution NarrowingTrace Substitution Qid ~> NarrowingSearchPathResult)
+    ({_,_,_,_,_,_} : Term Type Substitution NarrowingTrace Substitution Qid ~> NarrowingSearchPathResult)
 
         op-hook narrowingStepSymbol
-		({_,_,_,_,_,_,_} : Context Qid Substitution Qid Term Type Substitution ~> NarrowingStep)
-        op-hook nilNarrowingTraceSymbol		(nil : ~> NarrowingTrace)
-        op-hook narrowingTraceSymbol		(__ : NarrowingTrace NarrowingTrace ~> NarrowingTrace)
+    ({_,_,_,_,_,_,_} : Context Qid Substitution Qid Term Type Substitution ~> NarrowingStep)
+        op-hook nilNarrowingTraceSymbol   (nil : ~> NarrowingTrace)
+        op-hook narrowingTraceSymbol    (__ : NarrowingTrace NarrowingTrace ~> NarrowingTrace)
 
-        op-hook smtResultSymbol		({_,_,_,_} : Term Substitution Term Nat ~> SmtResult)
+        op-hook smtResultSymbol   ({_,_,_,_} : Term Substitution Term Nat ~> SmtResult)
 
-        op-hook traceStepSymbol		({_,_,_} : Term Type Rule ~> TraceStep)
-        op-hook nilTraceSymbol		(nil : ~> Trace)
-        op-hook traceSymbol		(__ : Trace Trace ~> Trace)
+        op-hook traceStepSymbol   ({_,_,_} : Term Type Rule ~> TraceStep)
+        op-hook nilTraceSymbol    (nil : ~> Trace)
+        op-hook traceSymbol   (__ : Trace Trace ~> Trace)
 
-        op-hook noParseSymbol		(noParse : Nat ~> ResultPair?)
-        op-hook ambiguitySymbol		(ambiguity : ResultPair ResultPair ~> ResultPair?)
-        op-hook failure2Symbol		(failure : ~> ResultPair?)
-        op-hook failure3Symbol		(failure : ~> ResultTriple?)
-        op-hook failureIncomplete3Symbol	(failureIncomplete : ~> ResultTriple?)
-        op-hook failure4Symbol		(failure : ~> Result4Tuple?)
-        op-hook noUnifierPairSymbol	(noUnifier : ~> UnificationPair?)
-        op-hook noUnifierTripleSymbol	(noUnifier : ~> UnificationTriple?)
-        op-hook noUnifierIncompletePairSymbol	(noUnifierIncomplete : ~> UnificationPair?)
-        op-hook noUnifierIncompleteTripleSymbol	(noUnifierIncomplete : ~> UnificationTriple?)
-        op-hook noVariantSymbol		(noVariant : ~> Variant?)
-        op-hook noVariantIncompleteSymbol	(noVariantIncomplete : ~> Variant?)
-        op-hook narrowingApplyFailureSymbol		(failure : ~> NarrowingApplyResult?)
-        op-hook narrowingApplyFailureIncompleteSymbol	(failureIncomplete : ~> NarrowingApplyResult?)
-        op-hook narrowingSearchFailureSymbol		(failure : ~> NarrowingSearchResult?)
-        op-hook narrowingSearchFailureIncompleteSymbol	(failureIncomplete : ~> NarrowingSearchResult?)
-        op-hook narrowingSearchPathFailureSymbol		(failure : ~> NarrowingSearchPathResult?)
-        op-hook narrowingSearchPathFailureIncompleteSymbol	(failureIncomplete : ~> NarrowingSearchPathResult?)
-        op-hook noMatchSubstSymbol	(noMatch : ~> Substitution?)
-        op-hook noMatchPairSymbol	(noMatch : ~> MatchPair?)
-        op-hook failureTraceSymbol	(failure : ~> Trace?)
-        op-hook smtFailureSymbol	(failure : ~> SmtResult?)
-        op-hook noStratParseSymbol	(noStratParse : Nat ~> Strategy?)
-        op-hook stratAmbiguitySymbol	(ambiguity : Strategy Strategy ~> Strategy?)
+        op-hook noParseSymbol   (noParse : Nat ~> ResultPair?)
+        op-hook ambiguitySymbol   (ambiguity : ResultPair ResultPair ~> ResultPair?)
+        op-hook failure2Symbol    (failure : ~> ResultPair?)
+        op-hook failure3Symbol    (failure : ~> ResultTriple?)
+        op-hook failureIncomplete3Symbol  (failureIncomplete : ~> ResultTriple?)
+        op-hook failure4Symbol    (failure : ~> Result4Tuple?)
+        op-hook noUnifierPairSymbol (noUnifier : ~> UnificationPair?)
+        op-hook noUnifierTripleSymbol (noUnifier : ~> UnificationTriple?)
+        op-hook noUnifierIncompletePairSymbol (noUnifierIncomplete : ~> UnificationPair?)
+        op-hook noUnifierIncompleteTripleSymbol (noUnifierIncomplete : ~> UnificationTriple?)
+        op-hook noVariantSymbol   (noVariant : ~> Variant?)
+        op-hook noVariantIncompleteSymbol (noVariantIncomplete : ~> Variant?)
+        op-hook narrowingApplyFailureSymbol   (failure : ~> NarrowingApplyResult?)
+        op-hook narrowingApplyFailureIncompleteSymbol (failureIncomplete : ~> NarrowingApplyResult?)
+        op-hook narrowingSearchFailureSymbol    (failure : ~> NarrowingSearchResult?)
+        op-hook narrowingSearchFailureIncompleteSymbol  (failureIncomplete : ~> NarrowingSearchResult?)
+        op-hook narrowingSearchPathFailureSymbol    (failure : ~> NarrowingSearchPathResult?)
+        op-hook narrowingSearchPathFailureIncompleteSymbol  (failureIncomplete : ~> NarrowingSearchPathResult?)
+        op-hook noMatchSubstSymbol  (noMatch : ~> Substitution?)
+        op-hook noMatchPairSymbol (noMatch : ~> MatchPair?)
+        op-hook failureTraceSymbol  (failure : ~> Trace?)
+        op-hook smtFailureSymbol  (failure : ~> SmtResult?)
+        op-hook noStratParseSymbol  (noStratParse : Nat ~> Strategy?)
+        op-hook stratAmbiguitySymbol  (ambiguity : Strategy Strategy ~> Strategy?)
 
-        op-hook mixfixSymbol		(mixfix : ~> PrintOption)
-        op-hook withParensSymbol	(with-parens : ~> PrintOption)
-        op-hook flatSymbol		(flat : ~> PrintOption)
-        op-hook formatPrintOptionSymbol	(format : ~> PrintOption)
-        op-hook numberSymbol		(number : ~> PrintOption)
-        op-hook ratSymbol		(rat : ~> PrintOption)
-        op-hook emptyPrintOptionSetSymbol	(none : ~> PrintOptionSet)
-        op-hook printOptionSetSymbol	(__ : PrintOptionSet PrintOptionSet ~> PrintOptionSet)
+        op-hook mixfixSymbol    (mixfix : ~> PrintOption)
+        op-hook withParensSymbol  (with-parens : ~> PrintOption)
+        op-hook flatSymbol    (flat : ~> PrintOption)
+        op-hook formatPrintOptionSymbol (format : ~> PrintOption)
+        op-hook numberSymbol    (number : ~> PrintOption)
+        op-hook ratSymbol   (rat : ~> PrintOption)
+        op-hook emptyPrintOptionSetSymbol (none : ~> PrintOptionSet)
+        op-hook printOptionSetSymbol  (__ : PrintOptionSet PrintOptionSet ~> PrintOptionSet)
 
-	op-hook breadthFirstSymbol	(breadthFirst : ~>  SrewriteOption)
-	op-hook depthFirstSymbol	(depthFirst : ~>  SrewriteOption)
+  op-hook breadthFirstSymbol  (breadthFirst : ~>  SrewriteOption)
+  op-hook depthFirstSymbol  (depthFirst : ~>  SrewriteOption)
 
-        op-hook legacyUnificationPairSymbol	({_,_} : Substitution Nat ~> UnificationPair)
-        op-hook legacyUnificationTripleSymbol	({_,_,_} : Substitution Substitution Nat ~> UnificationTriple)
-        op-hook legacyVariantSymbol		({_,_,_,_,_} : Term Substitution Nat Parent Bool ~> Variant)
+        op-hook legacyUnificationPairSymbol ({_,_} : Substitution Nat ~> UnificationPair)
+        op-hook legacyUnificationTripleSymbol ({_,_,_} : Substitution Substitution Nat ~> UnificationTriple)
+        op-hook legacyVariantSymbol   ({_,_,_,_,_} : Term Substitution Nat Parent Bool ~> Variant)
 
-        term-hook trueTerm		(true)
-        term-hook falseTerm		(false))] .
+        term-hook trueTerm    (true)
+        term-hook falseTerm   (false))] .
 
   op metaNormalize : Module Term ~> ResultPair
         [special (
-           id-hook MetaLevelOpSymbol	(metaNormalize)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaNormalize)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaRewrite : Module Term Bound ~> ResultPair
         [special (
-           id-hook MetaLevelOpSymbol	(metaRewrite)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaRewrite)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaFrewrite : Module Term Bound Nat ~> ResultPair
         [special (
-           id-hook MetaLevelOpSymbol	(metaFrewrite)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaFrewrite)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaApply : Module Term Qid Substitution Nat ~> ResultTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(metaApply)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaApply)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaXapply : Module Term Qid Substitution Nat Bound Nat ~> Result4Tuple?
         [special (
-           id-hook MetaLevelOpSymbol	(metaXapply)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaXapply)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaMatch : Module Term Term Condition Nat ~> Substitution?
         [special (
-           id-hook MetaLevelOpSymbol	(metaMatch)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaMatch)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaXmatch : Module Term Term Condition Nat Bound Nat ~> MatchPair?
         [special (
-           id-hook MetaLevelOpSymbol	(metaXmatch)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaXmatch)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaUnify : Module UnificationProblem Qid Nat ~> UnificationPair?
         [special (
-           id-hook MetaLevelOpSymbol	(metaUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaDisjointUnify : Module UnificationProblem Qid Nat ~> UnificationTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(metaDisjointUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaDisjointUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaSearch : Module Term Term Condition Qid Bound Nat ~> ResultTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(metaSearch)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaSearch)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaSearchPath : Module Term Term Condition Qid Bound Nat ~> Trace?
         [special (
-           id-hook MetaLevelOpSymbol	(metaSearchPath)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaSearchPath)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaNarrow : Module Term Term Qid Bound Nat ~> ResultTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(metaNarrow)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaNarrow)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaNarrow : Module Term Qid Bound Bool Nat ~> ResultPair?
         [special (
-           id-hook MetaLevelOpSymbol	(metaNarrow2)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaNarrow2)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaGetVariant : Module Term TermList Qid Nat ~> Variant?
         [special (
-           id-hook MetaLevelOpSymbol	(metaGetVariant)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaGetVariant)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaGetIrredundantVariant : Module Term TermList Qid Nat ~> Variant?
         [special (
-           id-hook MetaLevelOpSymbol	(metaGetIrredundantVariant)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaGetIrredundantVariant)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaVariantUnify : Module UnificationProblem TermList Qid Nat ~> UnificationPair?
         [special (
-           id-hook MetaLevelOpSymbol	(metaVariantUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaVariantUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaVariantDisjointUnify : Module UnificationProblem TermList Qid Nat ~> UnificationTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(metaVariantDisjointUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaVariantDisjointUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaNarrowingApply : Module Term TermList Qid Nat -> NarrowingApplyResult?
-	[special (
-	   id-hook MetaLevelOpSymbol	(metaNarrowingApply)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+  [special (
+     id-hook MetaLevelOpSymbol  (metaNarrowingApply)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaNarrowingSearch : Module Term Term Qid Bound Qid Nat -> NarrowingSearchResult?
-	[special (
-	   id-hook MetaLevelOpSymbol	(metaNarrowingSearch)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+  [special (
+     id-hook MetaLevelOpSymbol  (metaNarrowingSearch)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaNarrowingSearchPath : Module Term Term Qid Bound Qid Nat -> NarrowingSearchPathResult?
-	[special (
-	   id-hook MetaLevelOpSymbol	(metaNarrowingSearchPath)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+  [special (
+     id-hook MetaLevelOpSymbol  (metaNarrowingSearchPath)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaSrewrite : Module Term Strategy SrewriteOption Nat ~> ResultPair?
-	[special (
-	   id-hook MetaLevelOpSymbol	(metaSrewrite)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+  [special (
+     id-hook MetaLevelOpSymbol  (metaSrewrite)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaParseStrategy : Module VariableSet QidList ~> Strategy?
         [special (
-           id-hook MetaLevelOpSymbol	(metaParseStrategy)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaParseStrategy)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaPrettyPrintStrategy : Module VariableSet Strategy PrintOptionSet ~> QidList
         [special (
-           id-hook MetaLevelOpSymbol	(metaPrettyPrintStrategy)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaPrettyPrintStrategy)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op sortLeq : Module Type Type ~> Bool
         [special (
-           id-hook MetaLevelOpSymbol	(metaSortLeq)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaSortLeq)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op sameKind : Module Type Type ~> Bool
         [special (
-           id-hook MetaLevelOpSymbol	(metaSameKind)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaSameKind)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op lesserSorts : Module Type ~> SortSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaLesserSorts)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaLesserSorts)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op glbSorts : Module Type Type ~> TypeSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaGlbSorts)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaGlbSorts)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op leastSort : Module Term ~> Type
         [special (
-           id-hook MetaLevelOpSymbol	(metaLeastSort)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaLeastSort)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op completeName : Module Type ~> Type
         [special (
-           id-hook MetaLevelOpSymbol	(metaCompleteName)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaCompleteName)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaParse : Module VariableSet QidList Type? ~> ResultPair?
         [special (
-           id-hook MetaLevelOpSymbol	(metaParse)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaParse)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaPrettyPrint : Module VariableSet Term PrintOptionSet ~> QidList
         [special (
-           id-hook MetaLevelOpSymbol	(metaPrettyPrint)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaPrettyPrint)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaCheck : Module Term ~> Bool 
         [special (
-           id-hook MetaLevelOpSymbol	(metaCheck)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaCheck)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaSmtSearch : Module Term Term Condition Qid Nat Bound Nat ~> SmtResult?
         [special (
-           id-hook MetaLevelOpSymbol	(metaSmtSearch)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaSmtSearch)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op wellFormed : Module -> Bool
         [special (
-           id-hook MetaLevelOpSymbol	(metaWellFormedModule)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaWellFormedModule)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op wellFormed : Module Term ~> Bool
         [special (
-           id-hook MetaLevelOpSymbol	(metaWellFormedTerm)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaWellFormedTerm)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op wellFormed : Module Substitution ~> Bool
         [special (
-           id-hook MetaLevelOpSymbol	(metaWellFormedSubstitution)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaWellFormedSubstitution)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op getKind : Module Type ~> Kind
         [special (
-           id-hook MetaLevelOpSymbol	(metaGetKind)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaGetKind)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op getKinds : Module ~> KindSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaGetKinds)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaGetKinds)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op maximalSorts : Module Kind ~> SortSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaMaximalSorts)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaMaximalSorts)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op minimalSorts : Module Kind ~> SortSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaMinimalSorts)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaMinimalSorts)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op maximalAritySet : Module Qid TypeList Sort ~> TypeListSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaMaximalAritySet)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaMaximalAritySet)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upModule : Qid Bool ~> Module
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpModule)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpModule)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upImports : Qid ~> ImportList
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpImports)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpImports)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upSorts : Qid Bool ~> SortSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpSorts)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpSorts)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upSubsortDecls : Qid Bool ~> SubsortDeclSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpSubsortDecls)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpSubsortDecls)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upOpDecls : Qid Bool ~> OpDeclSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpOpDecls)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpOpDecls)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upMbs : Qid Bool ~> MembAxSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpMbs)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpMbs)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upEqs : Qid Bool ~> EquationSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpEqs)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpEqs)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upRls : Qid Bool ~> RuleSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpRls)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpRls)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upStratDecls : Qid Bool ~> StratDeclSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpStratDecls)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpStratDecls)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upSds : Qid Bool ~> StratDefSet
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpSds)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpSds)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upView : Qid ~> View
         [special (
-           id-hook MetaLevelOpSymbol	(metaUpView)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpView)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op upTerm : Universal -> Term
         [poly (1)
          special (
-           id-hook MetaLevelOpSymbol	(metaUpTerm)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaUpTerm)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op downTerm : Term Universal -> Universal
         [poly (2 0)
          special (
-           id-hook MetaLevelOpSymbol	(metaDownTerm)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (metaDownTerm)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
 ***
-***	For backward compatibility only.
-***	These operators are deprecated - do not use in new code.
+*** For backward compatibility only.
+*** These operators are deprecated - do not use in new code.
 ***
 
   op {_,_} : Substitution Nat -> UnificationPair [ctor] .
@@ -2911,58 +2911,58 @@ fmod META-LEVEL is
 
   op metaUnify : Module UnificationProblem Nat Nat ~> UnificationPair?
         [special (
-           id-hook MetaLevelOpSymbol	(legacyMetaUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (legacyMetaUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaDisjointUnify : Module UnificationProblem Nat Nat ~> UnificationTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(legacyMetaDisjointUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (legacyMetaDisjointUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaGetVariant : Module Term TermList Nat Nat ~> Variant?
         [special (
-           id-hook MetaLevelOpSymbol	(legacyMetaGetVariant)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (legacyMetaGetVariant)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaGetIrredundantVariant : Module Term TermList Nat Nat ~> Variant?
         [special (
-           id-hook MetaLevelOpSymbol	(legacyMetaGetIrredundantVariant)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (legacyMetaGetIrredundantVariant)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaVariantUnify : Module UnificationProblem TermList Nat Nat ~> UnificationPair?
         [special (
-           id-hook MetaLevelOpSymbol	(legacyMetaVariantUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (legacyMetaVariantUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 
   op metaVariantDisjointUnify : Module UnificationProblem TermList Nat Nat ~> UnificationTriple?
         [special (
-           id-hook MetaLevelOpSymbol	(legacyMetaVariantDisjointUnify)
-           op-hook shareWith		(metaReduce : Module Term ~> ResultPair))] .
+           id-hook MetaLevelOpSymbol  (legacyMetaVariantDisjointUnify)
+           op-hook shareWith    (metaReduce : Module Term ~> ResultPair))] .
 endfm
 
 ***
-***	Lexical module.
+*** Lexical module.
 ***
 
 fmod LEXICAL is
   protecting QID-LIST .
   op printTokens : QidList -> String
-        [special (id-hook QuotedIdentifierOpSymbol	(printTokens)
-                  op-hook stringSymbol			(<Strings> : ~> String)
-                  op-hook quotedIdentifierSymbol	(<Qids> : ~> Qid)
-		  op-hook nilQidListSymbol		(nil : ~> QidList)
-		  op-hook qidListSymbol			(__ : QidList QidList ~> QidList))] .
+        [special (id-hook QuotedIdentifierOpSymbol  (printTokens)
+                  op-hook stringSymbol      (<Strings> : ~> String)
+                  op-hook quotedIdentifierSymbol  (<Qids> : ~> Qid)
+      op-hook nilQidListSymbol    (nil : ~> QidList)
+      op-hook qidListSymbol     (__ : QidList QidList ~> QidList))] .
 
   op tokenize : String -> QidList
-	[special (id-hook QuotedIdentifierOpSymbol	(tokenize)
-                  op-hook stringSymbol			(<Strings> : ~> String)
-                  op-hook quotedIdentifierSymbol	(<Qids> : ~> Qid)
-		  op-hook nilQidListSymbol		(nil : ~> QidList)
-		  op-hook qidListSymbol			(__ : QidList QidList ~> QidList))] .
+  [special (id-hook QuotedIdentifierOpSymbol  (tokenize)
+                  op-hook stringSymbol      (<Strings> : ~> String)
+                  op-hook quotedIdentifierSymbol  (<Qids> : ~> Qid)
+      op-hook nilQidListSymbol    (nil : ~> QidList)
+      op-hook qidListSymbol     (__ : QidList QidList ~> QidList))] .
 endfm
 
 ***
-***	System modules.
+*** System modules.
 ***
 
 mod COUNTER is
@@ -2978,9 +2978,9 @@ mod LOOP-MODE is
   op [_,_,_] : QidList State QidList -> System 
         [ctor special (
            id-hook LoopSymbol
-           op-hook qidSymbol		(<Qids> : ~> Qid)
-           op-hook nilQidListSymbol	(nil : ~> QidList)
-           op-hook qidListSymbol	(__ : QidList QidList ~> QidList))] .
+           op-hook qidSymbol    (<Qids> : ~> Qid)
+           op-hook nilQidListSymbol (nil : ~> QidList)
+           op-hook qidListSymbol  (__ : QidList QidList ~> QidList))] .
 endm
 
 mod CONFIGURATION is

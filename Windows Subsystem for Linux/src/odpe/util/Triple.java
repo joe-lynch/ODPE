@@ -22,26 +22,26 @@ package odpe.util;
 
 public class Triple <Fst, Snd, Thrd> {
 
-	public Fst fst;
-	public Snd snd;
-	public Thrd thrd;
-	
-	public Triple(Fst fst, Snd snd, Thrd thrd) {
-		this.fst = fst;
-		this.snd = snd;
-		this.thrd = thrd;
-	}
-	
-	public Triple() {
-		this.fst = null;
-		this.snd = null;
-		this.thrd = null;
-	}
-	
-	public void copy(Triple<Fst, Snd, Thrd> q) {
-		this.fst = q.fst;
-		this.snd = q.snd;
-		this.thrd = q.thrd;
-	}
+    public Fst fst;
+    public Snd snd;
+    public Thrd thrd;
+    
+    public Triple(Fst fst, Snd snd, Thrd thrd) {
+        this.fst = fst;
+        this.snd = snd;
+        this.thrd = thrd;
+    }
+    
+    public Triple() {
+        this.fst = null;
+        this.snd = null;
+        this.thrd = null;
+    }
+    
+    public void copy(Triple<Fst, Snd, Thrd> q) {
+        this.fst = q.fst;
+        this.snd = q.snd;
+        this.thrd = q.thrd;
+    }
 
 }

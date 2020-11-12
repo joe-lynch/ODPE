@@ -67,8 +67,8 @@ fmod S-REP is
     if not ( atm :: NegAtom ) .
 
   ceq R ( [ A , B ] ) = [ R( A ) , R( B ) ]
-	   if not ( A :: Unit ) /\ not ( B :: Unit ) .
-	
+     if not ( A :: Unit ) /\ not ( B :: Unit ) .
+  
   eq R ( U1 ) = U1 .
 
 endfm

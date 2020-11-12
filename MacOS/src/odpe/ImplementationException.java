@@ -27,16 +27,16 @@ package odpe;
  */
 
 public class ImplementationException extends Exception {
-	
-	private static final long serialVersionUID = 1L;
+    
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 *  Constructs an implementation exception from an error message.
-	 * 
-	 * @param msg the error message
-	 */
-	public ImplementationException(String msg) {
-		super(msg);
-	}
+    /**
+     *  Constructs an implementation exception from an error message.
+     * 
+     * @param msg the error message
+     */
+    public ImplementationException(String msg) {
+        super(msg);
+    }
 
 }

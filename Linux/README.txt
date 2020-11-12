@@ -222,11 +222,11 @@ Please see KSg.maude and KSg-maude.xml for examples.
 Within Maude files the structure is as follows:
 
 fmod 
-	- Grammar of the proof system
+    - Grammar of the proof system
 endm
 
 mod
-	- Rules of the proof system
+    - Rules of the proof system
 endm
 
 ======================================================================

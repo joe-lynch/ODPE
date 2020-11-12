@@ -31,85 +31,85 @@ import odpe.frontend.ast.Node;
  */
 
 public class Parser {
-	
-	/** The table of operators, indexed by precedence. */
-	private Operator[] operators;
-	
-	/** Maximum precedence allowed. */
-	private final static int MAX_PRECEDENCE = 255;
-	
-	/** Constructs a Parser and allocates its operator table. */
-	public Parser() {
-		operators = new Operator[MAX_PRECEDENCE+1];
-	}
-	
-	/**
-	 * Adds an operator. Operators know about their own
-	 * precedence, hence it can be extracted from the object.
-	 * The method checks whether the precedence is sensible
-	 * (i.e., <code>&gt;=0</code> and <code>&lt;=MAX_PRECEDENCE</code>,
-	 * and that there is not already an operator with that
-	 * precedence; otherwise, an exception is thrown.
-	 * 
-	 * @param op the operator to be added
-	 * @throws InvalidPrecedenceException
-	 */
+    
+    /** The table of operators, indexed by precedence. */
+    private Operator[] operators;
+    
+    /** Maximum precedence allowed. */
+    private final static int MAX_PRECEDENCE = 255;
+    
+    /** Constructs a Parser and allocates its operator table. */
+    public Parser() {
+        operators = new Operator[MAX_PRECEDENCE+1];
+    }
+    
+    /**
+     * Adds an operator. Operators know about their own
+     * precedence, hence it can be extracted from the object.
+     * The method checks whether the precedence is sensible
+     * (i.e., <code>&gt;=0</code> and <code>&lt;=MAX_PRECEDENCE</code>,
+     * and that there is not already an operator with that
+     * precedence; otherwise, an exception is thrown.
+     * 
+     * @param op the operator to be added
+     * @throws InvalidPrecedenceException
+     */
 
-	public void addOperator(Operator op) throws InvalidPrecedenceException {
-		int prec = op.getPrecedence();
-		if(0 <= prec && prec <= MAX_PRECEDENCE)
-			if(operators[prec] == null)
-				operators[prec] = op;
-			else
-				throw new InvalidPrecedenceException("multiple operators with same precedence ("+prec+"): "+
-						operators[prec]+" and "+op);
-		else
-			throw new InvalidPrecedenceException("precedence out of range");
-	}
+    public void addOperator(Operator op) throws InvalidPrecedenceException {
+        int prec = op.getPrecedence();
+        if(0 <= prec && prec <= MAX_PRECEDENCE)
+            if(operators[prec] == null)
+                operators[prec] = op;
+            else
+                throw new InvalidPrecedenceException("multiple operators with same precedence ("+prec+"): "+
+                        operators[prec]+" and "+op);
+        else
+            throw new InvalidPrecedenceException("precedence out of range");
+    }
 
-	/**
-	 * Parses input provided by a {@link Lexer}, starting at
-	 * a given precedence.
-	 * @param l the lexer to use
-	 * @param prec the precedence to start from; if -1, then parsing starts from <code>MAX_PRECEDENCE</code>
-	 * @return the parsed node
-	 * @throws ParseError
-	 */
-	public Node parse(Lexer l, int prec) throws ParseError {
-		int i;
-		if(prec == -1)
-			prec = MAX_PRECEDENCE;
-		for(i=prec; i>=0 && operators[i]==null; --i) ;
-		if(i < 0)
-			throw new ParseError("no matching operator definition found");
-		return operators[i].parse(l, this);
-	}
-	
-	/**
-	 * Parses input provided by a {@link Lexer}, starting at the
-	 * highest priority.
-	 * @param l the lexer to use
-	 * @return the parsed node
-	 * @throws ParseError
-	 */
-	public Node parse(Lexer l) throws ParseError {
-		return parse(l, MAX_PRECEDENCE);
-	}
+    /**
+     * Parses input provided by a {@link Lexer}, starting at
+     * a given precedence.
+     * @param l the lexer to use
+     * @param prec the precedence to start from; if -1, then parsing starts from <code>MAX_PRECEDENCE</code>
+     * @return the parsed node
+     * @throws ParseError
+     */
+    public Node parse(Lexer l, int prec) throws ParseError {
+        int i;
+        if(prec == -1)
+            prec = MAX_PRECEDENCE;
+        for(i=prec; i>=0 && operators[i]==null; --i) ;
+        if(i < 0)
+            throw new ParseError("no matching operator definition found");
+        return operators[i].parse(l, this);
+    }
+    
+    /**
+     * Parses input provided by a {@link Lexer}, starting at the
+     * highest priority.
+     * @param l the lexer to use
+     * @return the parsed node
+     * @throws ParseError
+     */
+    public Node parse(Lexer l) throws ParseError {
+        return parse(l, MAX_PRECEDENCE);
+    }
 
-	/**
-	 * Parses a given input string using a {@link Lexer}, starting
-	 * at the highest priority.
-	 * @param str the string to parse
-	 * @param l the lexer to use
-	 * @return the parsed node
-	 * @throws ParseError
-	 */
-	public Node parse(String str, Lexer l) throws ParseError {
-		l.start(str);
-		Node res = parse(l, MAX_PRECEDENCE);
-		if(!l.current().equals("") && !l.current().equals(">"))
-			throw new ParseError("unexpected token: `"+l.current()+"'");
-		return res;
-	}
+    /**
+     * Parses a given input string using a {@link Lexer}, starting
+     * at the highest priority.
+     * @param str the string to parse
+     * @param l the lexer to use
+     * @return the parsed node
+     * @throws ParseError
+     */
+    public Node parse(String str, Lexer l) throws ParseError {
+        l.start(str);
+        Node res = parse(l, MAX_PRECEDENCE);
+        if(!l.current().equals("") && !l.current().equals(">"))
+            throw new ParseError("unexpected token: `"+l.current()+"'");
+        return res;
+    }
 
 }

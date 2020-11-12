@@ -29,21 +29,21 @@ mod KSg-Inf is
   var R A B C D : Structure .
 
   rl  [i_down]  : [ atm , - atm ]                =>   tt .
-  rl  [s]       : [ { A , C } , B ]   		 =>   { [ A , B ] , C } .
+  rl  [s]       : [ { A , C } , B ]        =>   { [ A , B ] , C } .
   rl  [m]       : { [ A , C ] , [ B , D ] }  =>   [ { A , B } , { C , D } ] .
   rl  [c_down]  : R                         =>   [ R , R ] .
-  rl  [c_up]    : { A , A }             	 =>   A .
+  rl  [c_up]    : { A , A }                =>   A .
   rl  [w_down]  : R                          =>   ff .
 
   ***(
-  rl  [i-down]  : [ atm , - atm ]          	=>   tt .
-  rl  [s]       : [ { R , T } , U ]    		=>   { [ R , U ] , T } .
-  rl  [w-down]  : R                    		=>   ff .
-  rl  [c-down]  : atm                  	 	=>   [ atm , atm ] .
+  rl  [i-down]  : [ atm , - atm ]           =>   tt .
+  rl  [s]       : [ { R , T } , U ]       =>   { [ R , U ] , T } .
+  rl  [w-down]  : R                       =>   ff .
+  rl  [c-down]  : atm                     =>   [ atm , atm ] .
   rl  [c-up]    : { atm, atm }              =>   atm .
-  rl  [tt-dis]  : [ tt , tt ]            	=>   tt .
-  rl  [ff-con]  : { ff, ff }	         	=>   ff .
-  rl  [tt-elim] : { atm , tt }             	=>   atm .
+  rl  [tt-dis]  : [ tt , tt ]             =>   tt .
+  rl  [ff-con]  : { ff, ff }            =>   ff .
+  rl  [tt-elim] : { atm , tt }              =>   atm .
   )
 
 endm
@@ -60,7 +60,7 @@ mod KSg-Inf-Reverse is
   rl  [s-r]       : { [ R , U ] , T }    =>   [ { R , T } , U ] .
   rl  [w-up-r]    : R                    =>   tt .
   rl  [c-down-r]  : [ R , R ]            =>    R .
-  rl  [c-up-r]    : R         		 	 =>   { R , R } .
+  rl  [c-up-r]    : R                =>   { R , R } .
 
 endm
 

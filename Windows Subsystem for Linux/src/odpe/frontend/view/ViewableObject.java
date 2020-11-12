@@ -8,11 +8,11 @@
 package odpe.frontend.view;
 
 public abstract class ViewableObject {
-	
-	public abstract WidgetView getGraphicalView();
-	
-	public abstract String getTextInputView();
-	
-	public abstract String getTextOutputView();
-	
+    
+    public abstract WidgetView getGraphicalView();
+    
+    public abstract String getTextInputView();
+    
+    public abstract String getTextOutputView();
+    
 }

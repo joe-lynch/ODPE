@@ -11,10 +11,10 @@ import odpe.frontend.model.InferenceSystem;
 
 
 public abstract class OperandPosition extends Operator {
-	
-	protected OperandPosition(String id, InferenceSystem sys, 
-			int prec) {
-		super(id, sys, prec);
-	}
-	
+    
+    protected OperandPosition(String id, InferenceSystem sys, 
+            int prec) {
+        super(id, sys, prec);
+    }
+    
 }

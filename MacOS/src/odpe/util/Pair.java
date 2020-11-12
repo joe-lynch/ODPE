@@ -21,23 +21,23 @@
 package odpe.util;
 
 public class Pair <Fst, Snd> {
-	
-	public Fst fst;
-	public Snd snd;
-	
-	public Pair(Fst fst, Snd snd) {
-		this.fst = fst;
-		this.snd = snd;
-	}
-	
-	public Pair() {
-		this.fst = null;
-		this.snd = null;
-	}
-	
-	public void copy(Pair<Fst, Snd> q) {
-		this.fst = q.fst;
-		this.snd = q.snd;
-	}
+    
+    public Fst fst;
+    public Snd snd;
+    
+    public Pair(Fst fst, Snd snd) {
+        this.fst = fst;
+        this.snd = snd;
+    }
+    
+    public Pair() {
+        this.fst = null;
+        this.snd = null;
+    }
+    
+    public void copy(Pair<Fst, Snd> q) {
+        this.fst = q.fst;
+        this.snd = q.snd;
+    }
 
 }

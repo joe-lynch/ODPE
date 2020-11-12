@@ -5,103 +5,103 @@
 ]>
 
 <system name="KSg" subatomic-name="SAM">
-	<normal>
-		<syntax>
-			<unary-prefix  symbol="-" input="-"/>
-			<binary-outfix id="dis" symbol="[&vel;]" input="[,]"/>
-			<binary-outfix id="copar" symbol="(&wedge;)" input="(,)"/>
-			<constant      symbol="tt"/>
-			<constant      symbol="ff"/>
-			<constant      symbol="t"/>
-			<constants     symbols="a b c d e f g h i j"/>
-			<constant      symbol="a&one;"   input="a1"/>
-			<constant symbol="&phi;&one;" input="phi1"/>
-			<constant symbol="&phi;&two;" input="phi2"/>
-			<constant symbol="&phi;&three;" input="phi3"/>
-			<constant symbol="&phi;&four;" input="phi4"/>
-			<constant symbol="&phi;&five;" input="phi5"/>
-			<constant symbol="&phi;&six;" input="phi6"/>
-			<constant symbol="&phi;&seven;" input="phi7"/>
-			<constant symbol="&phi;&eight;" input="phi8"/>
-			<constant symbol="&phi;&nine;" input="phi9"/>
-			<constant symbol="&phi;&one;&zero;" input="phi10"/>
-			<constant symbol="&phi;&one;&one;" input="phi11"/>
-			<constant symbol="&phi;&one;&two;" input="phi12"/>
-			<constant symbol="&phi;&one;&three;" input="phi13"/>
-			<constant symbol="&phi;&one;&four;" input="phi14"/>
-			<constant symbol="&phi;&one;&five;" input="phi15"/>
-			<constant symbol="&phi;&one;&six;" input="phi16"/>
+    <normal>
+        <syntax>
+            <unary-prefix  symbol="-" input="-"/>
+            <binary-outfix id="dis" symbol="[&vel;]" input="[,]"/>
+            <binary-outfix id="copar" symbol="(&wedge;)" input="(,)"/>
+            <constant      symbol="tt"/>
+            <constant      symbol="ff"/>
+            <constant      symbol="t"/>
+            <constants     symbols="a b c d e f g h i j"/>
+            <constant      symbol="a&one;"   input="a1"/>
+            <constant symbol="&phi;&one;" input="phi1"/>
+            <constant symbol="&phi;&two;" input="phi2"/>
+            <constant symbol="&phi;&three;" input="phi3"/>
+            <constant symbol="&phi;&four;" input="phi4"/>
+            <constant symbol="&phi;&five;" input="phi5"/>
+            <constant symbol="&phi;&six;" input="phi6"/>
+            <constant symbol="&phi;&seven;" input="phi7"/>
+            <constant symbol="&phi;&eight;" input="phi8"/>
+            <constant symbol="&phi;&nine;" input="phi9"/>
+            <constant symbol="&phi;&one;&zero;" input="phi10"/>
+            <constant symbol="&phi;&one;&one;" input="phi11"/>
+            <constant symbol="&phi;&one;&two;" input="phi12"/>
+            <constant symbol="&phi;&one;&three;" input="phi13"/>
+            <constant symbol="&phi;&one;&four;" input="phi14"/>
+            <constant symbol="&phi;&one;&five;" input="phi15"/>
+            <constant symbol="&phi;&one;&six;" input="phi16"/>
 
 
-		</syntax>
-		  
-		<rules>
-			<inference-rule id="i_down"  name="i&downarrow;"/>
-			<inference-rule 			 name="s"/> 
-			<inference-rule id="w_down"  name="w&downarrow;"/>
-			<inference-rule id="c_down"  name="c&downarrow;"/>
-			<inference-rule id="c_up"    name="c&uparrow;"/>
-			<inference-rule 			 name="tt-dis" />
-			<inference-rule 			 name="ff-con"/>
-			<inference-rule 			 name="tt-elim"/>
-			<inference-rule id="equality" name="="/>
-			<inference-rule id="nowt" name=" "/>
+        </syntax>
+          
+        <rules>
+            <inference-rule id="i_down"  name="i&downarrow;"/>
+            <inference-rule              name="s"/> 
+            <inference-rule id="w_down"  name="w&downarrow;"/>
+            <inference-rule id="c_down"  name="c&downarrow;"/>
+            <inference-rule id="c_up"    name="c&uparrow;"/>
+            <inference-rule              name="tt-dis" />
+            <inference-rule              name="ff-con"/>
+            <inference-rule              name="tt-elim"/>
+            <inference-rule id="equality" name="="/>
+            <inference-rule id="nowt" name=" "/>
 
-			<reverse-inference-rule id="i-up-r"	 name="i&uparrow;"/>
-			<reverse-inference-rule id="s-r"	 name="s"/>
-			<reverse-inference-rule id="w-up-r"	 name="w&uparrow;"/>
-			<reverse-inference-rule id="c-up-r"	 name="c&uparrow;"/>
-			<reverse-inference-rule id="c-down-r"	 name="c&downarrow;"/>	
-		</rules>
-	</normal>
-	 
-	<subatomic>
-		<syntax>
-			<constant	   symbol="ff"/>
-			<constant 	   symbol="tt"/>
-		</syntax>
-		  
-		<rules>
-			<inference-rule id="eq" name="="/>
-			<inference-rule id="a_down" name="a&downarrow;"/>
-			<inference-rule id="a_up" name="a&uparrow;"/>
-			<inference-rule id="conj_down" name="&wedge;&downarrow;"/>
-			<inference-rule id="disj_up" name="&vel;&uparrow;"/>
-			<inference-rule id="m" name="m"/>
-			<inference-rule id="ac" name="ac"/>
-			<inference-rule id="acc" name="acc"/>
-			<inference-rule id="c_down" name="c&downarrow;"/>
-			<inference-rule id="c_up" name="c&uparrow;"/>
-				
-			<reverse-inference-rule id="eq-r" name="="/>
-			<reverse-inference-rule id="a-down-r" name="a&downarrow;"/>
-			<reverse-inference-rule id="a-up-r" name="a&uparrow;"/>
-			<reverse-inference-rule id="conj-down-r" name="&wedge;&downarrow;"/>
-			<reverse-inference-rule id="disj-up-r" name="&vel;&uparrow;"/>
-			<reverse-inference-rule id="m-r" name="m"/>
-			<reverse-inference-rule id="ac-r" name="ac"/>
-			<reverse-inference-rule id="acc-r" name="acc"/>
-			<reverse-inference-rule id="c-down-r" name="c&downarrow;"/>
-			<reverse-inference-rule id="c-up-r" name="c&uparrow;"/>
-		</rules>
-	</subatomic>
+            <reverse-inference-rule id="i-up-r"  name="i&uparrow;"/>
+            <reverse-inference-rule id="s-r"     name="s"/>
+            <reverse-inference-rule id="w-up-r"  name="w&uparrow;"/>
+            <reverse-inference-rule id="c-up-r"  name="c&uparrow;"/>
+            <reverse-inference-rule id="c-down-r"    name="c&downarrow;"/>  
+        </rules>
+    </normal>
+     
+    <subatomic>
+        <syntax>
+            <constant      symbol="ff"/>
+            <constant      symbol="tt"/>
+        </syntax>
+          
+        <rules>
+            <inference-rule id="eq" name="="/>
+            <inference-rule id="a_down" name="a&downarrow;"/>
+            <inference-rule id="a_up" name="a&uparrow;"/>
+            <inference-rule id="conj_down" name="&wedge;&downarrow;"/>
+            <inference-rule id="disj_up" name="&vel;&uparrow;"/>
+            <inference-rule id="m" name="m"/>
+            <inference-rule id="ac" name="ac"/>
+            <inference-rule id="acc" name="acc"/>
+            <inference-rule id="c_down" name="c&downarrow;"/>
+            <inference-rule id="c_up" name="c&uparrow;"/>
+                
+            <reverse-inference-rule id="eq-r" name="="/>
+            <reverse-inference-rule id="a-down-r" name="a&downarrow;"/>
+            <reverse-inference-rule id="a-up-r" name="a&uparrow;"/>
+            <reverse-inference-rule id="conj-down-r" name="&wedge;&downarrow;"/>
+            <reverse-inference-rule id="disj-up-r" name="&vel;&uparrow;"/>
+            <reverse-inference-rule id="m-r" name="m"/>
+            <reverse-inference-rule id="ac-r" name="ac"/>
+            <reverse-inference-rule id="acc-r" name="acc"/>
+            <reverse-inference-rule id="c-down-r" name="c&downarrow;"/>
+            <reverse-inference-rule id="c-up-r" name="c&uparrow;"/>
+        </rules>
+    </subatomic>
   
-	<backend class="odpe.backend.odpe2maude.ODPE2Maude">
-		<load name="sam.maude"/>
-		<load name="s.maude"/>
-		<load name="strat.maude"/>
-		<load name="ksg.maude"/>
-		<inferencer name="KSg-Meta"/>
-		<reverseinferencer name="KSg-Meta-Reverse"/>
-		<sa_inferencer name="SAM-Meta"/>
-		<sa_reverseinferencer name="SAM-Meta-Reverse"/>
-		<normalizer name="NNF"/>
-		<subatomiser name="SAM-Meta"/>
-		<interpreter name="S-INT"/>
-		<maudename id="dis" name="[_,_]"/>
-		<maudename id="copar" name="{_,_}"/>
-		<result-sort name="Structure"/>
-	</backend>
+    <backend class="odpe.backend.odpe2maude.ODPE2Maude">
+        <load name="sam.maude"/>
+        <load name="s.maude"/>
+        <load name="strat.maude"/>
+        <load name="ksg.maude"/>
+        <inferencer name="KSg-Meta"/>
+        <reverseinferencer name="KSg-Meta-Reverse"/>
+        <sa_inferencer name="SAM-Meta"/>
+        <sa_reverseinferencer name="SAM-Meta-Reverse"/>
+        <normalizer name="NNF"/>
+        <subatomiser name="SAM-Meta"/>
+        <interpreter name="S-INT"/>
+        <maudename id="dis" name="[_,_]"/>
+        <maudename id="copar" name="{_,_}"/>
+        <result-sort name="Structure"/>
+    </backend>
 
 
 </system>

@@ -47,7 +47,7 @@ fmod Util is
 
   op findRewrites : Term Qid QidList -> RewritingSet .
   op findRewritesForRule : Term Qid Qid Nat -> RewritingSet .
-  op extractRewriting : Term Qid Result4Tuple -> RewritingSet .	
+  op extractRewriting : Term Qid Result4Tuple -> RewritingSet . 
   op extractTermList : Term -> TermList .
   op getElements : Term -> Term .
 
@@ -267,10 +267,10 @@ fmod Util is
   eq findRewrites(Trm, M, nil) = empty .
   
   eq findRewritesForRule(Trm, M, Q, N) =
-  	if  metaXapply([M], Trm, Q, none, 0, unbounded, N) == failure
-  	then empty
-  	else extractRewriting(Trm, Q, metaXapply([M], Trm, Q, none, 0, unbounded, N)),
-  	     findRewritesForRule(Trm, M, Q, N + 1)
+    if  metaXapply([M], Trm, Q, none, 0, unbounded, N) == failure
+    then empty
+    else extractRewriting(Trm, Q, metaXapply([M], Trm, Q, none, 0, unbounded, N)),
+         findRewritesForRule(Trm, M, Q, N + 1)
           fi .
 
 *** gets the formulae of a ground term without the connective stuff
@@ -284,29 +284,29 @@ fmod Util is
 
   eq extractRewriting(Trm, Q, {Trm2, Tp, Subst, Ctxt}) =
     if Q == 'tt-norm then
-		if extractTermList(Trm2) =/= 'tt.Unit then
-    		findRewritesForRule(Trm2, 'KSg-Meta, 'tt-norm, 0)
-    	else
-    		rewriting(Q, Ctxt, extractTermList(Trm2))
-    	fi
+    if extractTermList(Trm2) =/= 'tt.Unit then
+        findRewritesForRule(Trm2, 'KSg-Meta, 'tt-norm, 0)
+      else
+        rewriting(Q, Ctxt, extractTermList(Trm2))
+      fi
     else
-    	if Q == 'tt-elim then
-    		if contains('tt.Unit, getElements(extractTermList(Trm2))) then
-    			findRewritesForRule(Trm2, 'KSg-Meta, 'tt-elim, 0)
-    		else
-    			rewriting(Q, Ctxt, extractTermList(Trm2))
-    		fi
-    	else
-    		if Trm == Trm2 or Ctxt =/= [] then
-    			empty
-    		else
-    			rewriting(Q, Ctxt, extractTermList(Trm2))
-    		fi
-    	fi
+      if Q == 'tt-elim then
+        if contains('tt.Unit, getElements(extractTermList(Trm2))) then
+          findRewritesForRule(Trm2, 'KSg-Meta, 'tt-elim, 0)
+        else
+          rewriting(Q, Ctxt, extractTermList(Trm2))
+        fi
+      else
+        if Trm == Trm2 or Ctxt =/= [] then
+          empty
+        else
+          rewriting(Q, Ctxt, extractTermList(Trm2))
+        fi
+      fi
     fi .
 
   eq extractTermList(Q[TL]) =
-	if Q == '_;_ then TL else Q[TL] fi .
+  if Q == '_;_ then TL else Q[TL] fi .
 
 *** C is constant, V is variable
   eq extractTermList(C) = C .
